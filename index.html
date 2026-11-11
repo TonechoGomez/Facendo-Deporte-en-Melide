@@ -10,31 +10,31 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        /* PALETA SUAVE Y ALEGRE BASADA EN EL ESCUDO DE MELIDE */
-        .bg-melide-fondo { background-color: #eaf1f8; }         /* Azul cielo muy suave y luminoso */
-        .bg-melide-cajon { background-color: #dce7f5; }        /* Azul pastel suave para tarjetas */
-        .text-melide-azul { color: #1b365d; }                  /* Azul institucional del escudo */
-        .bg-melide-azul { background-color: #1b365d; }
-        .border-melide-dorado { border-color: #d4af37; }       /* Dorado de la corona del escudo */
-        .text-melide-dorado { color: #b8860b; }
-        .bg-melide-rojo { background-color: #b91c1c; }         /* Rojo gules del escudo */
+        /* COLORES VIVOS BASADOS EN EL ESCUDO (SIN BLANCO) */
+        .bg-melide-fondo { background-color: #cce0f5; }         /* Azul cielo alegre y vivo */
+        .bg-melide-cajon { background-color: #b3d1f2; }        /* Azul pastel más intenso para tarjetas */
+        .text-melide-azul { color: #102a4c; }                  /* Azul marino institucional profundo */
+        .bg-melide-azul { background-color: #102a4c; }
+        .border-melide-dorado { border-color: #e5b80b; }       /* Dorado vivo de la corona */
+        .text-melide-dorado { color: #8a6d0b; }
+        .bg-melide-rojo { background-color: #d32f2f; }         /* Rojo gules vivo */
     </style>
 </head>
-<body class="bg-melide-fondo text-slate-800 min-h-screen flex flex-col justify-between p-3">
+<body class="bg-melide-fondo text-slate-900 min-h-screen flex flex-col justify-between p-3">
 
-    <!-- CABECERA CON EL ESCUDO OFICIAL ARRIBA A LA IZQUIERDA -->
-    <header class="bg-melide-cajon p-3.5 rounded-2xl border-2 border-amber-400 shadow-sm flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <!-- Contenedor del escudo oficial local con el nombre exacto del archivo -->
-            <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center p-1 border-2 border-amber-400 shadow-sm flex-shrink-0 overflow-hidden">
-                <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" class="h-full object-contain">
+    <!-- CABECERA CON EL ESCUDO GRANDE ARRIBA A LA IZQUIERDA -->
+    <header class="bg-melide-cajon p-4 rounded-2xl border-2 border-amber-500 shadow-md flex items-center justify-between">
+        <div class="flex items-center gap-3.5">
+            <!-- Contenedor del escudo grande y limpio -->
+            <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center p-1 border-2 border-amber-500 shadow-md flex-shrink-0 overflow-hidden">
+                <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" class="w-full h-full object-contain">
             </div>
             <div>
                 <h1 class="font-extrabold text-base text-melide-azul leading-tight tracking-wide">DEPORTE MELIDE</h1>
-                <p class="text-xs font-bold text-melide-dorado uppercase tracking-wider">Concello de Melide</p>
+                <p class="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Concello de Melide</p>
             </div>
         </div>
-        <span id="badge-sesion" class="text-xs bg-emerald-200 text-emerald-900 font-bold px-3 py-1 rounded-full border border-emerald-300 hidden">
+        <span id="badge-sesion" class="text-xs bg-emerald-300 text-emerald-950 font-extrabold px-3 py-1.5 rounded-full border-2 border-emerald-500 hidden">
             Activo
         </span>
     </header>
@@ -43,51 +43,51 @@
     <main class="flex-1 my-3 flex flex-col justify-center">
 
         <!-- VISTA 1: INGRESO -->
-        <div id="view-ingreso" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-400 shadow-md flex flex-col justify-between min-h-[72vh]">
+        <div id="view-ingreso" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-500 shadow-lg flex flex-col justify-between min-h-[72vh]">
             <div class="space-y-2">
-                <span class="text-xs uppercase tracking-widest font-extrabold text-melide-dorado block">Iniciativa Municipal</span>
+                <span class="text-xs uppercase tracking-widest font-extrabold text-amber-900 block">Iniciativa Municipal</span>
                 <h2 class="text-2xl font-extrabold text-melide-azul leading-tight">Acceso al Programa</h2>
-                <p class="text-xs text-slate-700">Empieza a tu ritmo en las instalaciones de la villa o desde tu casa.</p>
+                <p class="text-xs text-slate-800 font-medium">Empieza a tu ritmo en las instalaciones de la villa o desde tu casa.</p>
             </div>
 
             <form id="form-ingreso" onsubmit="handleIngreso(event)" class="space-y-5 my-auto">
                 <div>
-                    <label class="block text-xs font-extrabold text-slate-700 uppercase mb-2">Tu Identificador o Correo</label>
-                    <input type="text" id="input-usuario" placeholder="Ej. vecino@melide.gal" class="w-full px-5 py-4 rounded-2xl bg-white border-2 border-slate-300 text-slate-900 placeholder-slate-400 text-base font-bold focus:border-amber-500 outline-none transition" required>
+                    <label class="block text-xs font-extrabold text-melide-azul uppercase mb-2">Tu Identificador o Correo</label>
+                    <input type="text" id="input-usuario" placeholder="Ej. vecino@melide.gal" class="w-full px-5 py-4 rounded-2xl bg-blue-50 border-2 border-blue-300 text-slate-900 placeholder-slate-500 text-base font-bold focus:border-amber-600 outline-none transition shadow-inner" required>
                 </div>
 
                 <div class="space-y-3">
-                    <button type="submit" class="w-full bg-melide-azul hover:bg-blue-900 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full bg-melide-azul hover:bg-slate-900 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md border-b-4 border-slate-950 flex items-center justify-center gap-2">
                         <span>ENTRAR (YA TENGO CUENTA)</span>
                         <span>→</span>
                     </button>
-                    <button type="button" onclick="goToAlta()" class="w-full bg-melide-rojo hover:bg-red-700 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md flex items-center justify-center gap-2">
+                    <button type="button" onclick="goToAlta()" class="w-full bg-melide-rojo hover:bg-red-800 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md border-b-4 border-red-950 flex items-center justify-center gap-2">
                         <span>PRIMERA VEZ (NUEVA ALTA)</span>
                         <span>+</span>
                     </button>
                 </div>
             </form>
 
-            <p class="text-center text-xs text-slate-600 font-medium">Servicio gratuito para usuarios del Concello</p>
+            <p class="text-center text-xs text-slate-800 font-bold">Servicio gratuito para usuarios del Concello</p>
         </div>
 
         <!-- VISTA 2: FORMULARIO ALTA NUEVA -->
-        <div id="view-alta" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-400 shadow-md flex flex-col justify-between min-h-[75vh] hidden">
+        <div id="view-alta" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-500 shadow-lg flex flex-col justify-between min-h-[75vh] hidden">
             <div class="space-y-2">
-                <span class="text-xs uppercase tracking-widest font-extrabold text-melide-dorado block">Cuestionario Inicial</span>
+                <span class="text-xs uppercase tracking-widest font-extrabold text-amber-900 block">Cuestionario Inicial</span>
                 <h2 class="text-2xl font-extrabold text-melide-azul">Datos para tu rutina</h2>
-                <p class="text-xs text-slate-700">Responde a estas preguntas para personalizar tu plan.</p>
+                <p class="text-xs text-slate-800 font-medium">Responde a estas preguntas para personalizar tu plan.</p>
             </div>
 
             <form onsubmit="completeAlta(event)" class="space-y-4 my-auto">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre o Alias</label>
-                    <input type="text" placeholder="¿Cómo quieres que te llamemos?" class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-300 text-slate-900 text-sm outline-none focus:border-amber-500" required>
+                    <label class="block text-xs font-bold text-melide-azul uppercase mb-1">Nombre o Alias</label>
+                    <input type="text" placeholder="¿Cómo quieres que te llamemos?" class="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-300 text-slate-900 text-sm font-bold outline-none focus:border-amber-600 shadow-inner" required>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Franja de Edad</label>
-                    <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-300 text-slate-900 text-sm outline-none focus:border-amber-500">
+                    <label class="block text-xs font-bold text-melide-azul uppercase mb-1">Franja de Edad</label>
+                    <select class="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-300 text-slate-900 text-sm font-bold outline-none focus:border-amber-600 shadow-inner">
                         <option>Niños (6-12 años)</option>
                         <option>Adolescentes (13-17 años)</option>
                         <option selected>Adultos (18-64 años)</option>
@@ -97,8 +97,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Espacio de Entrenamiento</label>
-                    <select class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-300 text-slate-900 text-sm outline-none focus:border-amber-500">
+                    <label class="block text-xs font-bold text-melide-azul uppercase mb-1">Espacio de Entrenamiento</label>
+                    <select class="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-300 text-slate-900 text-sm font-bold outline-none focus:border-amber-600 shadow-inner">
                         <option>Gimnasio Municipal</option>
                         <option>En casa (Sin material)</option>
                         <option>En casa (Con material básico)</option>
@@ -106,48 +106,48 @@
                     </select>
                 </div>
 
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md">
+                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md border-b-4 border-emerald-950">
                     GUARDAR Y CREAR SESIÓN
                 </button>
             </form>
 
-            <button onclick="logout()" class="text-xs text-slate-700 underline text-center font-bold">Volver al inicio</button>
+            <button onclick="logout()" class="text-xs text-melide-azul underline text-center font-extrabold">Volver al inicio</button>
         </div>
 
         <!-- VISTA 3: SELECCIÓN DE SESIÓN -->
-        <div id="view-principal" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-400 shadow-md flex flex-col justify-between min-h-[75vh] hidden">
-            <div class="flex justify-between items-center border-b border-slate-300 pb-4">
+        <div id="view-principal" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-500 shadow-lg flex flex-col justify-between min-h-[75vh] hidden">
+            <div class="flex justify-between items-center border-b-2 border-blue-300/60 pb-4">
                 <div>
-                    <span class="text-xs font-extrabold text-melide-dorado uppercase block">Menú Principal</span>
+                    <span class="text-xs font-extrabold text-amber-900 uppercase block">Menú Principal</span>
                     <h2 class="text-xl font-extrabold text-melide-azul" id="saludo-usuario">Hola</h2>
                 </div>
-                <button onclick="logout()" class="text-xs bg-white text-red-700 border border-red-300 px-3 py-1.5 rounded-xl font-bold">Salir</button>
+                <button onclick="logout()" class="text-xs bg-blue-50 text-red-700 border-2 border-red-300 px-3 py-1.5 rounded-xl font-extrabold">Salir</button>
             </div>
 
             <!-- OPCIONES DE PANTALLA COMPLETA -->
             <div class="space-y-4 my-auto">
-                <button onclick="alert('Cargando la sesión personalizada de hoy...')" class="w-full text-left p-5 rounded-2xl bg-amber-100 border-2 border-amber-400 hover:bg-amber-200 transition flex flex-col gap-2 shadow-sm">
-                    <span class="text-xs font-extrabold text-melide-dorado uppercase tracking-wider">Plan personalizado</span>
+                <button onclick="alert('Cargando la sesión personalizada de hoy...')" class="w-full text-left p-5 rounded-2xl bg-amber-200/90 border-2 border-amber-500 hover:bg-amber-300 transition flex flex-col gap-2 shadow-md">
+                    <span class="text-xs font-extrabold text-amber-950 uppercase tracking-wider">Plan personalizado</span>
                     <span class="text-lg font-extrabold text-melide-azul">🏋️‍♂️ Iniciar Sesión de Hoy</span>
-                    <span class="text-xs text-slate-700">15 min • Adaptada a tu nivel y espacio</span>
+                    <span class="text-xs text-slate-800 font-medium">15 min • Adaptada a tu nivel y espacio</span>
                 </button>
 
-                <button onclick="alert('Abriendo selector de instalaciones...')" class="w-full text-left p-5 rounded-2xl bg-white border-2 border-slate-300 hover:border-amber-500 transition flex flex-col gap-2 shadow-sm">
+                <button onclick="alert('Abriendo selector de instalaciones...')" class="w-full text-left p-5 rounded-2xl bg-blue-50 border-2 border-blue-300 hover:border-amber-500 transition flex flex-col gap-2 shadow-md">
                     <span class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Configuración</span>
                     <span class="text-lg font-extrabold text-melide-azul">📍 Cambiar de Espacio</span>
-                    <span class="text-xs text-slate-700">Gimnasio municipal, casa o parques de la villa</span>
+                    <span class="text-xs text-slate-800 font-medium">Gimnasio municipal, casa o parques de la villa</span>
                 </button>
             </div>
 
-            <div class="p-3 bg-white/60 rounded-xl border border-slate-300 text-center">
-                <p class="text-xs text-slate-700">¿Necesitas ayuda? Contacta con el equipo técnico deportivo del Concello.</p>
+            <div class="p-3 bg-blue-100 rounded-xl border-2 border-blue-300 text-center">
+                <p class="text-xs text-slate-800 font-semibold">¿Necesitas ayuda? Contacta con el equipo técnico deportivo del Concello.</p>
             </div>
         </div>
 
     </main>
 
     <!-- PIE -->
-    <footer class="text-center py-2 text-xs text-slate-700 font-bold">
+    <footer class="text-center py-2 text-xs text-melide-azul font-extrabold">
         Concello de Melide
     </footer>
 
