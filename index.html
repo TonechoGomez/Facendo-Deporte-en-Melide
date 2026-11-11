@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad Física - Concello de Melide</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        /* Colores institucionales basados en el escudo histórico de Melide (Azules institucionales y acentos dorados/rojos sutiles) */
+        .bg-melide-blue { background-color: #1b365d; }
+        .text-melide-blue { color: #1b365d; }
+        .border-melide-blue { border-color: #1b365d; }
+        .bg-melide-accent { background-color: #d97706; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- CABECERA INSTITUCIONAL CON ESCUDO -->
+    <header class="bg-melide-blue text-white p-4 shadow-md flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <!-- Representación del escudo / Sello municipal -->
+            <div class="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center font-bold text-slate-900 border-2 border-white shadow">
+                M
+            </div>
+            <div>
+                <h1 class="font-bold text-base leading-tight">Concello de Melide</h1>
+                <p class="text-xs text-slate-200">Deporte Inclusivo</p>
+            </div>
+        </div>
+        <span id="user-status-badge" class="text-xs bg-blue-900/60 px-2.5 py-1 rounded-full text-slate-200 hidden">Sesión activa</span>
+    </header>
+
+    <!-- CONTENEDOR DINÁMICO (UNA SOLA PANTALLA) -->
+    <main class="flex-1 max-w-md w-full mx-auto p-4 flex flex-col justify-center">
+
+        <!-- VISTA 1: IDENTIFICACIÓN / INGRESO -->
+        <div id="view-ingreso" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-xl font-bold text-melide-blue">Acceso al Programa</h2>
+                <p class="text-xs text-slate-500">Inicia sesión o regístrate para comenzar a moverte a tu ritmo, sin presiones.</p>
+            </div>
+
+            <form id="form-ingreso" onsubmit="handleIngreso(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Correo electrónico o DNI</label>
+                    <input type="text" id="input-usuario" placeholder="Ej. usuario@melide.gal" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-blue-800 outline-none" required>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <button type="submit" name="accion" value="existente" class="w-full bg-melide-blue hover:bg-blue-900 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+                        Ya tengo cuenta (Entrar)
+                    </button>
+                    <button type="button" onclick="goToAlta()" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-semibold py-2.5 rounded-xl text-sm transition shadow">
+                        Es mi primera vez (Alta Nueva)
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- VISTA 2: CUESTIONARIO DE ALTA NUEVA -->
+        <div id="view-alta" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5 hidden">
+            <div>
+                <h2 class="text-lg font-bold text-melide-blue">Configura tu perfil</h2>
+                <p class="text-xs text-slate-500">Cuéntanos un poco sobre ti para adaptar los ejercicios.</p>
+            </div>
+
+            <form onsubmit="completeAlta(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre o Alias</label>
+                    <input type="text" placeholder="¿Cómo quieres que te llamemos?" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Franja de Edad</label>
+                    <select class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm bg-white outline-none">
+                        <option>Niños (6-12 años)</option>
+                        <option>Adolescentes (13-17 años)</option>
+                        <option selected>Adultos (18-64 años)</option>
+                        <option>Mayores (65-75 años)</option>
+                        <option>Muy Mayores (+75 años)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">¿Dónde prefieres entrenar?</label>
+                    <select class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm bg-white outline-none">
+                        <option>Gimnasio Municipal</option>
+                        <option>En casa (Con material básico)</option>
+                        <option>En casa (Sin material / Peso corporal)</option>
+                        <option>Al aire libre (Rutas y parques de Melide)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-melide-blue hover:bg-blue-900 text-white font-semibold py-2.5 rounded-xl text-sm transition">
+                    Guardar y Empezar
+                </button>
+            </form>
+        </div>
+
+        <!-- VISTA 3: MENÚ PRINCIPAL (USUARIO LOGUEADO) -->
+        <div id="view-principal" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5 hidden">
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <h2 class="text-base font-bold text-melide-blue" id="saludo-usuario">Hola de nuevo</h2>
+                    <p class="text-xs text-slate-500">¿Qué te apetece hacer hoy?</p>
+                </div>
+                <button onclick="logout()" class="text-xs text-red-600 font-semibold hover:underline">Salir</button>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="alert('Cargando sesión personalizada para hoy...')" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-blue-900 bg-slate-50 hover:bg-blue-50/30 transition flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-sm text-slate-800 block">Iniciar sesión de hoy</span>
+                        <span class="text-xs text-slate-500">15 min • Suave y sin material</span>
+                    </div>
+                    <span class="text-melide-blue font-bold">→</span>
+                </button>
+
+                <button onclick="alert('Abriendo selector de instalaciones...')" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-blue-900 bg-slate-50 hover:bg-blue-50/30 transition flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-sm text-slate-800 block">Cambiar de instalación / espacio</span>
+                        <span class="text-xs text-slate-500">Gimnasio, casa o parque</span>
+                    </div>
+                    <span class="text-melide-blue font-bold">→</span>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PIE DISCRETO -->
+    <footer class="text-center py-4 text-xs text-slate-400">
+        Concello de Melide • Iniciativa Deportiva Accesible
+    </footer>
+
+    <script>
+        // Lógica de navegación en una sola pantalla
+        function handleIngreso(event) {
+            event.preventDefault();
+            const usuario = document.getElementById('input-usuario').value;
+            document.getElementById('saludo-usuario').innerText = `Hola, ${usuario}`;
+            
+            // Ocultar ingreso, mostrar menú principal
+            document.getElementById('view-ingreso').classList.add('hidden');
+            document.getElementById('view-principal').classList.remove('hidden');
+            document.getElementById('user-status-badge').classList.remove('hidden');
+        }
+
+        function goToAlta() {
+            document.getElementById('view-ingreso').classList.add('hidden');
+            document.getElementById('view-alta').classList.remove('hidden');
+        }
+
+        function completeAlta(event) {
+            event.preventDefault();
+            document.getElementById('view-alta').classList.add('hidden');
+            document.getElementById('view-principal').classList.remove('hidden');
+            document.getElementById('user-status-badge').classList.remove('hidden');
+        }
+
+        function logout() {
+            document.getElementById('view-principal').classList.add('hidden');
+            document.getElementById('view-alta').classList.add('hidden');
+            document.getElementById('view-ingreso').classList.remove('hidden');
+            document.getElementById('user-status-badge').classList.add('hidden');
+            document.getElementById('input-usuario').value = '';
+        }
+    </script>
+</body>
+</html>
