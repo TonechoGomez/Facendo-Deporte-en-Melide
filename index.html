@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Deporte Inclusivo - Concello de Melide</title>
+    <title>Facendo Deporte en Melide - Concello de Melide</title>
     
     <link rel="icon" type="image/png" href="favicon.png">
 
@@ -99,8 +99,8 @@
     <header id="main-header">
         <button class="header-btn" id="btn-atras" onclick="irA('scr-inicio')" style="display: none;">&#8592;</button>
         <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="concello-de-melide.jpeg" alt="Logo" style="height: 40px; border-radius: 8px; object-fit: contain;">
-            <span style="font-weight: bold; letter-spacing: 1px; font-size: 1rem;">DEPORTE MELIDE</span>
+            <img src="concello-de-melide.jpeg" alt="Logo" style="height: 44px; border-radius: 6px; object-fit: contain;">
+            <span style="font-weight: bold; letter-spacing: 0.5px; font-size: 0.95rem;">FACENDO DEPORTE EN MELIDE</span>
         </div>
         <div style="display: flex; align-items: center; gap: 5px;">
             <button class="header-btn" onclick="toggleFullScreen()" title="Pantalla completa">&#x26F6;</button>
@@ -111,8 +111,10 @@
     <!-- PANTALLA 1: INICIO DE SESIÓN Y ACCESO A REGISTRO -->
     <div id="scr-inicio" class="screen active">
         <div class="login-box">
-            <img src="concello-de-melide.jpeg" alt="Logo" style="width: 90px; height: 90px; border-radius: 16px; margin-bottom: 20px; object-fit: contain; border: 2px solid var(--melide-accent);">
-            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.4rem;">Acceso Vecinos</h2>
+            <!-- Escudo grande y limpio sin recuadro amarillo -->
+            <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" style="width: 240px; max-width: 85%; height: auto; margin-bottom: 18px; border-radius: 12px; object-fit: contain;">
+            
+            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.35rem; letter-spacing: 0.5px;">FACENDO DEPORTE EN MELIDE</h2>
             
             <form onsubmit="handleLogin(event)">
                 <input type="text" id="login-user" placeholder="Usuario / Correo" class="form-control" required>
