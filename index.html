@@ -127,7 +127,7 @@
 
             <div style="border-top: 2px solid #93c5fd; padding-top: 15px; margin-top: 5px;">
                 <p style="font-size: 0.85rem; color: #1e293b; margin-bottom: 10px;">¿Primera vez en el programa?</p>
-                <button type="button" class="btn-main btn-registro" onclick="irA('scr-registro')">REGISTRO NUEVO</button>
+                <button type="button" class="btn-main btn-registro" onclick="abrirRegistro()">REGISTRO NUEVO</button>
             </div>
         </div>
     </div>
@@ -139,7 +139,7 @@
             
             <div id="reg-error" class="error-msg"></div>
 
-            <form onsubmit="handleRegistro(event)" style="text-align: left;">
+            <form id="form-registro" onsubmit="handleRegistro(event)" style="text-align: left;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div><label class="form-label">Nombre *</label><input type="text" id="reg-nombre" class="form-control" placeholder="Tu nombre" required></div>
                     <div><label class="form-label">Apellidos *</label><input type="text" id="reg-apellidos" class="form-control" placeholder="Tus apellidos" required></div>
@@ -308,7 +308,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT INTEGRADO DIRECTAMENTE PARA EVITAR ERRORES DE RUTA -->
     <script>
         const STORAGE_KEY_USERS = 'melide_deporte_usuarios_v1';
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
@@ -341,6 +340,15 @@
                 header.style.display = 'flex';
                 btnAtras.style.display = (idPantalla === 'scr-registro') ? 'block' : 'none';
             }
+        }
+
+        // Función específica para limpiar por completo el formulario de registro al entrar
+        function abrirRegistro() {
+            const form = document.getElementById('form-registro');
+            if (form) form.reset();
+            const errorBox = document.getElementById('reg-error');
+            if (errorBox) errorBox.style.display = 'none';
+            irA('scr-registro');
         }
 
         function cambiarPestanaUsuario(pestana) {
@@ -395,7 +403,7 @@
                 email: email,
                 password: pass,
                 gustos: '',
-                preferenciasSesion: { instalacion: 'Pabellón', tiempo: '45 minutos', material: [], objetivo: 'Movilidad' }
+                preferenciasSesion: { instalacion: 'Pabellón Polideportivo Municipal', tiempo: '45 minutos', material: [], objetivo: 'Movilidad y Salud' }
             };
 
             usuarios.push(nuevoUsuario);
@@ -437,6 +445,24 @@
 
         function iniciarZonaUsuario(usuario) {
             document.getElementById('saludo-principal').innerText = `¡Hola, ${usuario.mote || usuario.nombre}!`;
+            
+            // Cargar las preferencias guardadas de ESTE usuario específico (o valores por defecto limpios si no tiene)
+            const prefs = usuario.preferenciasSesion || {
+                instalacion: 'Pabellón Polideportivo Municipal',
+                tiempo: '45 minutos',
+                material: [],
+                objetivo: 'Movilidad y Salud'
+            };
+
+            document.getElementById('pref-instalacion').value = prefs.instalacion;
+            document.getElementById('pref-tiempo').value = prefs.tiempo;
+            document.getElementById('pref-objetivo').value = prefs.objetivo;
+
+            const mats = prefs.material || [];
+            document.querySelectorAll('input[name="pref-mat"]').forEach(cb => {
+                cb.checked = mats.includes(cb.value);
+            });
+
             cambiarPestanaUsuario('actividad');
             irA('scr-dash');
         }
@@ -466,15 +492,15 @@
         function cargarDatosEnFormularioEdicion() {
             const usuario = obtenerUsuarioActivo();
             if (!usuario) return;
-            document.getElementById('edit-nombre').value = usuario.nombre;
-            document.getElementById('edit-apellidos').value = usuario.apellidos;
-            document.getElementById('edit-mote').value = usuario.mote;
-            document.getElementById('edit-dni').value = usuario.dni;
-            document.getElementById('edit-tf').value = usuario.telefono;
-            document.getElementById('edit-edad').value = usuario.edad;
-            document.getElementById('edit-direccion').value = usuario.direccion;
-            document.getElementById('edit-peso').value = usuario.peso;
-            document.getElementById('edit-estatura').value = usuario.estatura;
+            document.getElementById('edit-nombre').value = usuario.nombre || '';
+            document.getElementById('edit-apellidos').value = usuario.apellidos || '';
+            document.getElementById('edit-mote').value = usuario.mote || '';
+            document.getElementById('edit-dni').value = usuario.dni || '';
+            document.getElementById('edit-tf').value = usuario.telefono || '';
+            document.getElementById('edit-edad').value = usuario.edad || '';
+            document.getElementById('edit-direccion').value = usuario.direccion || '';
+            document.getElementById('edit-peso').value = usuario.peso || '';
+            document.getElementById('edit-estatura').value = usuario.estatura || '';
             document.getElementById('edit-gustos').value = usuario.gustos || '';
         }
 
@@ -534,6 +560,9 @@
 
         function cerrarSesion() {
             localStorage.removeItem(STORAGE_KEY_SESSION);
+            // Limpiar también las cajas del login al salir
+            document.getElementById('login-user').value = '';
+            document.getElementById('login-pass').value = '';
             irA('scr-inicio');
         }
 
