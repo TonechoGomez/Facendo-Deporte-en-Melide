@@ -313,8 +313,12 @@
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
 
         function obtenerUsuarios() {
-            const data = localStorage.getItem(STORAGE_KEY_USERS);
-            return data ? JSON.parse(data) : [];
+            try {
+                const data = localStorage.getItem(STORAGE_KEY_USERS);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
         }
 
         function guardarUsuarios(lista) {
@@ -342,7 +346,6 @@
             }
         }
 
-        // Función específica para limpiar por completo el formulario de registro al entrar
         function abrirRegistro() {
             const form = document.getElementById('form-registro');
             if (form) form.reset();
@@ -428,9 +431,9 @@
 
             const usuarios = obtenerUsuarios();
             const encontrado = usuarios.find(u => 
-                (u.email.toLowerCase() === userInput.toLowerCase() || 
-                 u.dni.toUpperCase() === userInput.toUpperCase() ||
-                 u.mote.toLowerCase() === userInput.toLowerCase()) && 
+                (u.email && u.email.toLowerCase() === userInput.toLowerCase() || 
+                 u.dni && u.dni.toUpperCase() === userInput.toUpperCase() ||
+                 u.mote && u.mote.toLowerCase() === userInput.toLowerCase()) && 
                 u.password === passInput
             );
 
@@ -446,7 +449,6 @@
         function iniciarZonaUsuario(usuario) {
             document.getElementById('saludo-principal').innerText = `¡Hola, ${usuario.mote || usuario.nombre}!`;
             
-            // Cargar las preferencias guardadas de ESTE usuario específico (o valores por defecto limpios si no tiene)
             const prefs = usuario.preferenciasSesion || {
                 instalacion: 'Pabellón Polideportivo Municipal',
                 tiempo: '45 minutos',
@@ -560,7 +562,6 @@
 
         function cerrarSesion() {
             localStorage.removeItem(STORAGE_KEY_SESSION);
-            // Limpiar también las cajas del login al salir
             document.getElementById('login-user').value = '';
             document.getElementById('login-pass').value = '';
             irA('scr-inicio');
