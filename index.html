@@ -2,184 +2,335 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Deporte Inclusivo - Concello de Melide</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="icon" type="image/png" href="favicon.png">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        
-        /* COLORES VIVOS BASADOS EN EL ESCUDO (SIN BLANCO) */
-        .bg-melide-fondo { background-color: #cce0f5; }         /* Azul cielo alegre y vivo */
-        .bg-melide-cajon { background-color: #b3d1f2; }        /* Azul pastel más intenso para tarjetas */
-        .text-melide-azul { color: #102a4c; }                  /* Azul marino institucional profundo */
-        .bg-melide-azul { background-color: #102a4c; }
-        .border-melide-dorado { border-color: #e5b80b; }       /* Dorado vivo de la corona */
-        .text-melide-dorado { color: #8a6d0b; }
-        .bg-melide-rojo { background-color: #d32f2f; }         /* Rojo gules vivo */
+        :root {
+            --melide-primary: #102a4c;
+            --melide-accent: #e5b80b;
+            --bg-gradient: linear-gradient(135deg, #cce0f5 0%, #b3d1f2 100%);
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg-gradient); 
+            color: #102a4c; margin: 0; height: 100vh; 
+            display: flex; flex-direction: column; overflow: hidden; 
+        }
+
+        header { 
+            background: var(--melide-primary); color: white; padding: 0 15px; 
+            display: none; align-items: center; justify-content: space-between;
+            height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 100; flex-shrink: 0;
+        }
+
+        /* Pantallas de navegación */
+        .screen { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 20px; }
+        .screen.active { display: flex; }
+
+        #scr-inicio { 
+            justify-content: center; align-items: center; text-align: center; 
+        }
+
+        #scr-registro {
+            justify-content: flex-start; align-items: center; padding-bottom: 40px;
+        }
+
+        .login-box {
+            background: #b3d1f2; padding: 25px; border-radius: 25px; width: 100%; max-width: 420px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--melide-accent);
+            box-sizing: border-box; margin: auto 0;
+        }
+
+        .form-label {
+            display: block; font-size: 0.72rem; font-weight: bold; color: var(--melide-primary); 
+            margin-bottom: 4px; text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%; padding: 11px 13px; margin-bottom: 12px; border-radius: 12px; 
+            border: 2px solid #93c5fd; background: #eff6ff; color: #102a4c; font-weight: bold; font-size: 0.9rem;
+            box-sizing: border-box; outline: none;
+        }
+        .form-control:focus { border-color: var(--melide-accent); }
+        .form-control:invalid:not(:placeholder-shown) { border-color: #d32f2f; }
+
+        .btn-main { 
+            width: 100%; padding: 14px; border-radius: 12px; border: none; 
+            background: var(--melide-primary); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background 0.2s;
+        }
+        .btn-main:hover { background: #1e3a8a; }
+
+        .btn-registro { background: #d32f2f; }
+        .btn-registro:hover { background: #b91c1c; }
+
+        .header-btn { background:none; border:none; color:white; font-size: 1.8rem; cursor:pointer; padding: 5px 10px; }
+
+        .error-msg {
+            background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; 
+            padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; 
+            margin-bottom: 12px; display: none; text-align: center;
+        }
+
+        /* Estilo cuadrícula para panel principal posterior */
+        .menu-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; max-width: 900px; margin: auto; width: 100%;
+        }
+        .menu-item { 
+            background: #b3d1f2; color: var(--melide-primary); padding: 40px 20px; 
+            border-radius: 25px; text-align: center; font-weight: bold; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; cursor: pointer; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 2px solid var(--melide-accent);
+            transition: transform 0.2s;
+        }
+        .menu-item:active { transform: scale(0.97); }
+        .menu-item span { font-size: 4rem; display: block; }
+        .menu-item label { font-size: 1.2rem; text-transform: uppercase; cursor: pointer; }
     </style>
 </head>
-<body class="bg-melide-fondo text-slate-900 min-h-screen flex flex-col justify-between p-3">
+<body>
 
-    <!-- CABECERA CON EL ESCUDO GRANDE ARRIBA A LA IZQUIERDA -->
-    <header class="bg-melide-cajon p-4 rounded-2xl border-2 border-amber-500 shadow-md flex items-center justify-between">
-        <div class="flex items-center gap-3.5">
-            <!-- Contenedor del escudo grande y limpio -->
-            <div class="w-16 h-16 rounded-2xl bg-white flex items-center justify-center p-1 border-2 border-amber-500 shadow-md flex-shrink-0 overflow-hidden">
-                <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" class="w-full h-full object-contain">
-            </div>
-            <div>
-                <h1 class="font-extrabold text-base text-melide-azul leading-tight tracking-wide">DEPORTE MELIDE</h1>
-                <p class="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Concello de Melide</p>
-            </div>
+    <!-- CABECERA INSTITUCIONAL -->
+    <header id="main-header">
+        <button class="header-btn" id="btn-atras" onclick="irA('scr-inicio')" style="display: none;">&#8592;</button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="concello-de-melide.jpeg" alt="Logo" style="height: 40px; border-radius: 8px; object-fit: contain;">
+            <span style="font-weight: bold; letter-spacing: 1px; font-size: 1rem;">DEPORTE MELIDE</span>
         </div>
-        <span id="badge-sesion" class="text-xs bg-emerald-300 text-emerald-950 font-extrabold px-3 py-1.5 rounded-full border-2 border-emerald-500 hidden">
-            Activo
-        </span>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <button class="header-btn" onclick="toggleFullScreen()" title="Pantalla completa">&#x26F6;</button>
+            <button class="header-btn" onclick="cerrarSesion()" title="Inicio / Salir">&#127968;</button>
+        </div>
     </header>
 
-    <!-- CONTENEDOR MÓVIL EN PANTALLA COMPLETA -->
-    <main class="flex-1 my-3 flex flex-col justify-center">
-
-        <!-- VISTA 1: INGRESO -->
-        <div id="view-ingreso" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-500 shadow-lg flex flex-col justify-between min-h-[72vh]">
-            <div class="space-y-2">
-                <span class="text-xs uppercase tracking-widest font-extrabold text-amber-900 block">Iniciativa Municipal</span>
-                <h2 class="text-2xl font-extrabold text-melide-azul leading-tight">Acceso al Programa</h2>
-                <p class="text-xs text-slate-800 font-medium">Empieza a tu ritmo en las instalaciones de la villa o desde tu casa.</p>
-            </div>
-
-            <form id="form-ingreso" onsubmit="handleIngreso(event)" class="space-y-5 my-auto">
-                <div>
-                    <label class="block text-xs font-extrabold text-melide-azul uppercase mb-2">Tu Identificador o Correo</label>
-                    <input type="text" id="input-usuario" placeholder="Ej. vecino@melide.gal" class="w-full px-5 py-4 rounded-2xl bg-blue-50 border-2 border-blue-300 text-slate-900 placeholder-slate-500 text-base font-bold focus:border-amber-600 outline-none transition shadow-inner" required>
-                </div>
-
-                <div class="space-y-3">
-                    <button type="submit" class="w-full bg-melide-azul hover:bg-slate-900 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md border-b-4 border-slate-950 flex items-center justify-center gap-2">
-                        <span>ENTRAR (YA TENGO CUENTA)</span>
-                        <span>→</span>
-                    </button>
-                    <button type="button" onclick="goToAlta()" class="w-full bg-melide-rojo hover:bg-red-800 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md border-b-4 border-red-950 flex items-center justify-center gap-2">
-                        <span>PRIMERA VEZ (NUEVA ALTA)</span>
-                        <span>+</span>
-                    </button>
-                </div>
-            </form>
-
-            <p class="text-center text-xs text-slate-800 font-bold">Servicio gratuito para usuarios del Concello</p>
-        </div>
-
-        <!-- VISTA 2: FORMULARIO ALTA NUEVA -->
-        <div id="view-alta" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-500 shadow-lg flex flex-col justify-between min-h-[75vh] hidden">
-            <div class="space-y-2">
-                <span class="text-xs uppercase tracking-widest font-extrabold text-amber-900 block">Cuestionario Inicial</span>
-                <h2 class="text-2xl font-extrabold text-melide-azul">Datos para tu rutina</h2>
-                <p class="text-xs text-slate-800 font-medium">Responde a estas preguntas para personalizar tu plan.</p>
-            </div>
-
-            <form onsubmit="completeAlta(event)" class="space-y-4 my-auto">
-                <div>
-                    <label class="block text-xs font-bold text-melide-azul uppercase mb-1">Nombre o Alias</label>
-                    <input type="text" placeholder="¿Cómo quieres que te llamemos?" class="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-300 text-slate-900 text-sm font-bold outline-none focus:border-amber-600 shadow-inner" required>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-melide-azul uppercase mb-1">Franja de Edad</label>
-                    <select class="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-300 text-slate-900 text-sm font-bold outline-none focus:border-amber-600 shadow-inner">
-                        <option>Niños (6-12 años)</option>
-                        <option>Adolescentes (13-17 años)</option>
-                        <option selected>Adultos (18-64 años)</option>
-                        <option>Mayores (65-75 años)</option>
-                        <option>Muy Mayores (+75 años)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-melide-azul uppercase mb-1">Espacio de Entrenamiento</label>
-                    <select class="w-full px-4 py-3 rounded-xl bg-blue-50 border-2 border-blue-300 text-slate-900 text-sm font-bold outline-none focus:border-amber-600 shadow-inner">
-                        <option>Gimnasio Municipal</option>
-                        <option>En casa (Sin material)</option>
-                        <option>En casa (Con material básico)</option>
-                        <option>Al aire libre (Parques / Rutas)</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold py-4 rounded-2xl text-base transition shadow-md border-b-4 border-emerald-950">
-                    GUARDAR Y CREAR SESIÓN
-                </button>
-            </form>
-
-            <button onclick="logout()" class="text-xs text-melide-azul underline text-center font-extrabold">Volver al inicio</button>
-        </div>
-
-        <!-- VISTA 3: SELECCIÓN DE SESIÓN -->
-        <div id="view-principal" class="bg-melide-cajon p-6 rounded-3xl border-2 border-amber-500 shadow-lg flex flex-col justify-between min-h-[75vh] hidden">
-            <div class="flex justify-between items-center border-b-2 border-blue-300/60 pb-4">
-                <div>
-                    <span class="text-xs font-extrabold text-amber-900 uppercase block">Menú Principal</span>
-                    <h2 class="text-xl font-extrabold text-melide-azul" id="saludo-usuario">Hola</h2>
-                </div>
-                <button onclick="logout()" class="text-xs bg-blue-50 text-red-700 border-2 border-red-300 px-3 py-1.5 rounded-xl font-extrabold">Salir</button>
-            </div>
-
-            <!-- OPCIONES DE PANTALLA COMPLETA -->
-            <div class="space-y-4 my-auto">
-                <button onclick="alert('Cargando la sesión personalizada de hoy...')" class="w-full text-left p-5 rounded-2xl bg-amber-200/90 border-2 border-amber-500 hover:bg-amber-300 transition flex flex-col gap-2 shadow-md">
-                    <span class="text-xs font-extrabold text-amber-950 uppercase tracking-wider">Plan personalizado</span>
-                    <span class="text-lg font-extrabold text-melide-azul">🏋️‍♂️ Iniciar Sesión de Hoy</span>
-                    <span class="text-xs text-slate-800 font-medium">15 min • Adaptada a tu nivel y espacio</span>
-                </button>
-
-                <button onclick="alert('Abriendo selector de instalaciones...')" class="w-full text-left p-5 rounded-2xl bg-blue-50 border-2 border-blue-300 hover:border-amber-500 transition flex flex-col gap-2 shadow-md">
-                    <span class="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Configuración</span>
-                    <span class="text-lg font-extrabold text-melide-azul">📍 Cambiar de Espacio</span>
-                    <span class="text-xs text-slate-800 font-medium">Gimnasio municipal, casa o parques de la villa</span>
-                </button>
-            </div>
-
-            <div class="p-3 bg-blue-100 rounded-xl border-2 border-blue-300 text-center">
-                <p class="text-xs text-slate-800 font-semibold">¿Necesitas ayuda? Contacta con el equipo técnico deportivo del Concello.</p>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- PIE -->
-    <footer class="text-center py-2 text-xs text-melide-azul font-extrabold">
-        Concello de Melide
-    </footer>
-
-    <script>
-        function handleIngreso(event) {
-            event.preventDefault();
-            const usuario = document.getElementById('input-usuario').value;
-            document.getElementById('saludo-usuario').innerText = `Hola, ${usuario}`;
+    <!-- PANTALLA 1: INICIO DE SESIÓN Y ACCESO A REGISTRO -->
+    <div id="scr-inicio" class="screen active">
+        <div class="login-box">
+            <img src="concello-de-melide.jpeg" alt="Logo" style="width: 90px; height: 90px; border-radius: 16px; margin-bottom: 20px; object-fit: contain; border: 2px solid var(--melide-accent);">
+            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.4rem;">Acceso Vecinos</h2>
             
-            document.getElementById('view-ingreso').classList.add('hidden');
-            document.getElementById('view-principal').classList.remove('hidden');
-            document.getElementById('badge-sesion').classList.remove('hidden');
+            <form onsubmit="handleLogin(event)">
+                <input type="text" id="login-user" placeholder="Usuario / Correo" class="form-control" required>
+                <input type="password" id="login-pass" placeholder="Contraseña" class="form-control" required>
+                <button type="submit" class="btn-main" style="margin-bottom: 12px;">ENTRAR</button>
+            </form>
+
+            <div style="border-top: 2px solid #93c5fd; padding-top: 15px; margin-top: 5px;">
+                <p style="font-size: 0.85rem; color: #1e293b; margin-bottom: 10px;">¿Primera vez en el programa?</p>
+                <button type="button" class="btn-main btn-registro" onclick="irA('scr-registro')">REGISTRO NUEVO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: FORMULARIO DE REGISTRO COMPLETO CON VALIDACIONES -->
+    <div id="scr-registro" class="screen">
+        <div class="login-box" style="max-width: 500px; width: 100%;">
+            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; text-align: center;">Nuevo Registro Vecinal</h2>
+            
+            <div id="reg-error" class="error-msg"></div>
+
+            <form onsubmit="handleRegistro(event)" style="text-align: left;">
+                <!-- NOMBRE Y APELLIDOS -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Nombre *</label>
+                        <input type="text" id="reg-nombre" class="form-control" placeholder="Tu nombre" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Apellidos *</label>
+                        <input type="text" id="reg-apellidos" class="form-control" placeholder="Tus apellidos" required>
+                    </div>
+                </div>
+
+                <!-- MOTE Y DNI -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Mote *</label>
+                        <input type="text" id="reg-mote" class="form-control" placeholder="Alias" required>
+                    </div>
+                    <div>
+                        <label class="form-label">DNI *</label>
+                        <input type="text" id="reg-dni" class="form-control" placeholder="12345678A" pattern="[0-9]{8}[A-Za-z]" title="Debe tener 8 números y 1 letra (Ej: 12345678A)" maxlength="9" style="text-transform: uppercase;" required>
+                    </div>
+                </div>
+
+                <!-- TELÉFONO Y EDAD -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Teléfono *</label>
+                        <input type="tel" id="reg-tf" class="form-control" placeholder="600123456" pattern="[0-9]{9}" title="Debe contener exactamente 9 dígitos numéricos" maxlength="9" inputmode="numeric" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Edad *</label>
+                        <input type="number" id="reg-edad" class="form-control" placeholder="Años" min="5" max="115" required>
+                    </div>
+                </div>
+
+                <!-- DIRECCIÓN -->
+                <div>
+                    <label class="form-label">Dirección *</label>
+                    <input type="text" id="reg-direccion" class="form-control" placeholder="Calle, número, piso / parroquia" required>
+                </div>
+
+                <!-- PESO Y ESTATURA -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Peso (kg) *</label>
+                        <input type="number" step="0.1" id="reg-peso" class="form-control" placeholder="Ej. 70.5" min="15" max="300" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Estatura (cm) *</label>
+                        <input type="number" id="reg-estatura" class="form-control" placeholder="Ej. 175" min="50" max="250" required>
+                    </div>
+                </div>
+
+                <!-- HÁBITOS Y CONDICIÓN FÍSICA -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Hábitos *</label>
+                        <select id="reg-habitos" class="form-control" required>
+                            <option value="Saludables">Saludables</option>
+                            <option value="Sedentarios">Sedentarios</option>
+                            <option value="Persona Mayor">Persona Mayor</option>
+                            <option value="Activo">Activo</option>
+                            <option value="Ninguno">Ninguno</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Condición Física *</label>
+                        <select id="reg-condicion" class="form-control" required>
+                            <option value="Normal">Normal</option>
+                            <option value="Mala">Mala</option>
+                            <option value="Buena">Buena</option>
+                            <option value="Muy buena">Muy buena</option>
+                            <option value="Muy mala">Muy mala</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CORREO Y CONFIRMACIÓN DE CORREO -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Correo *</label>
+                        <input type="email" id="reg-email" class="form-control" placeholder="correo@melide.gal" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Confirmar Correo *</label>
+                        <input type="email" id="reg-email-confirm" class="form-control" placeholder="Repite tu correo" required>
+                    </div>
+                </div>
+
+                <!-- CONTRASEÑA Y CONFIRMACIÓN DE CONTRASEÑA -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Contraseña *</label>
+                        <input type="password" id="reg-password" class="form-control" placeholder="Mín. 6 caracteres" minlength="6" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Confirmar Contraseña *</label>
+                        <input type="password" id="reg-password-confirm" class="form-control" placeholder="Repite contraseña" minlength="6" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-main" style="background-color: #059669; margin-top: 8px;">GUARDAR Y ACCEDER</button>
+            </form>
+
+            <button type="button" class="btn-main" style="background: transparent; color: var(--melide-primary); box-shadow: none; margin-top: 8px;" onclick="irA('scr-inicio')">← Volver al inicio</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: PANEL PRINCIPAL (DASHBOARD) -->
+    <div id="scr-dash" class="screen" style="justify-content: center; padding: 30px;">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h2 id="saludo-principal" style="color: var(--melide-primary); margin: 0; font-size: 1.6rem;">¡Bienvenido al programa!</h2>
+            <p style="color: #1e293b; font-size: 0.9rem; margin-top: 5px;">Selecciona una opción para continuar</p>
+        </div>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="alert('Cargando rutinas y planes de actividad física...')">
+                <span>🏋️‍♂️</span>
+                <label>Mis Sesiones</label>
+            </div>
+            <div class="menu-item" onclick="alert('Abriendo configuración de perfil y datos...')">
+                <span>📋</span>
+                <label>Mi Perfil</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lógica de control de pantallas y validaciones -->
+    <script>
+        function irA(idPantalla) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(idPantalla).classList.add('active');
+
+            const header = document.getElementById('main-header');
+            const btnAtras = document.getElementById('btn-atras');
+
+            if (idPantalla === 'scr-inicio') {
+                header.style.display = 'none';
+            } else {
+                header.style.display = 'flex';
+                if (idPantalla === 'scr-registro') {
+                    btnAtras.style.display = 'block';
+                } else {
+                    btnAtras.style.display = 'none';
+                }
+            }
         }
 
-        function goToAlta() {
-            document.getElementById('view-ingreso').classList.add('hidden');
-            document.getElementById('view-alta').classList.remove('hidden');
+        function handleLogin(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('login-user').value;
+            document.getElementById('saludo-principal').innerText = `Hola, ${usuario}`;
+            irA('scr-dash');
         }
 
-        function completeAlta(event) {
-            event.preventDefault();
-            document.getElementById('view-alta').classList.add('hidden');
-            document.getElementById('view-principal').classList.remove('hidden');
-            document.getElementById('badge-sesion').classList.remove('hidden');
+        function handleRegistro(e) {
+            e.preventDefault();
+            const errorBox = document.getElementById('reg-error');
+            errorBox.style.display = 'none';
+
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const emailConfirm = document.getElementById('reg-email-confirm').value.trim().toLowerCase();
+            const pass = document.getElementById('reg-password').value;
+            const passConfirm = document.getElementById('reg-password-confirm').value;
+
+            if (email !== emailConfirm) {
+                errorBox.innerText = "⚠️ Los correos electrónicos no coinciden. Revísalos.";
+                errorBox.style.display = 'block';
+                document.getElementById('scr-registro').scrollTop = 0;
+                return;
+            }
+
+            if (pass !== passConfirm) {
+                errorBox.innerText = "⚠️ Las contraseñas no coinciden. Revísalas.";
+                errorBox.style.display = 'block';
+                document.getElementById('scr-registro').scrollTop = 0;
+                return;
+            }
+
+            const nombre = document.getElementById('reg-nombre').value;
+            document.getElementById('saludo-principal').innerText = `¡Bienvenido/a, ${nombre}!`;
+            irA('scr-dash');
         }
 
-        function logout() {
-            document.getElementById('view-principal').classList.add('hidden');
-            document.getElementById('view-alta').classList.add('hidden');
-            document.getElementById('view-ingreso').classList.remove('hidden');
-            document.getElementById('badge-sesion').classList.add('hidden');
-            document.getElementById('input-usuario').value = '';
+        function cerrarSesion() {
+            document.getElementById('login-user').value = '';
+            document.getElementById('login-pass').value = '';
+            irA('scr-inicio');
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
         }
     </script>
 </body>
