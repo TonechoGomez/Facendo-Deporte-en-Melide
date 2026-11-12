@@ -35,12 +35,12 @@
             justify-content: center; align-items: center; text-align: center; 
         }
 
-        #scr-registro {
+        #scr-registro, #scr-perfil, #scr-dash, #scr-admin {
             justify-content: flex-start; align-items: center; padding-bottom: 40px;
         }
 
         .login-box {
-            background: #b3d1f2; padding: 25px; border-radius: 25px; width: 100%; max-width: 420px; 
+            background: #b3d1f2; padding: 25px; border-radius: 25px; width: 100%; max-width: 440px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--melide-accent);
             box-sizing: border-box; margin: auto 0;
         }
@@ -76,21 +76,44 @@
             margin-bottom: 12px; display: none; text-align: center;
         }
 
-        /* Estilo cuadrícula para panel principal posterior */
-        .menu-grid { 
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 20px; max-width: 900px; margin: auto; width: 100%;
+        .success-msg {
+            background: #d1fae5; color: #065f46; border: 2px solid #10b981; 
+            padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; 
+            margin-bottom: 12px; display: none; text-align: center;
         }
-        .menu-item { 
-            background: #b3d1f2; color: var(--melide-primary); padding: 40px 20px; 
-            border-radius: 25px; text-align: center; font-weight: bold; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; cursor: pointer; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 2px solid var(--melide-accent);
-            transition: transform 0.2s;
+
+        /* Pestañas de navegación dentro de Zona Usuario */
+        .nav-tabs {
+            display: flex; gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px;
         }
-        .menu-item:active { transform: scale(0.97); }
-        .menu-item span { font-size: 4rem; display: block; }
-        .menu-item label { font-size: 1.2rem; text-transform: uppercase; cursor: pointer; }
+        .tab-btn {
+            flex: 1; padding: 12px; border-radius: 14px; border: 2px solid var(--melide-primary);
+            background: #eff6ff; color: var(--melide-primary); font-weight: bold; cursor: pointer;
+            font-size: 0.9rem; transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--melide-primary); color: white; border-color: var(--melide-accent);
+        }
+
+        /* Tarjetas de estadísticas (Puerta trasera visual) */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; width: 100%; margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #eff6ff; padding: 20px 15px; border-radius: 18px; text-align: center;
+            border: 2px solid var(--melide-accent); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .stat-card .num { font-size: 2rem; font-weight: 800; color: var(--melide-primary); display: block; }
+        .stat-card .lbl { font-size: 0.75rem; font-weight: bold; color: #475569; text-transform: uppercase; }
+
+        .checkbox-group {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;
+        }
+        .checkbox-item {
+            background: #eff6ff; border: 2px solid #93c5fd; border-radius: 10px; padding: 8px 10px;
+            display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -104,20 +127,21 @@
         </div>
         <div style="display: flex; align-items: center; gap: 5px;">
             <button class="header-btn" onclick="toggleFullScreen()" title="Pantalla completa">&#x26F6;</button>
-            <button class="header-btn" onclick="cerrarSesion()" title="Inicio / Salir">&#127968;</button>
+            <button class="header-btn" onclick="cerrarSesion()" title="Cerrar Sesión">&#127968;</button>
         </div>
     </header>
 
     <!-- PANTALLA 1: INICIO DE SESIÓN Y ACCESO A REGISTRO -->
     <div id="scr-inicio" class="screen active">
         <div class="login-box">
-            <!-- Escudo grande y limpio sin recuadro amarillo -->
             <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" style="width: 240px; max-width: 85%; height: auto; margin-bottom: 18px; border-radius: 12px; object-fit: contain;">
             
-            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.35rem; letter-spacing: 0.5px;">FACENDO DEPORTE EN MELIDE</h2>
+            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.35rem; letter-spacing: 0.5px;">FACENDO DEPORTE EN MELIDE</h2>
             
+            <div id="login-error" class="error-msg"></div>
+
             <form onsubmit="handleLogin(event)">
-                <input type="text" id="login-user" placeholder="Usuario / Correo" class="form-control" required>
+                <input type="text" id="login-user" placeholder="Usuario / Correo / DNI" class="form-control" required>
                 <input type="password" id="login-pass" placeholder="Contraseña" class="form-control" required>
                 <button type="submit" class="btn-main" style="margin-bottom: 12px;">ENTRAR</button>
             </form>
@@ -137,7 +161,6 @@
             <div id="reg-error" class="error-msg"></div>
 
             <form onsubmit="handleRegistro(event)" style="text-align: left;">
-                <!-- NOMBRE Y APELLIDOS -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label class="form-label">Nombre *</label>
@@ -149,7 +172,6 @@
                     </div>
                 </div>
 
-                <!-- MOTE Y DNI -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label class="form-label">Mote *</label>
@@ -161,7 +183,6 @@
                     </div>
                 </div>
 
-                <!-- TELÉFONO Y EDAD -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label class="form-label">Teléfono *</label>
@@ -173,13 +194,11 @@
                     </div>
                 </div>
 
-                <!-- DIRECCIÓN -->
                 <div>
                     <label class="form-label">Dirección *</label>
                     <input type="text" id="reg-direccion" class="form-control" placeholder="Calle, número, piso / parroquia" required>
                 </div>
 
-                <!-- PESO Y ESTATURA -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label class="form-label">Peso (kg) *</label>
@@ -191,7 +210,6 @@
                     </div>
                 </div>
 
-                <!-- HÁBITOS Y CONDICIÓN FÍSICA -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label class="form-label">Hábitos *</label>
@@ -215,7 +233,6 @@
                     </div>
                 </div>
 
-                <!-- CORREO Y CONFIRMACIÓN DE CORREO -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label class="form-label">Correo *</label>
@@ -227,15 +244,14 @@
                     </div>
                 </div>
 
-                <!-- CONTRASEÑA Y CONFIRMACIÓN DE CONTRASEÑA -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
                         <label class="form-label">Contraseña *</label>
-                        <input type="password" id="reg-password" class="form-control" placeholder="Mín. 6 caracteres" minlength="6" required>
+                        <input type="password" id="reg-password" class="form-control" placeholder="Mín. 4 caracteres" minlength="4" required>
                     </div>
                     <div>
                         <label class="form-label">Confirmar Contraseña *</label>
-                        <input type="password" id="reg-password-confirm" class="form-control" placeholder="Repite contraseña" minlength="6" required>
+                        <input type="password" id="reg-password-confirm" class="form-control" placeholder="Repite contraseña" minlength="4" required>
                     </div>
                 </div>
 
@@ -246,94 +262,203 @@
         </div>
     </div>
 
-    <!-- PANTALLA 3: PANEL PRINCIPAL (DASHBOARD) -->
-    <div id="scr-dash" class="screen" style="justify-content: center; padding: 30px;">
-        <div style="text-align: center; margin-bottom: 25px;">
-            <h2 id="saludo-principal" style="color: var(--melide-primary); margin: 0; font-size: 1.6rem;">¡Bienvenido al programa!</h2>
-            <p style="color: #1e293b; font-size: 0.9rem; margin-top: 5px;">Selecciona una opción para continuar</p>
+    <!-- PANTALLA 3: ZONA DE USUARIO (SELECCIÓN DE ACTIVIDAD + PESTAÑA DE PERFIL) -->
+    <div id="scr-dash" class="screen">
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h2 id="saludo-principal" style="color: var(--melide-primary); margin: 0; font-size: 1.4rem;">¡Hola!</h2>
+            <p style="color: #1e293b; font-size: 0.85rem; margin-top: 4px;">Configura tu sesión o revisa tus datos</p>
         </div>
-        <div class="menu-grid">
-            <div class="menu-item" onclick="alert('Cargando rutinas y planes de actividad física...')">
-                <span>🏋️‍♂️</span>
-                <label>Mis Sesiones</label>
-            </div>
-            <div class="menu-item" onclick="alert('Abriendo configuración de perfil y datos...')">
-                <span>📋</span>
-                <label>Mi Perfil</label>
-            </div>
+
+        <!-- PESTAÑAS DE NAVEGACIÓN -->
+        <div class="nav-tabs">
+            <button id="tab-btn-actividad" class="tab-btn active" onclick="cambiarPestanaUsuario('actividad')">🏃 Configurar Actividad</button>
+            <button id="tab-btn-perfil" class="tab-btn" onclick="cambiarPestanaUsuario('perfil')">👤 Mis Datos y Gustos</button>
+        </div>
+
+        <!-- SUBVISTA A: SELECCIÓN DE INSTALACIÓN, MATERIAL, TIEMPO, ETC. -->
+        <div id="subvista-actividad" class="login-box" style="max-width: 500px; width: 100%; text-align: left;">
+            <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">¿Qué quieres hacer hoy?</h3>
+            
+            <div id="actividad-msg" class="success-msg"></div>
+
+            <form onsubmit="guardarPreferenciasSesion(event)">
+                <label class="form-label">1. Instalación / Lugar preferido</label>
+                <select id="pref-instalacion" class="form-control">
+                    <option value="Pabellón Polideportivo Municipal">Pabellón Polideportivo Municipal</option>
+                    <option value="Piscina Climatizada / Exterior">Piscina Climatizada / Exterior</option>
+                    <option value="Gimnasio Municipal">Gimnasio Municipal</option>
+                    <option value="Ruta / Aire Libre (Furelos / Camiño)">Ruta / Aire Libre (Furelos / Camiño)</option>
+                    <option value="En Casa">En Casa</option>
+                </select>
+
+                <label class="form-label">2. Tiempo disponible</label>
+                <select id="pref-tiempo" class="form-control">
+                    <option value="20 minutos">20 minutos (Sesión rápida)</option>
+                    <option value="30 minutos">30 minutos</option>
+                    <option value="45 minutos" selected>45 minutos (Estándar)</option>
+                    <option value="60 minutos">60 minutos (Completa)</option>
+                    <option value="Más de 60 minutos">Más de 60 minutos</option>
+                </select>
+
+                <label class="form-label">3. Material disponible</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Sin material"> Sin material</label>
+                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Mancuernas"> Mancuernas / Pesas</label>
+                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Bandas elásticas"> Bandas elásticas</label>
+                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Esterilla"> Esterilla</label>
+                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Bicicleta / Elíptica"> Bici / Elíptica</label>
+                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Balón / Fitball"> Balón / Fitball</label>
+                </div>
+
+                <label class="form-label">4. Objetivo principal de hoy</label>
+                <select id="pref-objetivo" class="form-control">
+                    <option value="Movilidad y Salud">Movilidad y Salud</option>
+                    <option value="Cardio y Resistencia">Cardio y Resistencia</option>
+                    <option value="Fuerza y Tonificación">Fuerza y Tonificación</option>
+                    <option value="Relajación y Estiramientos">Relajación y Estiramientos</option>
+                </select>
+
+                <button type="submit" class="btn-main" style="background-color: #059669; margin-top: 5px;">GUARDAR PREFERENCIAS DE SESIÓN</button>
+            </form>
+        </div>
+
+        <!-- SUBVISTA B: MODIFICAR DATOS DE INSCRIPCIÓN Y GUSTOS -->
+        <div id="subvista-perfil" class="login-box" style="max-width: 500px; width: 100%; text-align: left; display: none;">
+            <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">Modificar Ficha y Gustos</h3>
+            
+            <div id="perfil-msg" class="success-msg"></div>
+
+            <form onsubmit="actualizarDatosUsuario(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Nombre</label>
+                        <input type="text" id="edit-nombre" class="form-control" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Apellidos</label>
+                        <input type="text" id="edit-apellidos" class="form-control" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Mote</label>
+                        <input type="text" id="edit-mote" class="form-control" required>
+                    </div>
+                    <div>
+                        <label class="form-label">DNI (No editable)</label>
+                        <input type="text" id="edit-dni" class="form-control" style="background: #cbd5e1; color: #475569;" readonly>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" id="edit-tf" class="form-control" pattern="[0-9]{9}" maxlength="9" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Edad</label>
+                        <input type="number" id="edit-edad" class="form-control" min="5" max="115" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Dirección</label>
+                    <input type="text" id="edit-direccion" class="form-control" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Peso (kg)</label>
+                        <input type="number" step="0.1" id="edit-peso" class="form-control" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Estatura (cm)</label>
+                        <input type="number" id="edit-estatura" class="form-control" required>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label class="form-label">Hábitos</label>
+                        <select id="edit-habitos" class="form-control">
+                            <option value="Saludables">Saludables</option>
+                            <option value="Sedentarios">Sedentarios</option>
+                            <option value="Persona Mayor">Persona Mayor</option>
+                            <option value="Activo">Activo</option>
+                            <option value="Ninguno">Ninguno</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Condición Física</label>
+                        <select id="edit-condicion" class="form-control">
+                            <option value="Normal">Normal</option>
+                            <option value="Mala">Mala</option>
+                            <option value="Buena">Buena</option>
+                            <option value="Muy buena">Muy buena</option>
+                            <option value="Muy mala">Muy mala</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Gustos / Deportes favoritos</label>
+                    <input type="text" id="edit-gustos" class="form-control" placeholder="Ej. Caminar, natación, baile, pádel...">
+                </div>
+
+                <button type="submit" class="btn-main" style="background-color: var(--melide-primary); margin-top: 5px;">GUARDAR CAMBIOS EN MI FICHA</button>
+            </form>
         </div>
     </div>
 
-    <!-- Lógica de control de pantallas y validaciones -->
-    <script>
-        function irA(idPantalla) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(idPantalla).classList.add('active');
+    <!-- PANTALLA 4: PUERTA TRASERA - PANEL DE ESTADÍSTICAS (VISUAL) -->
+    <div id="scr-admin" class="screen">
+        <div class="login-box" style="max-width: 650px; width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--melide-primary); padding-bottom: 10px; margin-bottom: 20px;">
+                <div>
+                    <span style="background: #d32f2f; color: white; font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Modo Administración</span>
+                    <h2 style="color: var(--melide-primary); margin: 5px 0 0 0; font-size: 1.4rem;">Panel de Estadísticas - Melide</h2>
+                </div>
+                <span style="font-size: 2rem;">📊</span>
+            </div>
 
-            const header = document.getElementById('main-header');
-            const btnAtras = document.getElementById('btn-atras');
+            <!-- RESUMEN VISUAL DE INDICADORES -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="num" id="stat-total-usuarios">0</span>
+                    <span class="lbl">Usuarios Inscritos</span>
+                </div>
+                <div class="stat-card">
+                    <span class="num" id="stat-edad-media">--</span>
+                    <span class="lbl">Edad Media</span>
+                </div>
+                <div class="stat-card">
+                    <span class="num" id="stat-instalacion-top" style="font-size: 1.1rem; margin: 8px 0;">Pabellón</span>
+                    <span class="lbl">Instalación Top</span>
+                </div>
+            </div>
 
-            if (idPantalla === 'scr-inicio') {
-                header.style.display = 'none';
-            } else {
-                header.style.display = 'flex';
-                if (idPantalla === 'scr-registro') {
-                    btnAtras.style.display = 'block';
-                } else {
-                    btnAtras.style.display = 'none';
-                }
-            }
-        }
+            <!-- BLOQUES VISUALES PARA FUTURAS GRÁFICAS Y LISTADOS -->
+            <div style="background: #eff6ff; padding: 15px; border-radius: 16px; border: 2px solid #93c5fd; margin-bottom: 15px; text-align: left;">
+                <h4 style="margin: 0 0 10px 0; color: var(--melide-primary); font-size: 0.95rem;">Distribución por Condición Física</h4>
+                <div style="background: #cbd5e1; height: 14px; border-radius: 8px; overflow: hidden; margin-bottom: 8px;">
+                    <div style="width: 65%; background: #059669; height: 100%;"></div>
+                </div>
+                <p style="font-size: 0.78rem; color: #475569; margin: 0;">Espacio preparado para las gráficas detalladas de hábitos, edades e instalaciones.</p>
+            </div>
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const usuario = document.getElementById('login-user').value;
-            document.getElementById('saludo-principal').innerText = `Hola, ${usuario}`;
-            irA('scr-dash');
-        }
+            <div style="background: #eff6ff; padding: 15px; border-radius: 16px; border: 2px solid #93c5fd; margin-bottom: 20px; text-align: left;">
+                <h4 style="margin: 0 0 10px 0; color: var(--melide-primary); font-size: 0.95rem;">Últimos Vecinos Registrados</h4>
+                <div id="admin-lista-usuarios" style="font-size: 0.85rem; color: #1e293b;">
+                    <!-- Se rellena automáticamente desde usuarios.js -->
+                </div>
+            </div>
 
-        function handleRegistro(e) {
-            e.preventDefault();
-            const errorBox = document.getElementById('reg-error');
-            errorBox.style.display = 'none';
+            <button type="button" class="btn-main btn-registro" onclick="cerrarSesion()">SALIR DEL PANEL DE ESTADÍSTICAS</button>
+        </div>
+    </div>
 
-            const email = document.getElementById('reg-email').value.trim().toLowerCase();
-            const emailConfirm = document.getElementById('reg-email-confirm').value.trim().toLowerCase();
-            const pass = document.getElementById('reg-password').value;
-            const passConfirm = document.getElementById('reg-password-confirm').value;
-
-            if (email !== emailConfirm) {
-                errorBox.innerText = "⚠️ Los correos electrónicos no coinciden. Revísalos.";
-                errorBox.style.display = 'block';
-                document.getElementById('scr-registro').scrollTop = 0;
-                return;
-            }
-
-            if (pass !== passConfirm) {
-                errorBox.innerText = "⚠️ Las contraseñas no coinciden. Revísalas.";
-                errorBox.style.display = 'block';
-                document.getElementById('scr-registro').scrollTop = 0;
-                return;
-            }
-
-            const nombre = document.getElementById('reg-nombre').value;
-            document.getElementById('saludo-principal').innerText = `¡Bienvenido/a, ${nombre}!`;
-            irA('scr-dash');
-        }
-
-        function cerrarSesion() {
-            document.getElementById('login-user').value = '';
-            document.getElementById('login-pass').value = '';
-            irA('scr-inicio');
-        }
-
-        function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => console.log(err));
-            } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-            }
-        }
-    </script>
+    <!-- Archivo independiente de gestión de usuarios y preferencias -->
+    <script src="usuarios.js"></script>
 </body>
 </html>
