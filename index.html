@@ -106,26 +106,42 @@
         }
         .routine-block:last-of-type { border-bottom: none; margin-bottom: 10px; }
         .routine-block h4 {
-            margin: 0 0 8px 0; color: var(--melide-primary); font-size: 1rem; display: flex; align-items: center; gap: 6px;
+            margin: 0 0 10px 0; color: var(--melide-primary); font-size: 1rem; display: flex; align-items: center; gap: 6px;
         }
         
-        /* Tarjeta Visual de Ejercicio con Ilustración Gráfica Destacada */
-        .exercise-visual-card {
-            display: flex; align-items: center; gap: 12px;
-            background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px;
+        /* Tarjetas de ejercicio interactivas */
+        .interactive-exercise-card {
+            background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+            cursor: pointer; transition: all 0.2s;
         }
-        .exercise-badge-icon {
-            width: 48px; height: 48px; border-radius: 12px; background: #e0f2fe; color: #0369a1;
-            display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;
-            border: 1px solid #bae6fd;
+        .interactive-exercise-card:hover {
+            border-color: var(--melide-primary); background: #eff6ff;
         }
-        .exercise-content { flex: 1; }
-        .exercise-title {
-            font-weight: bold; color: var(--melide-primary); font-size: 0.88rem; margin: 0 0 2px 0;
+        .ex-title-row {
+            display: flex; align-items: center; justify-content: space-between; font-weight: bold; color: var(--melide-primary); font-size: 0.88rem;
         }
-        .exercise-instructions {
-            font-size: 0.8rem; color: #334155; margin: 0; line-height: 1.35;
+        .ex-hint {
+            font-size: 0.72rem; color: #0369a1; background: #e0f2fe; padding: 2px 6px; border-radius: 6px; font-weight: bold;
         }
+        .ex-brief {
+            font-size: 0.8rem; color: #334155; margin: 4px 0 0 0; line-height: 1.35;
+        }
+
+        /* Panel desplegable de detalle de ejercicio */
+        .exercise-detail-panel {
+            background: #ffffff; border: 2px solid var(--melide-primary); border-radius: 12px; padding: 14px; margin-top: 6px; margin-bottom: 10px; display: none;
+        }
+        .exercise-detail-panel h5 {
+            margin: 0 0 6px 0; color: var(--melide-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;
+        }
+        .exercise-detail-panel p {
+            margin: 0 0 10px 0; font-size: 0.82rem; color: #334155; line-height: 1.4;
+        }
+        .video-btn {
+            display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: #991b1b; border: 1px solid #ef4444;
+            padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: bold; text-decoration: none; transition: background 0.2s;
+        }
+        .video-btn:hover { background: #fecaca; }
     </style>
 </head>
 <body>
@@ -359,30 +375,34 @@
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
         let sesionGeneradaActual = null;
 
-        // Selector inteligente de icono gráfico según el tipo de ejercicio
-        function obtenerIconoGrafico(texto) {
-            const t = texto.toLowerCase();
-            if (t.includes('sentadilla') || t.includes('zancada') || t.includes('step') || t.includes('piernas')) return '🧎‍♂️';
-            if (t.includes('flexión') || t.includes('fondo') || t.includes('press') || t.includes('empuje')) return '🤲';
-            if (t.includes('remo') || t.includes('espalda') || t.includes('palo')) return '🚣';
-            if (t.includes('caminata') || t.includes('marcha') || t.includes('ruta') || t.includes('cardio')) return '🚶‍♂️';
-            if (t.includes('estiramiento') || t.includes('respiración') || t.includes('calma')) return '🧘‍♂️';
-            if (t.includes('movilidad') || t.includes('círculos') || t.includes('cuello')) return '🔄';
-            if (t.includes('core') || t.includes('abdominal') || t.includes('plancha')) return '🛡️';
-            return '⭐';
-        }
+        // Generador de tarjetas interactivas con panel de detalle y vídeo preconfigurado
+        function renderEjercicioInteractivo(titulo, resumen, explicacionDetallada, queryBusqueda) {
+            const idUnico = 'ex_' + Math.random().toString(36).substring(2, 9);
+            const urlVideo = `https://www.youtube.com/results?search_query=${encodeURIComponent(queryBusqueda + ' ejercicio tecnica correcta')}`;
 
-        function renderTarjetaVisual(titulo, descripcion) {
-            const icono = obtenerIconoGrafico(titulo + ' ' + descripcion);
             return `
-                <div class="exercise-visual-card">
-                    <div class="exercise-badge-icon">${icono}</div>
-                    <div class="exercise-content">
-                        <p class="exercise-title">${titulo}</p>
-                        <p class="exercise-instructions">${descripcion}</p>
+                <div class="interactive-exercise-card" onclick="toggleDetalleEjercicio('${idUnico}')">
+                    <div class="ex-title-row">
+                        <span>${titulo}</span>
+                        <span class="ex-hint">🔍 Toca para ver detalle</span>
                     </div>
+                    <p class="ex-brief">${resumen}</p>
+                </div>
+                <div id="${idUnico}" class="exercise-detail-panel">
+                    <h5>📖 Explicación paso a paso:</h5>
+                    <p>${explicacionDetallada}</p>
+                    <a href="${urlVideo}" target="_blank" rel="noopener noreferrer" class="video-btn" onclick="event.stopPropagation();">
+                        🎥 Ver vídeo demostrativo de este ejercicio
+                    </a>
                 </div>
             `;
+        }
+
+        function toggleDetalleEjercicio(id) {
+            const panel = document.getElementById(id);
+            if (panel) {
+                panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+            }
         }
 
         function obtenerUsuarios() {
@@ -564,7 +584,7 @@
             usuario.preferenciasSesion = { instalacion, material, tiempo, objetivo };
             actualizarUsuarioEnStorage(usuario);
 
-            const rutina = construirBloquesRutina(instalacion, material, tiempo, objetivo, usuario);
+            const rutina = construirBloquesRutinaDetallada(instalacion, material, tiempo, objetivo, usuario);
             sesionGeneradaActual = {
                 fecha: new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'}),
                 instalacion,
@@ -585,17 +605,17 @@
 
                     <div class="routine-block">
                         <h4>🔥 1. Calentamiento (${rutina.tiempoCalentamiento})</h4>
-                        <div>${rutina.calentamiento.map(item => renderTarjetaVisual(item.titulo, item.desc)).join('')}</div>
+                        <div>${rutina.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                     </div>
 
                     <div class="routine-block">
                         <h4>💪 2. Parte Principal (${rutina.tiempoPrincipal})</h4>
-                        <div>${rutina.principal.map(item => renderTarjetaVisual(item.titulo, item.desc)).join('')}</div>
+                        <div>${rutina.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                     </div>
 
                     <div class="routine-block">
                         <h4>🧘 3. Vuelta a la Calma (${rutina.tiempoCalma})</h4>
-                        <div>${rutina.calma.map(item => renderTarjetaVisual(item.titulo, item.desc)).join('')}</div>
+                        <div>${rutina.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                     </div>
 
                     <button type="button" class="btn-main" style="background-color: #059669; margin-top: 10px;" onclick="guardarSesionEnHistorial()">
@@ -607,76 +627,254 @@
             contenedor.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function construirBloquesRutina(instalacion, material, tiempo, objetivo, usuario) {
+        function construirBloquesRutinaDetallada(instalacion, material, tiempo, objetivo, usuario) {
             const mins = parseInt(tiempo, 10) || 45;
-            const tCal = mins <= 20 ? '4 min' : '7 min';
-            const tCalm = mins <= 20 ? '4 min' : '6 min';
+            const tCal = mins <= 20 ? '5 min' : '8 min';
+            const tCalm = mins <= 20 ? '4 min' : '7 min';
             const tPrin = (mins - parseInt(tCal) - parseInt(tCalm)) + ' min';
 
             const nivelBajo = (usuario.condicion === 'Mala' || usuario.condicion === 'Muy mala' || usuario.habitos === 'Persona Mayor');
-            const series = nivelBajo ? '2 series de 10 reps (suave)' : '3 series de 12-15 reps (descanso 45s)';
+            const repes = nivelBajo ? '2 series de 8-10 repeticiones (ritmo muy pausado)' : '3 series de 12 repeticiones (descanso de 45 segundos)';
 
             let calentamiento = [
-                { titulo: "Movilidad articular superior", desc: "Giros suaves y controlados de cuello, hombros y muñecas para lubricar articulaciones (1 min)." },
-                { titulo: "Movilidad de cadera y tobillos", desc: "Círculos amplios de cadera y flexo-extensión suave de tobillos (2 min)." }
+                {
+                    titulo: "🔄 Movilidad articular de cuello y hombros",
+                    resumen: "Giros circulares controlados para lubricar el cuello y la cintura escapular.",
+                    detalle: "De pie o sentado con la espalda recta, realiza 8 giros suaves de cabeza hacia la derecha y 8 hacia la izquierda. A continuación, eleva los hombros hacia las orejas y muévelos en círculos hacia atrás lentamente 10 veces.",
+                    query: "movilidad articular cuello y hombros calentamiento"
+                },
+                {
+                    titulo: "🔄 Movilidad de cadera y rodillas",
+                    resumen: "Rotaciones amplias de cadera y flexión suave de rodillas.",
+                    detalle: "Con las manos en la cadera y los pies separados a la anchura de los hombros, dibuja círculos amplios y lentos con la cadera (8 en cada sentido). Después, junta ligeramente las rodillas y haz flexiones muy suaves con las manos apoyadas en los muslos.",
+                    query: "movilidad de cadera y rodillas calentamiento"
+                }
             ];
+
             let principal = [];
+
             let calma = [
-                { titulo: "Respiración diafragmática", desc: "Inhalar profundo por la nariz hinchando abdomen y soltar lento por la boca (2 min)." },
-                { titulo: "Estiramiento de tren inferior", desc: "Mantener 20 segundos suaves por cada lado sin rebotes ni tirones." }
+                {
+                    titulo: "🌬️ Respiración diafragmática profunda",
+                    resumen: "Control de la respiración para reducir pulsaciones y relajar la musculatura.",
+                    detalle: "Inhala despacio por la nariz durante 4 segundos sintiendo cómo se expande tu abdomen. Mantén el aire 2 segundos y exhala muy lentamente por la boca con los labios fruncidos durante 6 segundos. Repite 6 veces.",
+                    query: "respiracion diafragmatica relajacion"
+                },
+                {
+                    titulo: "🧘 Estiramiento suave de tren inferior",
+                    resumen: "Alargamiento controlado de cuádriceps, gemelos y zona lumbar.",
+                    detalle: "Apóyate en una pared o respaldo firme. Dobla una pierna llevando el talón hacia el glúteo para estirar el cuádriceps (mantén 20 segundos sin rebotes). Repite con la otra pierna y estira gemelos apoyando la planta entera en el suelo.",
+                    query: "estiramientos cuadriceps y gemelos"
+                }
             ];
 
             if (instalacion === 'Gimnasio municipal') {
-                calentamiento.push({ titulo: "Activación cardiovascular", desc: "5 minutos en bicicleta estática, cinta o remo a ritmo muy suave." });
+                calentamiento.push({
+                    titulo: "🚴 Activación cardiovascular en máquina",
+                    resumen: "5 minutos suaves en bicicleta estática, cinta de marcha o remo.",
+                    detalle: "Súbete a la máquina seleccionada e inicia el movimiento a velocidad constante y cómoda, sin buscar esfuerzo alto, únicamente para elevar suavemente la temperatura corporal y lubricar las articulaciones.",
+                    query: "calentamiento bicicleta estatica o remo"
+                });
                 principal = [
-                    { titulo: `Circuito Gimnasio (${objetivo})`, desc: "Bloque adaptado al equipamiento profesional disponible en la instalación." },
-                    { titulo: "Bloque 1 - Tren inferior", desc: `Trabajo global de piernas y estabilidad (${series}).` },
-                    { titulo: "Bloque 2 - Torso y Brazos", desc: `Movimientos equilibrados de empuje y tracción (${series}).` },
-                    { titulo: "Bloque 3 - Estabilidad Core", desc: "Control postural y fortalecimiento de la zona media abdominal." }
+                    {
+                        titulo: `⚙️ Circuito adaptado (${objetivo})`,
+                        resumen: "Bloque guiado según el equipamiento profesional del gimnasio municipal.",
+                        detalle: `Realiza los ejercicios principales controlando la postura en todo momento (${repes}). Mantén el abdomen firme y concéntrate en la calidad del movimiento por encima del peso.`,
+                        query: "circuito gimnasio municipal ejercicios"
+                    },
+                    {
+                        titulo: "🦵 Prensa o Sentadilla asistida en máquina",
+                        resumen: "Trabajo seguro de fuerza para piernas con soporte guiado.",
+                        detalle: `Coloca los pies bien apoyados a la anchura de hombros. Empuja de forma controlada extendiendo las piernas sin bloquear las rodillas al llegar arriba, y baja frenando el peso lentamente (${repes}).`,
+                        query: "prensa de piernas gimnasio tecnica"
+                    },
+                    {
+                        titulo: "🫱 Remo sentado en polea / máquina",
+                        resumen: "Fortalecimiento de espalda alta y mejora de la postura corporal.",
+                        detalle: `Siéntate con la espalda recta y el pecho erguido. Tira de los agarres hacia tu abdomen llevando los codos hacia atrás y juntando las escápulas al final del recorrido (${repes}).`,
+                        query: "remo sentado en polea gimnasio"
+                    },
+                    {
+                        titulo: "🛡️ Plancha abdominal isométrica",
+                        resumen: "Fortalecimiento profundo de la zona media (Core) y protección lumbar.",
+                        detalle: "Apoya los antebrazos en el banco o suelo y las puntas de los pies. Alinea tu cuerpo formando una tabla recta, contrayendo abdomen y glúteos. Mantén la postura 20 a 30 segundos respirando con normalidad.",
+                        query: "plancha abdominal tecnica correcta"
+                    }
                 ];
             } else if (instalacion === 'En Casa') {
-                calentamiento.push({ titulo: "Marcha activa en el sitio", desc: "Elevación suave de rodillas alternadas acompañando con braceo dinámico." });
+                calentamiento.push({
+                    titulo: "🚶 Marcha activa estática con braceo",
+                    resumen: "Caminata en el sitio elevando ligeramente las rodillas.",
+                    detalle: "Camina en el mismo sitio coordinando el movimiento: al elevar la pierna derecha, acompaña con el brazo izquierdo hacia delante de forma natural. Mantén un ritmo alegre pero constante durante 3 minutos.",
+                    query: "marcha en el sitio calentamiento"
+                });
+
                 if (material === 'Accesorios de casa') {
                     principal = [
-                        { titulo: "Sentadilla con silla", desc: `Siéntate y levántate controlando la bajada sin dejarte caer de golpe (${series}).` },
-                        { titulo: "Remo con botellas o bolsas", desc: `Inclina ligeramente el tronco y lleva el peso hacia la cintura (${series}).` },
-                        { titulo: "Press con palo de escoba", desc: `Sujeta el palo a la anchura de hombros y elévalo sobre la cabeza (${series}).` },
-                        { titulo: "Flexiones en mesa o encimera", desc: `Apoya las manos en un borde firme y flexiona los codos (${series}).` }
+                        {
+                            titulo: "🪑 Sentadilla asistida con silla",
+                            resumen: "Flexión de piernas usando el asiento como referencia de seguridad.",
+                            detalle: `Colócate frente a una silla firme. Baja la cadera hacia atrás como si fueras a sentarte, toca ligeramente el asiento y vuelve a subir empujando desde los talones (${repes}).`,
+                            query: "sentadilla con silla tecnica"
+                        },
+                        {
+                            titulo: "🧴 Remo inclinado con botellas de agua",
+                            resumen: "Trabajo de espalda usando dos botellas llenas como mancuernas.",
+                            detalle: `Inclina ligeramente el tronco hacia delante manteniendo la espalda recta. Con una botella en cada mano, sube los codos pegados al cuerpo contrayendo la espalda (${repes}).`,
+                            query: "remo con botellas de agua"
+                        },
+                        {
+                            titulo: "🧹 Elevación frontal con palo de escoba",
+                            resumen: "Movilidad y tonificación de hombros y brazos.",
+                            detalle: `Sujeta un palo de escoba con las dos manos separadas a la anchura de los hombros. Elévalo suavemente desde los muslos hasta la altura de los ojos y baja con control (${repes}).`,
+                            query: "ejercicios con palo de escoba hombros"
+                        },
+                        {
+                            titulo: "🫸 Flexiones inclinadas en encimera o mesa",
+                            resumen: "Fuerza de pecho y brazos adaptada y segura.",
+                            detalle: `Apoya las manos firmemente en el borde de una mesa estable o encimera. Flexiona los codos acercando el pecho de forma controlada y empuja para volver a la posición inicial (${repes}).`,
+                            query: "flexiones inclinadas en mesa"
+                        }
                     ];
                 } else if (material === 'Material de gimnasio en casa') {
                     principal = [
-                        { titulo: "Sentadilla goblet con mancuerna", desc: `Sujeta el peso pegado al pecho y baja con la espalda recta (${series}).` },
-                        { titulo: "Remo con banda o mancuerna", desc: `Tracciona llevando los codos atrás juntando escápulas (${series}).` },
-                        { titulo: "Press de hombros", desc: `Empuje vertical controlado sin arquear la zona lumbar (${series}).` },
-                        { titulo: "Puente de glúteo en esterilla", desc: `Eleva la cadera contrayendo los glúteos arriba (${series}).` }
+                        {
+                            titulo: "🏋️ Sentadilla Goblet con mancuerna",
+                            resumen: "Sentadilla profunda sujetando un peso frente al pecho.",
+                            detalle: `Sujeta una mancuerna verticalmente pegada al esternón. Baja la cadera manteniendo los talones totalmente apoyados en el suelo y la espalda erguida (${repes}).`,
+                            query: "sentadilla goblet con mancuerna"
+                        },
+                        {
+                            titulo: "🪢 Remo vertical con banda elástica",
+                            resumen: "Tracción de espalda fijando la banda bajo los pies.",
+                            detalle: `Pisa el centro de la banda elástica y sujeta los extremos con las manos. Inclina el tronco recto y tira de los extremos hacia la cadera manteniendo los codos cerca (${repes}).`,
+                            query: "remo con banda elastica espalda"
+                        },
+                        {
+                            titulo: "🙋 Press de hombros con mancuernas o banda",
+                            resumen: "Empuje vertical controlado para hombros y brazos.",
+                            detalle: `Sujeta las mancuernas a la altura de los hombros y elévalas verticalmente hacia arriba sin arquear la zona lumbar (${repes}).`,
+                            query: "press de hombros mancuernas"
+                        },
+                        {
+                            titulo: "🌉 Puente de glúteo en esterilla",
+                            resumen: "Elevación de cadera tumbado boca arriba.",
+                            detalle: `Tumbado boca arriba con las rodillas dobladas y los pies apoyados, eleva la cadera contrayendo con fuerza los glúteos en la parte alta (${repes}).`,
+                            query: "puente de gluteo suelo"
+                        }
                     ];
                 } else {
                     principal = [
-                        { titulo: "Sentadillas al aire", desc: `Baja manteniendo los talones apoyados y la espalda recta (${series}).` },
-                        { titulo: "Zancadas atrás alternas", desc: `Da un paso amplio atrás apoyando bien la puntera (${series}).` },
-                        { titulo: "Flexiones en pared o suelo", desc: `Mantén el abdomen firme durante todo el recorrido (${series}).` },
-                        { titulo: "Plancha abdominal", desc: "Mantén la postura firme 20-30 segundos sin hundir la zona lumbar." }
+                        {
+                            titulo: "🧍 Sentadillas libres con peso corporal",
+                            resumen: "Flexión profunda de piernas controlando la postura.",
+                            detalle: `Separa los pies a la anchura de los hombros. Flexiona las rodillas llevando la cadera hacia atrás como si buscaras un asiento invisible, manteniendo el pecho abierto (${repes}).`,
+                            query: "sentadilla libre tecnica correcta"
+                        },
+                        {
+                            titulo: "🦵 Zancadas alternas hacia atrás",
+                            resumen: "Fortalecimiento de piernas y equilibrio general.",
+                            detalle: `Da un paso amplio hacia atrás apoyando la puntera y baja la cadera verticalmente con la espalda recta. Vuelve a la posición inicial y alterna con la otra pierna (${repes}).`,
+                            query: "zancadas hacia atras tecnica"
+                        },
+                        {
+                            titulo: "🧱 Flexiones apoyadas en pared",
+                            resumen: "Trabajo de brazos y pectoral sin sobrecargar articulaciones.",
+                            detalle: `Colócate frente a una pared a un paso de distancia. Apoya las manos a la altura de los hombros y flexiona los codos acercando el rostro con control (${repes}).`,
+                            query: "flexiones en pared tecnica"
+                        },
+                        {
+                            titulo: "🛡️ Plancha abdominal estática",
+                            resumen: "Control y firmeza de la zona media.",
+                            detalle: "Apóyate sobre las palmas de manos o antebrazos y las puntas de los pies. Contrae el abdomen y los glúteos evitando que la cadera caiga hacia el suelo durante 25-30 segundos.",
+                            query: "plancha abdominal basica"
+                        }
                     ];
                 }
-                calma.push({ titulo: "Estiramiento de espalda", desc: "Apoya las manos en el respaldo de una silla y alarga suavemente la columna." });
+                calma.push({
+                    titulo: "🪑 Estiramiento de columna asistido con silla",
+                    resumen: "Alargamiento suave de la espalda apoyado en el respaldo.",
+                    detalle: "Colócate de pie frente al respaldo de una silla, apoya las manos firmemente y da un paso atrás alejando la cadera mientras dejas caer el pecho suavemente hacia el suelo para estirar toda la espalda.",
+                    query: "estiramiento espalda con silla"
+                });
             } else if (instalacion === 'Exterior') {
-                calentamiento.push({ titulo: "Caminata rápida con giro", desc: "Paso vivo por el parque realizando rotaciones suaves de tronco." });
+                calentamiento.push({
+                    titulo: "🌳 Caminata rápida en el parque con giros",
+                    resumen: "Paso activo combinando giros suaves de tronco.",
+                    detalle: "Camina a buen ritmo por el parque durante 4 minutos. Cada minuto, realiza 5 giros suaves de torso hacia los lados acompañando con el movimiento natural de los brazos.",
+                    query: "caminata calentamiento rotacion tronco"
+                });
                 principal = [
-                    { titulo: "Subida a banco (Step-up)", desc: `Sube alternando ambas piernas en el asiento con control (${series}).` },
-                    { titulo: "Flexiones inclinadas en banco", desc: `Cuerpo alineado como una tabla apoyando las manos en el respaldo (${series}).` },
-                    { titulo: "Fondos de tríceps en banco", desc: `Manos apoyadas en el borde del asiento y flexión suave de codos (${series}).` },
-                    { titulo: "Desplazamientos laterales", desc: "4 bloques de 1 minuto activo + 30 seg de recuperación." }
+                    {
+                        titulo: "🪑 Subida a banco urbano (Step-up)",
+                        resumen: "Trabajo de fuerza en piernas usando el banco del parque.",
+                        detalle: `Sube al asiento del banco apoyando toda la planta del pie, eleva el cuerpo contrayendo el glúteo y baja frenando el movimiento con control (${repes} alternando piernas).`,
+                        query: "subida a banco step up parque"
+                    },
+                    {
+                        titulo: "🧱 Flexiones inclinadas en respaldo de banco",
+                        resumen: "Tonificación de pectoral y brazos aprovechando el mobiliario.",
+                        detalle: `Apoya las manos firmemente en el respaldo superior del banco. Mantén el cuerpo completamente alineado como una tabla y flexiona los codos de forma pausada (${repes}).`,
+                        query: "flexiones inclinadas en banco parque"
+                    },
+                    {
+                        titulo: "💪 Fondos de tríceps en asiento de banco",
+                        resumen: "Fortalecimiento de brazos usando el borde del banco.",
+                        detalle: `Coloca las manos en el borde del asiento con los dedos hacia delante y los pies apoyados en el suelo. Flexiona los codos hacia atrás y empuja para subir (${repes}).`,
+                        query: "fondos de triceps en banco parque"
+                    },
+                    {
+                        titulo: "⚡ Desplazamientos laterales activos",
+                        resumen: "Agilidad y trabajo cardiovascular controlado.",
+                        detalle: "Realiza pequeños desplazamientos laterales de un lado a otro en un espacio seguro de 3 o 4 pasos, manteniendo las rodillas ligeramente flexibles durante 1 minuto.",
+                        query: "desplazamientos laterales ejercicio"
+                    }
                 ];
-                calma.push({ titulo: "Estiramiento en banco", desc: "Apoya un talón sobre el asiento del banco e inclina suavemente el tronco." });
+                calma.push({
+                    titulo: "🪑 Estiramiento de isquiotibiales en banco",
+                    resumen: "Alargamiento de la parte posterior de la pierna.",
+                    detalle: "Coloca un talón apoyado sobre el asiento del banco con la pierna estirada. Inclina ligeramente el tronco hacia delante desde la cadera con la espalda recta hasta notar tensión suave en el muslo (20 seg).",
+                    query: "estiramiento isquiotibiales en banco"
+                });
             } else if (instalacion === 'Ruta') {
-                calentamiento.push({ titulo: "Caminata progresiva", desc: "Primeros 5 minutos aumentando poco a poco la amplitud de zancada." });
+                calentamiento.push({
+                    titulo: "🌲 Caminata progresiva en el camino",
+                    resumen: "Inicio de marcha aumentando gradualmente la zancada.",
+                    detalle: "Comienza los primeros 5 minutos de la ruta a un paso moderado, concentrándote en respirar con naturalidad y aumentando progresivamente la amplitud de la zancada.",
+                    query: "tecnica de caminata rapida ejercicio"
+                });
                 principal = [
-                    { titulo: `Caminata constante (${objetivo})`, desc: "Mantén postura erguida, mirada al frente y braceo natural constante." },
-                    { titulo: "Parada activa en banco o muro", desc: "10 repeticiones de sentarse y levantarse con control de postura." },
-                    { titulo: "Empuje contra árbol o señal", desc: "12 flexiones inclinadas de brazos apoyando firmemente las palmas." },
-                    { titulo: "Cambios de ritmo (Fartlek)", desc: "Alterna 2 minutos a paso muy vivo con 1 minuto a paso normal." }
+                    {
+                        titulo: `🚶 Caminata aeróbica constante (${objetivo})`,
+                        resumen: "Marcha continuada manteniendo postura erguida.",
+                        detalle: "Mantén la mirada al frente, los hombros relajados y un braceo natural coordinado con tus pasos. Mantén un ritmo constante que te permita hablar sin ahogarte durante la mayor parte del bloque.",
+                        query: "marcha nordica caminata deportiva tecnica"
+                    },
+                    {
+                        titulo: "🪑 Parada activa: Sentadillas en banco o muro",
+                        resumen: "Fuerza de piernas aprovechando elementos del trayecto.",
+                        detalle: "Aprovecha un banco o muro firme del camino para realizar 10 repeticiones de sentarse y levantarse con control absoluto de la postura y la respiración.",
+                        query: "sentadilla en banco de ruta"
+                    },
+                    {
+                        titulo: "🌳 Flexiones de empuje contra árbol firme",
+                        resumen: "Tonificación de torso utilizando árboles o señales de la ruta.",
+                        detalle: "Apoya las palmas de las manos contra el tronco de un árbol grande a la altura del pecho. Realiza 12 flexiones inclinadas manteniendo el abdomen firme y el cuerpo recto.",
+                        query: "flexiones contra arbol tecnica"
+                    },
+                    {
+                        titulo: "⏱️ Fartlek suave (Cambios de ritmo)",
+                        resumen: "Intervalos de aceleración controlada en el camino.",
+                        detalle: "Alterna 2 minutos caminando a un ritmo muy vivo con 1 minuto de marcha a paso normal, repitiendo el ciclo para estimular la capacidad cardiorrespiratoria.",
+                        query: "caminata intervalos cambios de ritmo"
+                    }
                 ];
-                calma.push({ titulo: "Estiramiento de gemelos", desc: "Adelanta una pierna contra el árbol y mantén el talón trasero pegado al suelo." });
+                calma.push({
+                    titulo: "🌳 Estiramiento de gemelos apoyado en árbol",
+                    resumen: "Relajación de la pantorrilla al finalizar la marcha.",
+                    detalle: "Adelanta una pierna doblando la rodilla y apoya las manos contra el tronco de un árbol. Mantén la pierna trasera completamente estirada con el talón pegado al suelo durante 20 segundos.",
+                    query: "estiramiento gemelos en arbol"
+                });
             }
 
             return {
@@ -724,11 +922,11 @@
                         <p style="margin: 0 0 6px 0;"><strong>Material:</strong> ${s.material} | <strong>Objetivo:</strong> ${s.objetivo}</p>
                         ${s.calentamiento ? `
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🔥 Calentamiento:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderTarjetaVisual(i.titulo, i.desc)).join('')}</div>
+                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>💪 Parte Principal:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderTarjetaVisual(i.titulo, i.desc)).join('')}</div>
+                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🧘 Vuelta a la Calma:</strong></p>
-                            <div>${s.calma.map(i => renderTarjetaVisual(i.titulo, i.desc)).join('')}</div>
+                            <div>${s.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                         ` : ''}
                     </div>
                 </details>
