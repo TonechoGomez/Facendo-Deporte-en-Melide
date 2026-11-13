@@ -45,7 +45,6 @@
             flex-shrink: 0;
         }
 
-        /* Contenedor flexible del header para centrar en PC y ajustar en móvil con mayor tamaño */
         .header-brand {
             display: flex;
             align-items: center;
@@ -1053,7 +1052,7 @@
                 `).join('');
             }
 
-            // 3. CAJÓN DE ESTADÍSTICAS, GRÁFICAS Y TEMPORALIZACIÓN (Corregido con timestamp seguro)
+            // 3. CAJÓN DE ESTADÍSTICAS, GRÁFICAS Y TEMPORALIZACIÓN
             const contenedorStats = document.getElementById('admin-estadisticas-contenido');
             const totalUsuarios = usuarios.length;
             const totalSesiones = cacheTodasLasSesionesAdmin.length;
@@ -1066,25 +1065,53 @@
             const unMes = 30 * unDia;
 
             const sesionesHoy = cacheTodasLasSesionesAdmin.filter(s => {
-                const ts = s.timestamp || new Date(s.fecha.split(' ')[0].split('/').reverse().join('-')).getTime() || ahora;
+                const ts = s.timestamp || ahora;
                 return (ahora - ts) < unDia;
             }).length;
 
             const sesionesSemana = cacheTodasLasSesionesAdmin.filter(s => {
-                const ts = s.timestamp || new Date(s.fecha.split(' ')[0].split('/').reverse().join('-')).getTime() || ahora;
+                const ts = s.timestamp || ahora;
                 return (ahora - ts) < unaSemana;
             }).length;
 
             const sesionesMes = cacheTodasLasSesionesAdmin.filter(s => {
-                const ts = s.timestamp || new Date(s.fecha.split(' ')[0].split('/').reverse().join('-')).getTime() || ahora;
+                const ts = s.timestamp || ahora;
                 return (ahora - ts) < unMes;
             }).length;
 
-            // Porcentajes para las gráficas visuales de barras
             const maxRef = Math.max(totalSesiones, 1);
             const pctHoy = Math.min(Math.round((sesionesHoy / maxRef) * 100), 100);
             const pctSemana = Math.min(Math.round((sesionesSemana / maxRef) * 100), 100);
             const pctMes = Math.min(Math.round((sesionesMes / maxRef) * 100), 100);
+
+            // Cálculos para Gráfica por Instalación
+            let instGimnasio = 0, instExterior = 0, instRuta = 0, instCasa = 0;
+            cacheTodasLasSesionesAdmin.forEach(s => {
+                if (s.instalacion === 'Gimnasio municipal') instGimnasio++;
+                else if (s.instalacion === 'Exterior') instExterior++;
+                else if (s.instalacion === 'Ruta') instRuta++;
+                else if (s.instalacion === 'En Casa') instCasa++;
+            });
+            const maxInst = Math.max(totalSesiones, 1);
+            const pctGimnasio = Math.round((instGimnasio / maxInst) * 100);
+            const pctExterior = Math.round((instExterior / maxInst) * 100);
+            const pctRuta = Math.round((instRuta / maxInst) * 100);
+            const pctCasa = Math.round((instCasa / maxInst) * 100);
+
+            // Cálculos para Gráfica por Edad de Usuarios
+            let edadJoven = 0, edadAdulto = 0, edadSenior = 0, edadMayor = 0;
+            usuarios.forEach(u => {
+                const e = u.edad || 0;
+                if (e < 30) edadJoven++;
+                else if (e <= 50) edadAdulto++;
+                else if (e <= 65) edadSenior++;
+                else edadMayor++;
+            });
+            const maxUser = Math.max(totalUsuarios, 1);
+            const pctJoven = Math.round((edadJoven / maxUser) * 100);
+            const pctAdulto = Math.round((edadAdulto / maxUser) * 100);
+            const pctSenior = Math.round((edadSenior / maxUser) * 100);
+            const pctMayor = Math.round((edadMayor / maxUser) * 100);
 
             contenedorStats.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;">
@@ -1102,8 +1129,9 @@
                     </div>
                 </div>
 
-                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📈 Gráficas de Actividad y Usos Temporales</h5>
+                <!-- GRÁFICA TEMPORAL -->
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📈 Gráficas de Usos Temporales</h5>
                     
                     <div class="stat-bar-container">
                         <div class="stat-bar-label"><span>Últimas 24 horas (Día)</span><span>${sesionesHoy} sesiones</span></div>
@@ -1123,6 +1151,56 @@
                     <div class="stat-bar-container" style="margin-bottom: 0;">
                         <div class="stat-bar-label"><span>Histórico completo (Años)</span><span>${totalSesiones} sesiones</span></div>
                         <div class="stat-bar-track"><div class="stat-bar-fill" style="width: 100%; background: var(--navy-primary);"></div></div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICA POR INSTALACIÓN -->
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📍 Uso por Tipo de Instalación</h5>
+                    
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Gimnasio municipal</span><span>${instGimnasio} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctGimnasio}%; background: #0369a1;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Exterior (Parques / Calle)</span><span>${instExterior} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctExterior}%; background: #0d9488;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Ruta (Caminos / Senderos)</span><span>${instRuta} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctRuta}%; background: #16a34a;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container" style="margin-bottom: 0;">
+                        <div class="stat-bar-label"><span>En Casa</span><span>${instCasa} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctCasa}%; background: #ca8a04;"></div></div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICA POR EDAD DE USUARIOS -->
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">👥 Distribución de Usuarios por Edad</h5>
+                    
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Menores de 30 años</span><span>${edadJoven} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctJoven}%; background: #6366f1;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>De 30 a 50 años</span><span>${edadAdulto} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctAdulto}%; background: #3b82f6;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>De 51 a 65 años</span><span>${edadSenior} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctSenior}%; background: #0284c7;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container" style="margin-bottom: 0;">
+                        <div class="stat-bar-label"><span>Mayores de 65 años</span><span>${edadMayor} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctMayor}%; background: #d97706;"></div></div>
                     </div>
                 </div>
             `;
