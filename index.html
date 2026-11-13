@@ -73,11 +73,12 @@
             margin-bottom: 12px; display: none; text-align: center;
         }
 
-        .nav-tabs { display: flex; gap: 10px; width: 100%; max-width: 500px; margin-bottom: 20px; }
+        /* Pestañas de navegación de Zona Usuario (3 opciones) */
+        .nav-tabs { display: flex; gap: 6px; width: 100%; max-width: 520px; margin-bottom: 20px; }
         .tab-btn {
-            flex: 1; padding: 12px; border-radius: 14px; border: 2px solid var(--melide-primary);
+            flex: 1; padding: 10px 6px; border-radius: 12px; border: 2px solid var(--melide-primary);
             background: #eff6ff; color: var(--melide-primary); font-weight: bold; cursor: pointer;
-            font-size: 0.9rem; transition: all 0.2s;
+            font-size: 0.78rem; text-align: center; transition: all 0.2s;
         }
         .tab-btn.active { background: var(--melide-primary); color: white; border-color: var(--melide-accent); }
 
@@ -88,12 +89,6 @@
         }
         .stat-card .num { font-size: 2rem; font-weight: 800; color: var(--melide-primary); display: block; }
         .stat-card .lbl { font-size: 0.75rem; font-weight: bold; color: #475569; text-transform: uppercase; }
-
-        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .checkbox-item {
-            background: #eff6ff; border: 2px solid #93c5fd; border-radius: 10px; padding: 8px 10px;
-            display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -202,47 +197,49 @@
         </div>
     </div>
 
-    <!-- PANTALLA 3: ZONA DE USUARIO -->
+    <!-- PANTALLA 3: ZONA DE USUARIO (3 PESTAÑAS) -->
     <div id="scr-dash" class="screen">
         <div style="text-align: center; margin-bottom: 15px;">
             <h2 id="saludo-principal" style="color: var(--melide-primary); margin: 0; font-size: 1.4rem;">¡Hola!</h2>
-            <p style="color: #1e293b; font-size: 0.85rem; margin-top: 4px;">Configura tu sesión o revisa tus datos</p>
+            <p style="color: #1e293b; font-size: 0.85rem; margin-top: 4px;">Configura tu sesión, revisa tus sesiones o modifica tus datos</p>
         </div>
 
         <div class="nav-tabs">
-            <button id="tab-btn-actividad" class="tab-btn active" onclick="cambiarPestanaUsuario('actividad')">🏃 Configurar Actividad</button>
-            <button id="tab-btn-perfil" class="tab-btn" onclick="cambiarPestanaUsuario('perfil')">👤 Mis Datos y Gustos</button>
+            <button id="tab-btn-actividad" class="tab-btn active" onclick="cambiarPestanaUsuario('actividad')">🏃 Actividad</button>
+            <button id="tab-btn-historial" class="tab-btn" onclick="cambiarPestanaUsuario('historial')">📋 Sesiones</button>
+            <button id="tab-btn-perfil" class="tab-btn" onclick="cambiarPestanaUsuario('perfil')">👤 Mis Datos</button>
         </div>
 
+        <!-- SUBVISTA A: CONFIGURAR ACTIVIDAD -->
         <div id="subvista-actividad" class="login-box" style="max-width: 500px; width: 100%; text-align: left;">
             <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">¿Qué quieres hacer hoy?</h3>
             <div id="actividad-msg" class="success-msg"></div>
 
-            <form onsubmit="guardarPreferenciasSesion(event)">
+            <form onsubmit="guardarYRegistrarSesion(event)">
                 <label class="form-label">1. Instalación / Lugar preferido</label>
                 <select id="pref-instalacion" class="form-control">
-                    <option value="Pabellón Polideportivo Municipal">Pabellón Polideportivo Municipal</option>
-                    <option value="Piscina Climatizada / Exterior">Piscina Climatizada / Exterior</option>
-                    <option value="Gimnasio Municipal">Gimnasio Municipal</option>
-                    <option value="Ruta / Aire Libre (Furelos / Camiño)">Ruta / Aire Libre (Furelos / Camiño)</option>
-                    <option value="En Casa">En Casa</option>
+                    <option value="Gimnasio municipal">Gimnasio municipal</option>
+                    <option value="Exterior">Exterior (Parques / Calle / Mobiliario urbano)</option>
+                    <option value="Ruta">Ruta (Caminos / Árboles / Bancos / Señales)</option>
+                    <option value="En Casa">En Casa (Picas, botellas, bolsas de guisantes, sillas...)</option>
                 </select>
 
-                <label class="form-label">2. Tiempo disponible</label>
+                <label class="form-label">2. Material disponible</label>
+                <select id="pref-material" class="form-control">
+                    <option value="Sin material">Sin material</option>
+                    <option value="Accesorios de casa">Accesorios de casa (Escobas, botellas, sillas...)</option>
+                    <option value="Mobiliario urbano / Exterior">Mobiliario urbano / Elementos del parque</option>
+                    <option value="Elementos de rutas">Elementos de rutas (Bancos, árboles, señales...)</option>
+                    <option value="Material de gimnasio en casa">Material de gimnasio en casa (Mancuernas, bandas...)</option>
+                </select>
+
+                <label class="form-label">3. Tiempo disponible</label>
                 <select id="pref-tiempo" class="form-control">
                     <option value="20 minutos">20 minutos</option>
                     <option value="30 minutos">30 minutos</option>
                     <option value="45 minutos" selected>45 minutos</option>
                     <option value="60 minutos">60 minutos</option>
                 </select>
-
-                <label class="form-label">3. Material disponible</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Sin material"> Sin material</label>
-                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Mancuernas"> Mancuernas / Pesas</label>
-                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Bandas elásticas"> Bandas elásticas</label>
-                    <label class="checkbox-item"><input type="checkbox" name="pref-mat" value="Esterilla"> Esterilla</label>
-                </div>
 
                 <label class="form-label">4. Objetivo principal de hoy</label>
                 <select id="pref-objetivo" class="form-control">
@@ -251,10 +248,19 @@
                     <option value="Fuerza y Tonificación">Fuerza y Tonificación</option>
                 </select>
 
-                <button type="submit" class="btn-main" style="background-color: #059669; margin-top: 5px;">GUARDAR PREFERENCIAS DE SESIÓN</button>
+                <button type="submit" class="btn-main" style="background-color: #059669; margin-top: 5px;">GUARDAR Y REGISTRAR SESIÓN</button>
             </form>
         </div>
 
+        <!-- SUBVISTA B: HISTORIAL DE SESIONES HECHAS -->
+        <div id="subvista-historial" class="login-box" style="max-width: 500px; width: 100%; text-align: left; display: none;">
+            <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">Historial de Sesiones Realizadas</h3>
+            <div id="lista-sesiones-hechas" style="font-size: 0.85rem; color: #1e293b;">
+                <!-- Se rellena dinámicamente -->
+            </div>
+        </div>
+
+        <!-- SUBVISTA C: MODIFICAR FICHA Y GUSTOS -->
         <div id="subvista-perfil" class="login-box" style="max-width: 500px; width: 100%; text-align: left; display: none;">
             <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">Modificar Ficha y Gustos</h3>
             <div id="perfil-msg" class="success-msg"></div>
@@ -356,19 +362,29 @@
 
         function cambiarPestanaUsuario(pestana) {
             const subActividad = document.getElementById('subvista-actividad');
+            const subHistorial = document.getElementById('subvista-historial');
             const subPerfil = document.getElementById('subvista-perfil');
+            
             const btnActividad = document.getElementById('tab-btn-actividad');
+            const btnHistorial = document.getElementById('tab-btn-historial');
             const btnPerfil = document.getElementById('tab-btn-perfil');
+
+            subActividad.style.display = 'none';
+            subHistorial.style.display = 'none';
+            subPerfil.style.display = 'none';
+            btnActividad.classList.remove('active');
+            btnHistorial.classList.remove('active');
+            btnPerfil.classList.remove('active');
 
             if (pestana === 'actividad') {
                 subActividad.style.display = 'block';
-                subPerfil.style.display = 'none';
                 btnActividad.classList.add('active');
-                btnPerfil.classList.remove('active');
+            } else if (pestana === 'historial') {
+                subHistorial.style.display = 'block';
+                btnHistorial.classList.add('active');
+                cargarHistorialSesiones();
             } else {
-                subActividad.style.display = 'none';
                 subPerfil.style.display = 'block';
-                btnActividad.classList.remove('active');
                 btnPerfil.classList.add('active');
                 cargarDatosEnFormularioEdicion();
             }
@@ -406,7 +422,8 @@
                 email: email,
                 password: pass,
                 gustos: '',
-                preferenciasSesion: { instalacion: 'Pabellón Polideportivo Municipal', tiempo: '45 minutos', material: [], objetivo: 'Movilidad y Salud' }
+                preferenciasSesion: { instalacion: 'Gimnasio municipal', material: 'Sin material', tiempo: '45 minutos', objetivo: 'Movilidad y Salud' },
+                historialSesiones: []
             };
 
             usuarios.push(nuevoUsuario);
@@ -450,45 +467,66 @@
             document.getElementById('saludo-principal').innerText = `¡Hola, ${usuario.mote || usuario.nombre}!`;
             
             const prefs = usuario.preferenciasSesion || {
-                instalacion: 'Pabellón Polideportivo Municipal',
+                instalacion: 'Gimnasio municipal',
+                material: 'Sin material',
                 tiempo: '45 minutos',
-                material: [],
                 objetivo: 'Movilidad y Salud'
             };
 
             document.getElementById('pref-instalacion').value = prefs.instalacion;
+            document.getElementById('pref-material').value = prefs.material;
             document.getElementById('pref-tiempo').value = prefs.tiempo;
             document.getElementById('pref-objetivo').value = prefs.objetivo;
-
-            const mats = prefs.material || [];
-            document.querySelectorAll('input[name="pref-mat"]').forEach(cb => {
-                cb.checked = mats.includes(cb.value);
-            });
 
             cambiarPestanaUsuario('actividad');
             irA('scr-dash');
         }
 
-        function guardarPreferenciasSesion(e) {
+        function guardarYRegistrarSesion(e) {
             e.preventDefault();
             const usuario = obtenerUsuarioActivo();
             if (!usuario) return;
 
-            const materiales = [];
-            document.querySelectorAll('input[name="pref-mat"]:checked').forEach(cb => materiales.push(cb.value));
-
-            usuario.preferenciasSesion = {
+            const nuevaPreferencia = {
                 instalacion: document.getElementById('pref-instalacion').value,
+                material: document.getElementById('pref-material').value,
                 tiempo: document.getElementById('pref-tiempo').value,
-                material: materiales,
-                objetivo: document.getElementById('pref-objetivo').value
+                objetivo: document.getElementById('pref-objetivo').value,
+                fecha: new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})
             };
 
+            usuario.preferenciasSesion = nuevaPreferencia;
+            if (!usuario.historialSesiones) usuario.historialSesiones = [];
+            usuario.historialSesiones.unshift(nuevaPreferencia); // Añadir al principio
+
             actualizarUsuarioEnStorage(usuario);
+
             const msg = document.getElementById('actividad-msg');
-            msg.innerText = '✅ Preferencias guardadas.';
+            msg.innerText = '✅ Sesión guardada y registrada con éxito.';
             msg.style.display = 'block';
             setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }
+
+        function cargarHistorialSesiones() {
+            const usuario = obtenerUsuarioActivo();
+            if (!usuario) return;
+
+            const contenedor = document.getElementById('lista-sesiones-hechas');
+            const historial = usuario.historialSesiones || [];
+
+            if (historial.length === 0) {
+                contenedor.innerHTML = '<p style="margin:0; color:#475569;">Aún no hay sesiones registradas. Configura y guarda tu primera actividad.</p>';
+                return;
+            }
+
+            contenedor.innerHTML = historial.map(s => `
+                <div style="background: #eff6ff; border: 2px solid #93c5fd; border-radius: 12px; padding: 12px; margin-bottom: 10px;">
+                    <div style="font-weight: bold; color: var(--melide-primary); margin-bottom: 4px;">📅 ${s.fecha}</div>
+                    <div style="font-size: 0.8rem; color: #334155;"><strong>Lugar:</strong> ${s.instalacion}</div>
+                    <div style="font-size: 0.8rem; color: #334155;"><strong>Material:</strong> ${s.material}</div>
+                    <div style="font-size: 0.8rem; color: #334155;"><strong>Duración:</strong> ${s.tiempo} | <strong>Objetivo:</strong> ${s.objetivo}</div>
+                </div>
+            `).join('');
         }
 
         function cargarDatosEnFormularioEdicion() {
