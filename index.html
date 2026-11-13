@@ -178,14 +178,6 @@
             box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35); 
         }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; width: 100%; margin-bottom: 24px; }
-        .stat-card {
-            background: #f8fafc; padding: 24px 16px; border-radius: 16px; text-align: center;
-            border: 1.5px solid var(--border-subtle);
-        }
-        .stat-card .num { font-size: 2.2rem; font-weight: 800; color: var(--navy-primary); display: block; margin-bottom: 4px; }
-        .stat-card .lbl { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-
         /* Tarjeta de Sesión Generada */
         .routine-card {
             background: var(--card-surface); border-radius: 20px; padding: 24px; margin-top: 24px;
@@ -500,7 +492,7 @@
         </div>
     </div>
 
-    <!-- PANTALLA 4: ADMINISTRACIÓN (TONECHO / 0010) -->
+    <!-- PANTALLA 4: ADMINISTRACIÓN (Tonecho / 0010) -->
     <div id="scr-admin" class="screen">
         <div id="admin-content-area" style="width: 100%; max-width: 680px; box-sizing: border-box;">
             
@@ -537,7 +529,7 @@
             <!-- CAJÓN 3: ESTADÍSTICAS Y USOS -->
             <div class="admin-drawer">
                 <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-stats')">
-                    <span>📊 3. Estadísticas, Usos y Temporizalización</span>
+                    <span>📊 3. Estadísticas, Usos y Temporalización</span>
                     <span id="icon-drawer-stats">▼</span>
                 </div>
                 <div id="drawer-stats" class="admin-drawer-body">
@@ -564,6 +556,7 @@
         const STORAGE_KEY_USERS = 'melide_deporte_usuarios_v1';
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
         let sesionGeneradaActual = null;
+        let cacheTodasLasSesionesAdmin = [];
 
         function generarRutinaDinamica(instalacion, material, tiempo, objetivo, usuario) {
             const mins = parseInt(tiempo, 10) || 45;
@@ -953,7 +946,7 @@
             cargarHistorialSesiones();
         }
 
-        // --- LÓGICA DEL PANEL DE ADMINISTRACIÓN (Tandech / Tonecho) ---
+        // --- LÓGICA DEL PANEL DE ADMINISTRACIÓN (Tonecho / 0010) ---
         function toggleAdminDrawer(drawerId) {
             const body = document.getElementById(drawerId);
             const icon = document.getElementById('icon-' + drawerId);
@@ -983,7 +976,7 @@
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${sesionesCount} sesiones</span>
-                                ${sesionsCount > 0 ? `<button class="btn-small btn-open-session" onclick="verSesionesDeUsuario('${u.dni}')">Ver sesiones</button>` : ''}
+                                ${sesionesCount > 0 ? `<button class="btn-small btn-open-session" onclick="verSesionesDeUsuario('${u.dni}')">Ver sesiones</button>` : ''}
                             </div>
                         </div>
                     `;
@@ -992,28 +985,27 @@
 
             // 2. CAJÓN DE TODAS LAS SESIONES (Globales de todos los usuarios)
             const contenedorSesiones = document.getElementById('admin-lista-todas-sesiones');
-            let todasLasSesiones = [];
+            cacheTodasLasSesionesAdmin = [];
             usuarios.forEach(u => {
                 if (u.historialSesiones) {
                     u.historialSesiones.forEach(s => {
-                        todasLasSesiones.push({ ...s, propietario: `${u.nombre} ${u.apellidos} (${u.mote})` });
+                        cacheTodasLasSesionesAdmin.push({ ...s, propietario: `${u.nombre} ${u.apellidos} (${u.mote})` });
                     });
                 }
             });
 
-            // Ordenar por fecha más reciente
-            todasLasSesiones.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            cacheTodasLasSesionesAdmin.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-            if (todasLasSesiones.length === 0) {
+            if (cacheTodasLasSesionesAdmin.length === 0) {
                 contenedorSesiones.innerHTML = '<p style="color:var(--text-muted);">No se ha generado ninguna sesión en la aplicación todavía.</p>';
             } else {
-                contenedorSesiones.innerHTML = todasLasSesiones.map((s, idx) => `
+                contenedorSesiones.innerHTML = cacheTodasLasSesionesAdmin.map((s, idx) => `
                     <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
                             <strong style="color: var(--navy-primary); font-size: 0.9rem;">${s.propietario}</strong><br>
                             <span style="font-size: 0.78rem; color: var(--text-muted);">📅 ${s.fecha} | 📍 ${s.instalacion} (${s.tiempo})</span>
                         </div>
-                        <button class="btn-small btn-open-session" onclick='abrirModalSesionDirecta(${JSON.stringify(s)})'>Ver rutina completa</button>
+                        <button class="btn-small btn-open-session" onclick="abrirModalSesionGlobal(${idx})">Ver rutina completa</button>
                     </div>
                 `).join('');
             }
@@ -1021,19 +1013,18 @@
             // 3. CAJÓN DE ESTADÍSTICAS Y TEMPORALIZACIÓN
             const contenedorStats = document.getElementById('admin-estadisticas-contenido');
             const totalUsuarios = usuarios.length;
-            const totalSesiones = todasLasSesiones.length;
+            const totalSesiones = cacheTodasLasSesionesAdmin.length;
             const edadSuma = usuarios.reduce((acc, u) => acc + (u.edad || 0), 0);
             const edadMedia = totalUsuarios > 0 ? Math.round(edadSuma / totalUsuarios) : 0;
 
-            // Desglose temporal básico
             const ahora = Date.now();
             const unDia = 24 * 60 * 60 * 1000;
             const unaSemana = 7 * unDia;
             const unMes = 30 * unDia;
 
-            const sesionesHoy = todasLasSesiones.filter(s => (ahora - (s.timestamp || 0)) < unDia).length;
-            const sesionesSemana = todasLasSesiones.filter(s => (ahora - (s.timestamp || 0)) < unaSemana).length;
-            const sesionesMes = todasLasSesiones.filter(s => (ahora - (s.timestamp || 0)) < unMes).length;
+            const sesionesHoy = cacheTodasLasSesionesAdmin.filter(s => (ahora - (s.timestamp || 0)) < unDia).length;
+            const sesionesSemana = cacheTodasLasSesionesAdmin.filter(s => (ahora - (s.timestamp || 0)) < unaSemana).length;
+            const sesionesMes = cacheTodasLasSesionesAdmin.filter(s => (ahora - (s.timestamp || 0)) < unMes).length;
 
             contenedorStats.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;">
@@ -1073,7 +1064,7 @@
                 html += `
                     <div style="background:#f8fafc; border:1px solid var(--border-subtle); border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                         <span>📅 ${s.fecha} — 📍 ${s.instalacion} (${s.tiempo})</span>
-                        <button class="btn-small btn-open-session" onclick='abrirModalSesionDirecta(${JSON.stringify(s)})'>Ver</button>
+                        <button class="btn-small btn-open-session" onclick="abrirModalSesionUsuario('${u.dni}', ${idx})">Ver</button>
                     </div>
                 `;
             });
@@ -1082,7 +1073,19 @@
             document.getElementById('admin-modal-sesion').style.display = 'flex';
         }
 
-        function abrirModalSesionDirecta(s) {
+        function abrirModalSesionGlobal(idx) {
+            const s = cacheTodasLasSesionesAdmin[idx];
+            if (s) mostrarDetalleSesionEnModal(s);
+        }
+
+        function abrirModalSesionUsuario(dni, idx) {
+            const u = obtenerUsuarios().find(x => x.dni === dni);
+            if (u && u.historialSesiones && u.historialSesiones[idx]) {
+                mostrarDetalleSesionEnModal(u.historialSesiones[idx]);
+            }
+        }
+
+        function mostrarDetalleSesionEnModal(s) {
             let html = `
                 <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
                     <strong>Propietario:</strong> ${s.usuarioNombre || 'Usuario municipal'}<br>
