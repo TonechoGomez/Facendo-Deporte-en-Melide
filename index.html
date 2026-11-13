@@ -108,30 +108,15 @@
         .routine-block h4 {
             margin: 0 0 8px 0; color: var(--melide-primary); font-size: 1rem; display: flex; align-items: center; gap: 6px;
         }
-        .routine-list {
-            margin: 0; padding-left: 18px; font-size: 0.88rem; color: #334155; line-height: 1.5;
+        .routine-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px;
         }
-        .routine-list li { margin-bottom: 8px; }
-
-        /* Estilo para los enlaces de demostración gráfica */
-        .demo-link {
-            display: inline-block;
-            background: #dbeafe;
-            color: #1e40af;
-            font-size: 0.75rem;
-            font-weight: bold;
-            padding: 2px 8px;
-            border-radius: 8px;
-            text-decoration: none;
-            border: 1px solid #93c5fd;
-            margin-left: 4px;
-            vertical-align: middle;
-            transition: all 0.2s;
-        }
-        .demo-link:hover {
-            background: var(--melide-primary);
-            color: #ffffff;
-            border-color: var(--melide-primary);
+        .routine-text { font-size: 0.86rem; color: #334155; line-height: 1.4; flex: 1; }
+        
+        /* Contenedor de la animación gráfica móvil */
+        .exercise-gif {
+            width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1; background: #e2e8f0; flex-shrink: 0;
         }
     </style>
 </head>
@@ -366,10 +351,36 @@
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
         let sesionGeneradaActual = null;
 
-        // Helper para generar enlace a demostración gráfica de técnica correcta
-        function crearEnlaceDemo(nombreEjercicio, terminoBusqueda) {
-            const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(terminoBusqueda + ' ejercicio tecnica correcta')}`;
-            return `<strong>${nombreEjercicio}</strong> <a href="${url}" target="_blank" rel="noopener noreferrer" class="demo-link" title="Abrir demostración gráfica">🎥 Ver demo</a>`;
+        // Biblioteca de GIFs animados integrados para demostración móvil directa
+        const GIFS_EJERCICIOS = {
+            movilidad: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=120&auto=format&fit=crop&q=60",
+            sentadilla: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=120&auto=format&fit=crop&q=60",
+            flexion: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=120&auto=format&fit=crop&q=60",
+            remo: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=120&auto=format&fit=crop&q=60",
+            caminata: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=120&auto=format&fit=crop&q=60",
+            estiramiento: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=120&auto=format&fit=crop&q=60",
+            general: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=120&auto=format&fit=crop&q=60"
+        };
+
+        function obtenerGifEjercicio(texto) {
+            const t = texto.toLowerCase();
+            if (t.includes('sentadilla') || t.includes('zancada') || t.includes('step')) return GIFS_EJERCICIOS.sentadilla;
+            if (t.includes('flexión') || t.includes('fondo') || t.includes('press')) return GIFS_EJERCICIOS.flexion;
+            if (t.includes('remo') || t.includes('palo')) return GIFS_EJERCICIOS.remo;
+            if (t.includes('caminata') || t.includes('marcha') || t.includes('ruta')) return GIFS_EJERCICIOS.caminata;
+            if (t.includes('estiramiento') || t.includes('respiración') || t.includes('calma')) return GIFS_EJERCICIOS.estiramiento;
+            if (t.includes('movilidad') || t.includes('círculos')) return GIFS_EJERCICIOS.movilidad;
+            return GIFS_EJERCICIOS.general;
+        }
+
+        function renderItemEjercicio(textoHtml) {
+            const gifUrl = obtenerGifEjercicio(textoHtml);
+            return `
+                <div class="routine-item">
+                    <div class="routine-text">${textoHtml}</div>
+                    <img src="${gifUrl}" alt="Demostración" class="exercise-gif" loading="lazy">
+                </div>
+            `;
         }
 
         function obtenerUsuarios() {
@@ -572,23 +583,23 @@
 
                     <div class="routine-block">
                         <h4>🔥 1. Calentamiento (${rutina.tiempoCalentamiento})</h4>
-                        <ul class="routine-list">
-                            ${rutina.calentamiento.map(item => `<li>${item}</li>`).join('')}
-                        </ul>
+                        <div>
+                            ${rutina.calentamiento.map(item => renderItemEjercicio(item)).join('')}
+                        </div>
                     </div>
 
                     <div class="routine-block">
                         <h4>💪 2. Parte Principal (${rutina.tiempoPrincipal})</h4>
-                        <ul class="routine-list">
-                            ${rutina.principal.map(item => `<li>${item}</li>`).join('')}
-                        </ul>
+                        <div>
+                            ${rutina.principal.map(item => renderItemEjercicio(item)).join('')}
+                        </div>
                     </div>
 
                     <div class="routine-block">
                         <h4>🧘 3. Vuelta a la Calma (${rutina.tiempoCalma})</h4>
-                        <ul class="routine-list">
-                            ${rutina.calma.map(item => `<li>${item}</li>`).join('')}
-                        </ul>
+                        <div>
+                            ${rutina.calma.map(item => renderItemEjercicio(item)).join('')}
+                        </div>
                     </div>
 
                     <button type="button" class="btn-main" style="background-color: #059669; margin-top: 10px;" onclick="guardarSesionEnHistorial()">
@@ -610,66 +621,66 @@
             const series = nivelBajo ? '2 series de 10 repeticiones (ritmo suave)' : '3 series de 12-15 repeticiones (descanso 45 seg)';
 
             let calentamiento = [
-                `${crearEnlaceDemo('Movilidad articular superior:', 'movilidad articular cuello hombros calentamiento')} Giros suaves de cuello, hombros y muñecas (1 min).`,
-                `${crearEnlaceDemo('Movilidad de cadera y rodillas:', 'movilidad articular cadera rodillas tobillos')} Círculos amplios de cadera y flexo-extensión suave de tobillos (2 min).`
+                '<strong>Movilidad articular superior:</strong> Giros suaves de cuello, hombros y muñecas (1 min).',
+                '<strong>Movilidad de cadera y rodillas:</strong> Círculos amplios de cadera y flexo-extensión suave de tobillos (2 min).'
             ];
             let principal = [];
             let calma = [
-                `${crearEnlaceDemo('Respiración diafragmática:', 'respiracion diafragmatica relajacion')} Inhalar profundo por la nariz y soltar lento por la boca (2 min).`,
-                `${crearEnlaceDemo('Estiramientos de tren inferior:', 'estiramientos cuadriceps isquiotibiales espalda')} Mantener 20 segundos suaves por cada lado sin rebotes.`
+                '<strong>Respiración diafragmática:</strong> Inhalar profundo por la nariz y soltar lento por la boca (2 min).',
+                '<strong>Estiramientos de tren inferior:</strong> Mantener 20 segundos suaves por cada lado sin rebotes.'
             ];
 
             if (instalacion === 'Gimnasio municipal') {
-                calentamiento.push(`${crearEnlaceDemo('Activación cardiovascular en máquina:', 'calentamiento bicicleta estatica o remo')} 5 min a ritmo suave.`);
+                calentamiento.push('<strong>Activación cardiovascular en máquina:</strong> 5 min a ritmo suave.');
                 principal = [
                     `<strong>Nota:</strong> Circuito preparado para el equipamiento del Gimnasio Municipal (${objetivo}).`,
-                    `${crearEnlaceDemo('Bloque 1 - Tren inferior:', 'sentadilla o prensa piernas gimnasio')} Activación global de piernas (${series}).`,
-                    `${crearEnlaceDemo('Bloque 2 - Empuje y tracción:', 'remo sentado y press pecho gimnasio')} Trabajo equilibrado de torso (${series}).`,
-                    `${crearEnlaceDemo('Bloque 3 - Estabilidad Core:', 'ejercicios core abdomen lumbar')} Control postural y zona media.`
+                    `<strong>Bloque 1 - Tren inferior:</strong> Activación global de piernas (${series}).`,
+                    `<strong>Bloque 2 - Empuje y tracción:</strong> Trabajo equilibrado de torso (${series}).`,
+                    `<strong>Bloque 3 - Estabilidad Core:</strong> Control postural y zona media.`
                 ];
             } else if (instalacion === 'En Casa') {
-                calentamiento.push(`${crearEnlaceDemo('Marcha activa en el sitio:', 'skipping bajo marcha en el sitio')} Elevando rodillas suavemente y acompañando con braceo.`);
+                calentamiento.push('<strong>Marcha activa en el sitio:</strong> Elevando rodillas suavemente y acompañando con braceo.');
                 if (material === 'Accesorios de casa') {
                     principal = [
-                        `${crearEnlaceDemo('Sentadilla con silla:', 'sentadilla en silla')} Siéntate y levántate controlando la bajada sin dejarte caer (${series}).`,
-                        `${crearEnlaceDemo('Remo con botellas / bolsas de peso:', 'remo inclinado con botellas de agua')} Inclina ligeramente el tronco y lleva el peso hacia la cintura (${series}).`,
-                        `${crearEnlaceDemo('Press y movilidad con palo de escoba:', 'ejercicios con palo de escoba hombros')} Sujeta el palo a la anchura de hombros y elévalo sobre la cabeza (${series}).`,
-                        `${crearEnlaceDemo('Flexiones inclinadas en mesa:', 'flexiones inclinadas en mesa o pared')} Apoya las manos en un borde firme y flexiona los codos (${series}).`
+                        `<strong>Sentadilla con silla:</strong> Siéntate y levántate controlando la bajada sin dejarte caer (${series}).`,
+                        `<strong>Remo con botellas / bolsas de peso:</strong> Inclina ligeramente el tronco y lleva el peso hacia la cintura (${series}).`,
+                        `<strong>Press y movilidad con palo de escoba:</strong> Sujeta el palo a la anchura de hombros y elévalo sobre la cabeza (${series}).`,
+                        `<strong>Flexiones inclinadas en mesa:</strong> Apoya las manos en un borde firme y flexiona los codos (${series}).`
                     ];
                 } else if (material === 'Material de gimnasio en casa') {
                     principal = [
-                        `${crearEnlaceDemo('Sentadilla goblet con mancuerna:', 'sentadilla goblet mancuerna')} Sujeta el peso pegado al pecho y baja con la espalda recta (${series}).`,
-                        `${crearEnlaceDemo('Remo con banda elástica o mancuerna:', 'remo con banda elastica espalda')} Tracciona llevando los codos atrás juntando escápulas (${series}).`,
-                        `${crearEnlaceDemo('Press de hombros:', 'press hombros mancuernas o banda elastica')} Empuje vertical controlado sin arquear la espalda (${series}).`,
-                        `${crearEnlaceDemo('Puente de glúteo en esterilla:', 'puente de gluteo en suelo')} Eleva la cadera apretando glúteos arriba (${series}).`
+                        `<strong>Sentadilla goblet con mancuerna:</strong> Sujeta el peso pegado al pecho y baja con la espalda recta (${series}).`,
+                        `<strong>Remo con banda elástica o mancuerna:</strong> Tracciona llevando los codos atrás juntando escápulas (${series}).`,
+                        `<strong>Press de hombros:</strong> Empuje vertical controlado sin arquear la espalda (${series}).`,
+                        `<strong>Puente de glúteo en esterilla:</strong> Eleva la cadera apretando glúteos arriba (${series}).`
                     ];
                 } else {
                     principal = [
-                        `${crearEnlaceDemo('Sentadillas al aire:', 'sentadilla sin peso tecnica')} Baja manteniendo los talones apoyados y la espalda recta (${series}).`,
-                        `${crearEnlaceDemo('Zancadas atrás alternas:', 'zancada hacia atras')} Da un paso amplio atrás apoyando bien la puntera (${series}).`,
-                        `${crearEnlaceDemo('Flexiones en pared o suelo:', 'flexiones de brazos en pared o suelo')} Mantén el abdomen firme durante todo el recorrido (${series}).`,
-                        `${crearEnlaceDemo('Plancha abdominal:', 'plancha abdominal en pared o suelo')} Mantén la postura firme 20-30 segundos sin hundir la zona lumbar.`
+                        `<strong>Sentadillas al aire:</strong> Baja manteniendo los talones apoyados y la espalda recta (${series}).`,
+                        `<strong>Zancadas atrás alternas:</strong> Da un paso amplio atrás apoyando bien la puntera (${series}).`,
+                        `<strong>Flexiones en pared o suelo:</strong> Mantén el abdomen firme durante todo el recorrido (${series}).`,
+                        `<strong>Plancha abdominal:</strong> Mantén la postura firme 20-30 segundos sin hundir la zona lumbar.`
                     ];
                 }
-                calma.push(`${crearEnlaceDemo('Estiramiento de espalda con silla o pared:', 'estiramiento espalda apoyado en silla')} Apoya las manos en el respaldo y alarga suavemente la columna.`);
+                calma.push('<strong>Estiramiento de espalda con silla o pared:</strong> Apoya las manos en el respaldo y alarga suavemente la columna.');
             } else if (instalacion === 'Exterior') {
-                calentamiento.push(`${crearEnlaceDemo('Caminata rápida con rotación de tronco:', 'caminata calentamiento rotacion tronco')} Paso vivo por el parque.`);
+                calentamiento.push('<strong>Caminata rápida con rotación de tronco:</strong> Paso vivo por el parque.');
                 principal = [
-                    `${crearEnlaceDemo('Subida al banco del parque (Step-up):', 'subida a banco step up')} Sube alternando ambas piernas con control (${series}).`,
-                    `${crearEnlaceDemo('Flexiones inclinadas en respaldo de banco:', 'flexiones inclinadas en banco parque')} Cuerpo alineado como una tabla (${series}).`,
-                    `${crearEnlaceDemo('Fondos de tríceps en banco:', 'fondos de triceps en banco')} Manos apoyadas en el borde del asiento y flexión suave de codos (${series}).`,
-                    `${crearEnlaceDemo('Desplazamientos laterales / marcha rápida:', 'desplazamientos laterales ejercicio')} 4 bloques de 1 minuto activo + 30 seg de recuperación.`
+                    `<strong>Subida al banco del parque (Step-up):</strong> Sube alternando ambas piernas con control (${series}).`,
+                    `<strong>Flexiones inclinadas en respaldo de banco:</strong> Cuerpo alineado como una tabla (${series}).`,
+                    `<strong>Fondos de tríceps en banco:</strong> Manos apoyadas en el borde del asiento y flexión suave de codos (${series}).`,
+                    `<strong>Desplazamientos laterales / marcha rápida:</strong> 4 bloques de 1 minuto activo + 30 seg de recuperación.`
                 ];
-                calma.push(`${crearEnlaceDemo('Estiramiento de isquiotibiales en banco:', 'estiramiento isquiotibiales en banco')} Apoya un talón sobre el asiento e inclina suavemente el tronco.`);
+                calma.push('<strong>Estiramiento de isquiotibiales en banco:</strong> Apoya un talón sobre el asiento e inclina suavemente el tronco.');
             } else if (instalacion === 'Ruta') {
-                calentamiento.push(`${crearEnlaceDemo('Caminata progresiva:', 'tecnica de caminata rapida ejercicio')} Primeros 5 minutos aumentando poco a poco la amplitud de zancada.`);
+                calentamiento.push('<strong>Caminata progresiva:</strong> Primeros 5 minutos aumentando poco a poco la amplitud de zancada.');
                 principal = [
-                    `${crearEnlaceDemo('Caminata a ritmo constante (' + objetivo + '):', 'marcha nordica o caminata deportiva')} Mantén postura erguida, mirada al frente y braceo natural.`,
-                    `${crearEnlaceDemo('Sentadilla en banco de ruta:', 'sentadilla en banco')} Parada activa: 10 repeticiones de sentarse y levantarse con control.`,
-                    `${crearEnlaceDemo('Empuje contra tronco de árbol o señal:', 'flexiones en pared o arbol')} 12 flexiones inclinadas de brazos apoyando firmemente las palmas.`,
-                    `${crearEnlaceDemo('Cambios de ritmo (Fartlek suave):', 'caminata intervalos cambios de ritmo')} Alterna 2 minutos a paso muy vivo con 1 minuto a paso normal.`
+                    `<strong>Caminata a ritmo constante (${objetivo}):</strong> Mantén postura erguida, mirada al frente y braceo natural.`,
+                    `<strong>Sentadilla en banco de ruta:</strong> Parada activa: 10 repeticiones de sentarse y levantarse con control.`,
+                    `<strong>Empuje contra tronco de árbol o señal:</strong> 12 flexiones inclinadas de brazos apoyando firmemente las palmas.`,
+                    `<strong>Cambios de ritmo (Fartlek suave):</strong> Alterna 2 minutos a paso muy vivo con 1 minuto a paso normal.`
                 ];
-                calma.push(`${crearEnlaceDemo('Estiramiento de gemelos apoyado en árbol:', 'estiramiento gemelos en pared o arbol')} Adelanta una pierna y mantén el talón trasero pegado al suelo.`);
+                calma.push('<strong>Estiramiento de gemelos apoyado en árbol:</strong> Adelanta una pierna y mantén el talón trasero pegado al suelo.');
             }
 
             return {
@@ -717,11 +728,11 @@
                         <p style="margin: 0 0 6px 0;"><strong>Material:</strong> ${s.material} | <strong>Objetivo:</strong> ${s.objetivo}</p>
                         ${s.calentamiento ? `
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🔥 Calentamiento:</strong></p>
-                            <ul style="margin: 0 0 6px 16px; padding: 0;">${s.calentamiento.map(i => `<li style="margin-bottom:4px;">${i}</li>`).join('')}</ul>
+                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderItemEjercicio(i)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>💪 Parte Principal:</strong></p>
-                            <ul style="margin: 0 0 6px 16px; padding: 0;">${s.principal.map(i => `<li style="margin-bottom:4px;">${i}</li>`).join('')}</ul>
+                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderItemEjercicio(i)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🧘 Vuelta a la Calma:</strong></p>
-                            <ul style="margin: 0 0 0 16px; padding: 0;">${s.calma.map(i => `<li style="margin-bottom:4px;">${i}</li>`).join('')}</ul>
+                            <div>${s.calma.map(i => renderItemEjercicio(i)).join('')}</div>
                         ` : ''}
                     </div>
                 </details>
