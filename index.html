@@ -108,15 +108,22 @@
         .routine-block h4 {
             margin: 0 0 8px 0; color: var(--melide-primary); font-size: 1rem; display: flex; align-items: center; gap: 6px;
         }
-        .routine-item {
-            display: flex; align-items: center; justify-content: space-between; gap: 10px;
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px;
-        }
-        .routine-text { font-size: 0.86rem; color: #334155; line-height: 1.4; flex: 1; }
         
-        /* Contenedor de la animación gráfica móvil */
-        .exercise-gif {
-            width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1; background: #e2e8f0; flex-shrink: 0;
+        /* Tarjeta de Asistente Visual por Ejercicio */
+        .exercise-card {
+            background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+        }
+        .exercise-title-row {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+        }
+        .exercise-name {
+            font-weight: bold; color: var(--melide-primary); font-size: 0.9rem;
+        }
+        .exercise-sequence {
+            font-size: 0.75rem; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 6px; font-weight: bold;
+        }
+        .exercise-desc {
+            font-size: 0.82rem; color: #334155; margin: 0; line-height: 1.4;
         }
     </style>
 </head>
@@ -351,34 +358,15 @@
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
         let sesionGeneradaActual = null;
 
-        // Biblioteca de GIFs animados integrados para demostración móvil directa
-        const GIFS_EJERCICIOS = {
-            movilidad: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=120&auto=format&fit=crop&q=60",
-            sentadilla: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=120&auto=format&fit=crop&q=60",
-            flexion: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=120&auto=format&fit=crop&q=60",
-            remo: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=120&auto=format&fit=crop&q=60",
-            caminata: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=120&auto=format&fit=crop&q=60",
-            estiramiento: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=120&auto=format&fit=crop&q=60",
-            general: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=120&auto=format&fit=crop&q=60"
-        };
-
-        function obtenerGifEjercicio(texto) {
-            const t = texto.toLowerCase();
-            if (t.includes('sentadilla') || t.includes('zancada') || t.includes('step')) return GIFS_EJERCICIOS.sentadilla;
-            if (t.includes('flexión') || t.includes('fondo') || t.includes('press')) return GIFS_EJERCICIOS.flexion;
-            if (t.includes('remo') || t.includes('palo')) return GIFS_EJERCICIOS.remo;
-            if (t.includes('caminata') || t.includes('marcha') || t.includes('ruta')) return GIFS_EJERCICIOS.caminata;
-            if (t.includes('estiramiento') || t.includes('respiración') || t.includes('calma')) return GIFS_EJERCICIOS.estiramiento;
-            if (t.includes('movilidad') || t.includes('círculos')) return GIFS_EJERCICIOS.movilidad;
-            return GIFS_EJERCICIOS.general;
-        }
-
-        function renderItemEjercicio(textoHtml) {
-            const gifUrl = obtenerGifEjercicio(textoHtml);
+        // Asistente Visual Inteligente por Iconos y Secuencia de Postura
+        function renderTarjetaEjercicio(titulo, secuencia, descripcion) {
             return `
-                <div class="routine-item">
-                    <div class="routine-text">${textoHtml}</div>
-                    <img src="${gifUrl}" alt="Demostración" class="exercise-gif" loading="lazy">
+                <div class="exercise-card">
+                    <div class="exercise-title-row">
+                        <span class="exercise-name">${titulo}</span>
+                        <span class="exercise-sequence">${secuencia}</span>
+                    </div>
+                    <p class="exercise-desc">${descripcion}</p>
                 </div>
             `;
         }
@@ -583,23 +571,17 @@
 
                     <div class="routine-block">
                         <h4>🔥 1. Calentamiento (${rutina.tiempoCalentamiento})</h4>
-                        <div>
-                            ${rutina.calentamiento.map(item => renderItemEjercicio(item)).join('')}
-                        </div>
+                        <div>${rutina.calentamiento.map(item => renderTarjetaEjercicio(item.titulo, item.secuencia, item.desc)).join('')}</div>
                     </div>
 
                     <div class="routine-block">
                         <h4>💪 2. Parte Principal (${rutina.tiempoPrincipal})</h4>
-                        <div>
-                            ${rutina.principal.map(item => renderItemEjercicio(item)).join('')}
-                        </div>
+                        <div>${rutina.principal.map(item => renderTarjetaEjercicio(item.titulo, item.secuencia, item.desc)).join('')}</div>
                     </div>
 
                     <div class="routine-block">
                         <h4>🧘 3. Vuelta a la Calma (${rutina.tiempoCalma})</h4>
-                        <div>
-                            ${rutina.calma.map(item => renderItemEjercicio(item)).join('')}
-                        </div>
+                        <div>${rutina.calma.map(item => renderTarjetaEjercicio(item.titulo, item.secuencia, item.desc)).join('')}</div>
                     </div>
 
                     <button type="button" class="btn-main" style="background-color: #059669; margin-top: 10px;" onclick="guardarSesionEnHistorial()">
@@ -618,69 +600,69 @@
             const tPrin = (mins - parseInt(tCal) - parseInt(tCalm)) + ' min';
 
             const nivelBajo = (usuario.condicion === 'Mala' || usuario.condicion === 'Muy mala' || usuario.habitos === 'Persona Mayor');
-            const series = nivelBajo ? '2 series de 10 repeticiones (ritmo suave)' : '3 series de 12-15 repeticiones (descanso 45 seg)';
+            const series = nivelBajo ? '2 series de 10 reps (suave)' : '3 series de 12-15 reps (descanso 45s)';
 
             let calentamiento = [
-                '<strong>Movilidad articular superior:</strong> Giros suaves de cuello, hombros y muñecas (1 min).',
-                '<strong>Movilidad de cadera y rodillas:</strong> Círculos amplios de cadera y flexo-extensión suave de tobillos (2 min).'
+                { titulo: "🔄 Movilidad articular superior", secuencia: "🧎‍♂️ ➔ 🔄 ➔ ✨", desc: "Giros suaves y controlados de cuello, hombros y muñecas para lubricar articulaciones (1 min)." },
+                { titulo: "🔄 Movilidad de cadera y tobillos", secuencia: "🧍 ➔ 🔄 ➔ 🟢", desc: "Círculos amplios de cadera y flexo-extensión suave de tobillos (2 min)." }
             ];
             let principal = [];
             let calma = [
-                '<strong>Respiración diafragmática:</strong> Inhalar profundo por la nariz y soltar lento por la boca (2 min).',
-                '<strong>Estiramientos de tren inferior:</strong> Mantener 20 segundos suaves por cada lado sin rebotes.'
+                { titulo: "🌬️ Respiración diafragmática", secuencia: "👃 ➔ 🫁 ➔ 👄", desc: "Inhalar profundo por la nariz hinchando abdomen y soltar lento por la boca (2 min)." },
+                { titulo: "🧘 Estiramiento de tren inferior", secuencia: "🦵 ➔ ⏱️ ➔ 😌", desc: "Mantener 20 segundos suaves por cada lado sin rebotes ni tirones." }
             ];
 
             if (instalacion === 'Gimnasio municipal') {
-                calentamiento.push('<strong>Activación cardiovascular en máquina:</strong> 5 min a ritmo suave.');
+                calentamiento.push({ titulo: "🚴 Activación cardiovascular", secuencia: "⚡ ➔ 🫀 ➔ 🟢", desc: "5 minutos en bicicleta estática, cinta o remo a ritmo muy suave." });
                 principal = [
-                    `<strong>Nota:</strong> Circuito preparado para el equipamiento del Gimnasio Municipal (${objetivo}).`,
-                    `<strong>Bloque 1 - Tren inferior:</strong> Activación global de piernas (${series}).`,
-                    `<strong>Bloque 2 - Empuje y tracción:</strong> Trabajo equilibrado de torso (${series}).`,
-                    `<strong>Bloque 3 - Estabilidad Core:</strong> Control postural y zona media.`
+                    { titulo: `📍 Circuito Gimnasio (${objetivo})`, secuencia: "⚙️ ➔ 🏋️ ➔ 💪", desc: "Bloque adaptado al equipamiento profesional disponible en la instalación." },
+                    { titulo: "🦵 Bloque 1 - Tren inferior", secuencia: "⬇️ ➔ ⬆️ ➔ 🔥", desc: `Trabajo global de piernas y estabilidad (${series}).` },
+                    { titulo: "💪 Bloque 2 - Torso y Brazos", secuencia: "🫱 ➔ 🫲 ➔ ✨", desc: `Movimientos equilibrados de empuje y tracción (${series}).` },
+                    { titulo: "🛡️ Bloque 3 - Estabilidad Core", secuencia: "🧍 ➔ 🔒 ➔ 🎯", desc: "Control postural y fortalecimiento de la zona media abdominal." }
                 ];
             } else if (instalacion === 'En Casa') {
-                calentamiento.push('<strong>Marcha activa en el sitio:</strong> Elevando rodillas suavemente y acompañando con braceo.');
+                calentamiento.push({ titulo: "🚶 Marcha activa en el sitio", secuencia: "🦿 ➔ ⬆️ ➔ 🔄", desc: "Elevación suave de rodillas alternadas acompañando con braceo dinámico." });
                 if (material === 'Accesorios de casa') {
                     principal = [
-                        `<strong>Sentadilla con silla:</strong> Siéntate y levántate controlando la bajada sin dejarte caer (${series}).`,
-                        `<strong>Remo con botellas / bolsas de peso:</strong> Inclina ligeramente el tronco y lleva el peso hacia la cintura (${series}).`,
-                        `<strong>Press y movilidad con palo de escoba:</strong> Sujeta el palo a la anchura de hombros y elévalo sobre la cabeza (${series}).`,
-                        `<strong>Flexiones inclinadas en mesa:</strong> Apoya las manos en un borde firme y flexiona los codos (${series}).`
+                        { titulo: "🪑 Sentadilla con silla", secuencia: "🧎‍♂️ ➔ 🪑 ➔ 🧍", desc: `Siéntate y levántate controlando la bajada sin dejarte caer de golpe (${series}).` },
+                        { titulo: "🧴 Remo con botellas o bolsas", secuencia: "🏋️ ➔ 🫱 ➔ 💪", desc: `Inclina ligeramente el tronco y lleva el peso hacia la cintura (${series}).` },
+                        { titulo: "🧹 Press con palo de escoba", secuencia: "🪵 ➔ ⬆️ ➔ 🟢", desc: `Sujeta el palo a la anchura de hombros y elévalo sobre la cabeza (${series}).` },
+                        { titulo: "🫸 Flexiones en mesa o encimera", secuencia: "🪞 ➔ 🫸 ➔ ✨", desc: `Apoya las manos en un borde firme y flexiona los codos (${series}).` }
                     ];
                 } else if (material === 'Material de gimnasio en casa') {
                     principal = [
-                        `<strong>Sentadilla goblet con mancuerna:</strong> Sujeta el peso pegado al pecho y baja con la espalda recta (${series}).`,
-                        `<strong>Remo con banda elástica o mancuerna:</strong> Tracciona llevando los codos atrás juntando escápulas (${series}).`,
-                        `<strong>Press de hombros:</strong> Empuje vertical controlado sin arquear la espalda (${series}).`,
-                        `<strong>Puente de glúteo en esterilla:</strong> Eleva la cadera apretando glúteos arriba (${series}).`
+                        { titulo: "🏋️ Sentadilla goblet con mancuerna", secuencia: "📦 ➔ 🧎‍♂️ ➔ 🧍", desc: `Sujeta el peso pegado al pecho y baja con la espalda recta (${series}).` },
+                        { titulo: "🦾 Remo con banda o mancuerna", secuencia: "🪢 ➔ 🫱 ➔ 💪", desc: `Tracciona llevando los codos atrás juntando escápulas (${series}).` },
+                        { titulo: "🙋 Press de hombros", secuencia: "🏋️ ➔ ⬆️ ➔ ✨", desc: `Empuje vertical controlado sin arquear la zona lumbar (${series}).` },
+                        { titulo: "🌉 Puente de glúteo en esterilla", secuencia: "🧘 ➔ 🌉 ➔ 🎯", desc: `Eleva la cadera contrayendo los glúteos arriba (${series}).` }
                     ];
                 } else {
                     principal = [
-                        `<strong>Sentadillas al aire:</strong> Baja manteniendo los talones apoyados y la espalda recta (${series}).`,
-                        `<strong>Zancadas atrás alternas:</strong> Da un paso amplio atrás apoyando bien la puntera (${series}).`,
-                        `<strong>Flexiones en pared o suelo:</strong> Mantén el abdomen firme durante todo el recorrido (${series}).`,
-                        `<strong>Plancha abdominal:</strong> Mantén la postura firme 20-30 segundos sin hundir la zona lumbar.`
+                        { titulo: "🧍 Sentadillas al aire", secuencia: "⬇️ ➔ ⏸️ ➔ ⬆️", desc: `Baja manteniendo los talones apoyados y la espalda recta (${series}).` },
+                        { titulo: "🦵 Zancadas atrás alternas", secuencia: "🦿 ➔ ⬇️ ➔ 🔄", desc: `Da un paso amplio atrás apoyando bien la puntera (${series}).` },
+                        { titulo: "🧱 Flexiones en pared o suelo", secuencia: "🧱 ➔ 🫸 ➔ ✨", desc: `Mantén el abdomen firme durante todo el recorrido (${series}).` },
+                        { titulo: "🛡️ Plancha abdominal", secuencia: "🧱 ➔ ⏱️ ➔ 🔒", desc: "Mantén la postura firme 20-30 segundos sin hundir la zona lumbar." }
                     ];
                 }
-                calma.push('<strong>Estiramiento de espalda con silla o pared:</strong> Apoya las manos en el respaldo y alarga suavemente la columna.');
+                calma.push({ titulo: "🪑 Estiramiento de espalda", secuencia: "🪑 ➔ 🫸 ➔ 😌", desc: "Apoya las manos en el respaldo de una silla y alarga suavemente la columna." });
             } else if (instalacion === 'Exterior') {
-                calentamiento.push('<strong>Caminata rápida con rotación de tronco:</strong> Paso vivo por el parque.');
+                calentamiento.push({ titulo: "🌳 Caminata rápida con giro", secuencia: "🚶 ➔ 🔄 ➔ ✨", desc: "Paso vivo por el parque realizando rotaciones suaves de tronco." });
                 principal = [
-                    `<strong>Subida al banco del parque (Step-up):</strong> Sube alternando ambas piernas con control (${series}).`,
-                    `<strong>Flexiones inclinadas en respaldo de banco:</strong> Cuerpo alineado como una tabla (${series}).`,
-                    `<strong>Fondos de tríceps en banco:</strong> Manos apoyadas en el borde del asiento y flexión suave de codos (${series}).`,
-                    `<strong>Desplazamientos laterales / marcha rápida:</strong> 4 bloques de 1 minuto activo + 30 seg de recuperación.`
+                    { titulo: "🪑 Subida a banco (Step-up)", secuencia: "🪑 ➔ 🦿 ➔ ⬆️", desc: `Sube alternando ambas piernas en el asiento con control (${series}).` },
+                    { titulo: "🧱 Flexiones inclinadas en banco", secuencia: "🧱 ➔ 🫸 ➔ 🟢", desc: `Cuerpo alineado como una tabla apoyando las manos en el respaldo (${series}).` },
+                    { titulo: "💪 Fondos de tríceps en banco", secuencia: "🪑 ➔ 🫱 ➔ ⬇️", desc: `Manos apoyadas en el borde del asiento y flexión suave de codos (${series}).` },
+                    { titulo: "⚡ Desplazamientos laterales", secuencia: "🏃 ➔ ↔️ ➔ 🎯", desc: "4 bloques de 1 minuto activo + 30 seg de recuperación." }
                 ];
-                calma.push('<strong>Estiramiento de isquiotibiales en banco:</strong> Apoya un talón sobre el asiento e inclina suavemente el tronco.');
+                calma.push({ titulo: "🪑 Estiramiento en banco", secuencia: "🪑 ➔ 🦵 ➔ 😌", desc: "Apoya un talón sobre el asiento del banco e inclina suavemente el tronco." });
             } else if (instalacion === 'Ruta') {
-                calentamiento.push('<strong>Caminata progresiva:</strong> Primeros 5 minutos aumentando poco a poco la amplitud de zancada.');
+                calentamiento.push({ titulo: "🌲 Caminata progresiva", secuencia: "🚶 ➔ 📈 ➔ 🟢", desc: "Primeros 5 minutos aumentando poco a poco la amplitud de zancada." });
                 principal = [
-                    `<strong>Caminata a ritmo constante (${objetivo}):</strong> Mantén postura erguida, mirada al frente y braceo natural.`,
-                    `<strong>Sentadilla en banco de ruta:</strong> Parada activa: 10 repeticiones de sentarse y levantarse con control.`,
-                    `<strong>Empuje contra tronco de árbol o señal:</strong> 12 flexiones inclinadas de brazos apoyando firmemente las palmas.`,
-                    `<strong>Cambios de ritmo (Fartlek suave):</strong> Alterna 2 minutos a paso muy vivo con 1 minuto a paso normal.`
+                    { titulo: `🚶 Caminata constante (${objetivo})`, secuencia: "🚶 ➔ 📏 ➔ 🎯", desc: "Mantén postura erguida, mirada al frente y braceo natural constante." },
+                    { titulo: "🪑 Parada activa en banco o muro", secuencia: "🪑 ➔ 🧎‍♂️ ➔ 🔄", desc: "10 repeticiones de sentarse y levantarse con control de postura." },
+                    { titulo: "🌳 Empuje contra árbol o señal", secuencia: "🪵 ➔ 🫸 ➔ 💪", desc: "12 flexiones inclinadas de brazos apoyando firmemente las palmas." },
+                    { titulo: "⚡ Cambios de ritmo (Fartlek)", secuencia: "🚶 ➔ 🏃 ➔ ⏱️", desc: "Alterna 2 minutos a paso muy vivo con 1 minuto a paso normal." }
                 ];
-                calma.push('<strong>Estiramiento de gemelos apoyado en árbol:</strong> Adelanta una pierna y mantén el talón trasero pegado al suelo.');
+                calma.push({ titulo: "🌳 Estiramiento de gemelos", secuencia: "🪵 ➔ 🦿 ➔ 😌", desc: "Adelanta una pierna contra el árbol y mantén el talón trasero pegado al suelo." });
             }
 
             return {
@@ -728,11 +710,11 @@
                         <p style="margin: 0 0 6px 0;"><strong>Material:</strong> ${s.material} | <strong>Objetivo:</strong> ${s.objetivo}</p>
                         ${s.calentamiento ? `
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🔥 Calentamiento:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderItemEjercicio(i)).join('')}</div>
+                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderTarjetaEjercicio(i.titulo, i.secuencia, i.desc)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>💪 Parte Principal:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderItemEjercicio(i)).join('')}</div>
+                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderTarjetaEjercicio(i.titulo, i.secuencia, i.desc)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🧘 Vuelta a la Calma:</strong></p>
-                            <div>${s.calma.map(i => renderItemEjercicio(i)).join('')}</div>
+                            <div>${s.calma.map(i => renderTarjetaEjercicio(i.titulo, i.secuencia, i.desc)).join('')}</div>
                         ` : ''}
                     </div>
                 </details>
