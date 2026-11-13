@@ -1,7 +1,72 @@
-const STORAGE_KEY_USERS = 'melide_deporte_usuarios_v1';
+// --- CONFIGURACIÓN DE SUPABASE ---
+const SUPABASE_URL = 'https://xkjywagvdxzbyqbjxser.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_6qZukJ1d6KEROUEI5sH3ew_0R9iiXVb';
+
+// Inicializar el cliente de Supabase
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
 let sesionGeneradaActual = null;
 let cacheTodasLasSesionesAdmin = [];
+
+// Variable local en memoria para manejar los datos de forma fluida tras sincronizar con Supabase
+let cacheUsuariosMemoria = [];
+
+// Función para cargar los usuarios desde Supabase (síncrona con caché local o llamada asíncrona)
+async function obtenerUsuariosAsync() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('app_store')
+            .select('*')
+            .eq('id', 'datos_globales')
+            .single();
+
+        if (error || !data) {
+            // Si la tabla está vacía o no existe aún, devolvemos la caché o array vacío
+            return cacheUsuariosMemoria;
+        }
+
+        // El contenido guardado en la columna JSONB
+        cacheUsuariosMemoria = data.contenido || [];
+        return cacheUsuariosMemoria;
+    } catch (e) {
+        console.error('Error al conectar con Supabase:', e);
+        return cacheUsuariosMemoria;
+    }
+}
+
+// Función para guardar los usuarios en Supabase en la nube
+async function guardarUsuariosAsync(listaUsuarios) {
+    cacheUsuariosMemoria = listaUsuarios;
+    try {
+        const { error } = await supabaseClient
+            .from('app_store')
+            .upsert({ 
+                id: 'datos_globales', 
+                contenido: listaUsuarios 
+            });
+
+        if (error) {
+            console.error('Error al guardar en Supabase:', error);
+        }
+    } catch (e) {
+        console.error('Excepción al guardar en Supabase:', e);
+    }
+}
+
+// Versión síncrona de compatibilidad para lecturas rápidas ya cacheadas
+function obtenerUsuarios() {
+    return cacheUsuariosMemoria;
+}
+
+function guardarUsuarios(lista) {
+    guardarUsuariosAsync(lista);
+}
+
+// Sincronizar datos al arrancar la aplicación
+document.addEventListener("DOMContentLoaded", async () => {
+    await obtenerUsuariosAsync();
+});
 
 function generarRutinaDinamica(instalacion, material, tiempo, objetivo, usuario) {
     const mins = parseInt(tiempo, 10) || 45;
@@ -89,19 +154,6 @@ function toggleDetalleEjercicio(id) {
     }
 }
 
-function obtenerUsuarios() {
-    try {
-        const data = localStorage.getItem(STORAGE_KEY_USERS);
-        return data ? JSON.parse(data) : [];
-    } catch (e) {
-        return [];
-    }
-}
-
-function guardarUsuarios(lista) {
-    localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(lista));
-}
-
 function obtenerUsuarioActivo() {
     const dniActivo = localStorage.getItem(STORAGE_KEY_SESSION);
     if (!dniActivo) return null;
@@ -166,10 +218,13 @@ function cambiarPestanaUsuario(pestana) {
     }
 }
 
-function handleRegistro(e) {
+async function handleRegistro(e) {
     e.preventDefault();
     const errorBox = document.getElementById('reg-error');
     errorBox.style.display = 'none';
+
+    // Descargar datos frescos de la nube antes de validar
+    const usuarios = await obtenerUsuariosAsync();
 
     const email = document.getElementById('reg-email').value.trim().toLowerCase();
     const emailConfirm = document.getElementById('reg-email-confirm').value.trim().toLowerCase();
@@ -180,7 +235,6 @@ function handleRegistro(e) {
     if (email !== emailConfirm) { mostrarError('reg-error', '⚠️ Los correos no coinciden.'); return; }
     if (pass !== passConfirm) { mostrarError('reg-error', '⚠️ Las contraseñas no coinciden.'); return; }
 
-    const usuarios = obtenerUsuarios();
     if (usuarios.some(u => u.dni === dni)) { mostrarError('reg-error', '⚠️ Ya existe un usuario con ese DNI.'); return; }
 
     const nuevoUsuario = {
@@ -203,12 +257,12 @@ function handleRegistro(e) {
     };
 
     usuarios.push(nuevoUsuario);
-    guardarUsuarios(usuarios);
+    await guardarUsuariosAsync(usuarios);
     localStorage.setItem(STORAGE_KEY_SESSION, nuevoUsuario.dni);
     iniciarZonaUsuario(nuevoUsuario);
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
     const errorBox = document.getElementById('login-error');
     errorBox.style.display = 'none';
@@ -217,12 +271,12 @@ function handleLogin(e) {
     const passInput = document.getElementById('login-pass').value.trim();
 
     if (userInput.toLowerCase() === 'tonecho' && passInput === '0010') {
-        cargarPanelAdministracion();
+        await cargarPanelAdministracion();
         irA('scr-admin');
         return;
     }
 
-    const usuarios = obtenerUsuarios();
+    const usuarios = await obtenerUsuariosAsync();
     const encontrado = usuarios.find(u => 
         (u.email && u.email.toLowerCase() === userInput.toLowerCase() || 
          u.dni && u.dni.toUpperCase() === userInput.toUpperCase() ||
@@ -320,16 +374,16 @@ function generarSesionEntrenamiento(e) {
     contenedor.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function guardarSesionEnHistorial() {
+async function guardarSesionEnHistorial() {
     const usuario = obtenerUsuarioActivo();
     if (!usuario || !sesionGeneradaActual) return;
 
     if (!usuario.historialSesiones) usuario.historialSesiones = [];
     usuario.historialSesiones.unshift(sesionGeneradaActual);
-    actualizarUsuarioEnStorage(usuario);
+    await actualizarUsuarioEnStorageAsync(usuario);
 
     const msg = document.getElementById('actividad-msg');
-    msg.innerText = '✅ ¡Sesión guardada en tu pestaña "Sesiones"!';
+    msg.innerText = '✅ ¡Sesión guardada en la nube y en tu historial!';
     msg.style.display = 'block';
     setTimeout(() => { msg.style.display = 'none'; }, 3500);
 }
@@ -387,12 +441,12 @@ function toggleSesionHistorial(bodyId, btn) {
     btn.innerHTML = isOpen ? '📂 Abrir sesión' : '🔼 Cerrar sesión';
 }
 
-function eliminarSesionHistorial(index) {
+async function eliminarSesionHistorial(index) {
     const usuario = obtenerUsuarioActivo();
     if (!usuario || !usuario.historialSesiones) return;
 
     usuario.historialSesiones.splice(index, 1);
-    actualizarUsuarioEnStorage(usuario);
+    await actualizarUsuarioEnStorageAsync(usuario);
     cargarHistorialSesiones();
 }
 
@@ -406,8 +460,9 @@ function toggleAdminDrawer(drawerId) {
     if (icon) icon.innerText = isOpen ? '▼' : '▲';
 }
 
-function cargarPanelAdministracion() {
-    const usuarios = obtenerUsuarios();
+async function cargarPanelAdministracion() {
+    // Descarga siempre los datos más frescos directamente de Supabase
+    const usuarios = await obtenerUsuariosAsync();
     
     // 1. CAJÓN DE USUARIOS (Ordenados alfabéticamente con botón de borrado)
     usuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
@@ -610,16 +665,16 @@ function cargarPanelAdministracion() {
     `;
 }
 
-function eliminarUsuarioAdmin(dni) {
+async function eliminarUsuarioAdmin(dni) {
     if (!confirm(`¿Estás seguro de que deseas eliminar al usuario con DNI ${dni}? Se borrará su ficha y todas sus sesiones guardadas.`)) {
         return;
     }
 
-    let usuarios = obtenerUsuarios();
+    let usuarios = await obtenerUsuariosAsync();
     usuarios = usuarios.filter(u => u.dni !== dni);
-    guardarUsuarios(usuarios);
+    await guardarUsuariosAsync(usuarios);
 
-    // Recargar el panel de administración para ver los cambios reflejados al instante
+    // Recargar el panel de administración
     cargarPanelAdministracion();
 }
 
@@ -698,7 +753,7 @@ function cargarDatosEnFormularioEdicion() {
     document.getElementById('edit-gustos').value = usuario.gustos || '';
 }
 
-function actualizarDatosUsuario(e) {
+async function actualizarDatosUsuario(e) {
     e.preventDefault();
     const usuario = obtenerUsuarioActivo();
     if (!usuario) return;
@@ -713,21 +768,21 @@ function actualizarDatosUsuario(e) {
     usuario.estatura = parseInt(document.getElementById('edit-estatura').value, 10);
     usuario.gustos = document.getElementById('edit-gustos').value.trim();
 
-    actualizarUsuarioEnStorage(usuario);
+    await actualizarUsuarioEnStorageAsync(usuario);
     document.getElementById('saludo-principal').innerText = `¡Hola, ${usuario.mote || usuario.nombre}!`;
 
     const msg = document.getElementById('perfil-msg');
-    msg.innerText = '✅ Ficha actualizada correctamente.';
+    msg.innerText = '✅ Ficha actualizada y sincronizada correctamente.';
     msg.style.display = 'block';
     setTimeout(() => { msg.style.display = 'none'; }, 3000);
 }
 
-function actualizarUsuarioEnStorage(usuarioActualizado) {
-    const usuarios = obtenerUsuarios();
+async function actualizarUsuarioEnStorageAsync(usuarioActualizado) {
+    const usuarios = await obtenerUsuariosAsync();
     const idx = usuarios.findIndex(u => u.dni === usuarioActualizado.dni);
     if (idx !== -1) {
         usuarios[idx] = usuarioActualizado;
-        guardarUsuarios(usuarios);
+        await guardarUsuariosAsync(usuarios);
     }
 }
 
