@@ -2,285 +2,1381 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melide Deporte - Actividad Municipal</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Facendo Deporte en Melide - Concello de Melide</title>
+
+    <!-- Librería oficial de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --navy-darkest: #061326;
+            --navy-primary: #0b2240;
+            --navy-medium: #133663;
+            --navy-light: #1e4d8c;
+            --gold-accent: #eab308;
+            --gold-hover: #ca8a04;
+            --bg-gradient: linear-gradient(145deg, #061326 0%, #0d284b 55%, #153c6e 100%);
+            --card-surface: #ffffff;
+            --text-dark: #0b2240;
+            --text-muted: #475569;
+            --border-subtle: #cbd5e1;
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: var(--bg-gradient); 
+            color: var(--text-dark); 
+            margin: 0; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden;
+        }
+
+        header { 
+            background: var(--navy-darkest); 
+            color: white; 
+            padding: 0 24px; 
+            display: none; 
+            align-items: center; 
+            justify-content: space-between;
+            min-height: 90px; 
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4); 
+            border-bottom: 3px solid var(--gold-accent);
+            z-index: 100; 
+            flex-shrink: 0;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+        }
+        @media (min-width: 768px) {
+            header { justify-content: space-around; padding: 0 40px; }
+            .header-brand { justify-content: center; max-width: 700px; margin: 0 auto; }
+        }
+
+        .screen { 
+            flex: 1; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center;
+            overflow-y: auto; 
+            padding: 24px 16px; 
+            box-sizing: border-box;
+        }
+        .screen.active { display: flex; }
+
+        #scr-inicio { 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 20px;
+        }
+
+        .login-box {
+            background: var(--card-surface); 
+            padding: 36px 30px; 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 460px; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35); 
+            border-top: 5px solid var(--gold-accent);
+            box-sizing: border-box; 
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .login-box { max-width: 540px; padding: 40px; }
+            .screen { padding: 32px 24px; }
+            #subvista-actividad, #subvista-historial, #subvista-perfil, #admin-content-area { max-width: 720px !important; }
+        }
+
+        @media (min-width: 1024px) {
+            .login-box { max-width: 580px; }
+            .nav-tabs { max-width: 660px !important; }
+        }
+
+        .form-label {
+            display: block; 
+            font-size: 0.74rem; 
+            font-weight: 700; 
+            color: var(--navy-primary); 
+            margin-bottom: 6px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.6px;
+        }
+
+        .form-control {
+            width: 100%; 
+            padding: 12px 14px; 
+            margin-bottom: 16px; 
+            border-radius: 10px; 
+            border: 1.5px solid var(--border-subtle); 
+            background: #f1f5f9; 
+            color: var(--navy-darkest); 
+            font-weight: 600; 
+            font-size: 0.95rem;
+            box-sizing: border-box; 
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        .form-control:focus { 
+            border-color: var(--navy-light); 
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(30, 77, 140, 0.18);
+        }
+
+        .btn-main { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            border: none; 
+            background: var(--navy-primary); 
+            color: white; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            box-shadow: 0 4px 12px rgba(6, 19, 38, 0.25); 
+            transition: all 0.2s ease;
+        }
+        .btn-main:hover { background: var(--navy-medium); transform: translateY(-1px); }
+
+        .btn-gold {
+            background: var(--gold-accent);
+            color: var(--navy-darkest);
+        }
+        .btn-gold:hover { background: var(--gold-hover); color: #ffffff; }
+
+        .btn-registro { background: #991b1b; }
+        .btn-registro:hover { background: #7f1d1d; }
+
+        .header-btn { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: background 0.2s; }
+        .header-btn:hover { background: rgba(255,255,255,0.12); }
+
+        .error-msg {
+            background: #fef2f2; color: #991b1b; border: 1.5px solid #f87171; 
+            padding: 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; 
+            margin-bottom: 16px; display: none; text-align: center;
+        }
+
+        .success-msg {
+            background: #ecfdf5; color: #065f46; border: 1.5px solid #34d399; 
+            padding: 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; 
+            margin-bottom: 16px; display: none; text-align: center;
+        }
+
+        .dash-hero {
+            text-align: center; 
+            margin-bottom: 22px;
+            color: #ffffff;
+        }
+        .dash-hero h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #ffffff; }
+        .dash-hero p { color: #cbd5e1; font-size: 0.9rem; margin-top: 6px; }
+
+        .nav-tabs { display: flex; gap: 8px; width: 100%; max-width: 540px; margin-bottom: 24px; }
+        .tab-btn {
+            flex: 1; padding: 12px 8px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.1); color: #e2e8f0; font-weight: 700; cursor: pointer;
+            font-size: 0.88rem; text-align: center; transition: all 0.2s;
+            backdrop-filter: blur(6px);
+        }
+        .tab-btn:hover { background: rgba(255, 255, 255, 0.2); color: #ffffff; }
+        .tab-btn.active { 
+            background: var(--gold-accent); 
+            color: var(--navy-darkest); 
+            border-color: var(--gold-accent); 
+            box-shadow: 0 4px 14px rgba(234, 179, 8, 0.35); 
+        }
+
+        .routine-card {
+            background: var(--card-surface); border-radius: 20px; padding: 24px; margin-top: 24px;
+            border-top: 5px solid var(--gold-accent); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            text-align: left; width: 100%; box-sizing: border-box;
+        }
+        .routine-header {
+            background: var(--navy-primary); color: #f8fafc; padding: 16px; border-radius: 12px; 
+            border-left: 5px solid var(--gold-accent); margin-bottom: 20px; font-size: 0.88rem; line-height: 1.6;
+        }
+        .routine-block {
+            margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;
+        }
+        .routine-block:last-of-type { border-bottom: none; margin-bottom: 10px; }
+        .routine-block h4 {
+            margin: 0 0 12px 0; color: var(--navy-primary); font-size: 1.05rem; display: flex; align-items: center; gap: 8px;
+        }
+        
+        .interactive-exercise-card {
+            background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .interactive-exercise-card:hover {
+            border-color: var(--navy-medium); background: #e2e8f0; transform: translateX(2px);
+        }
+        .ex-title-row {
+            display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--navy-darkest); font-size: 0.92rem; gap: 8px;
+        }
+        .ex-hint {
+            font-size: 0.72rem; color: #ffffff; background: var(--navy-medium); padding: 3px 8px; border-radius: 6px; font-weight: 700; white-space: nowrap;
+        }
+        .ex-brief {
+            font-size: 0.82rem; color: var(--text-muted); margin: 6px 0 0 0; line-height: 1.4;
+        }
+
+        .exercise-detail-panel {
+            background: #ffffff; border: 1.5px solid var(--navy-medium); border-radius: 12px; padding: 16px; margin-top: 6px; margin-bottom: 12px; display: none;
+            box-shadow: 0 4px 12px rgba(11, 34, 64, 0.08);
+        }
+        .exercise-detail-panel h5 {
+            margin: 0 0 8px 0; color: var(--navy-primary); font-size: 0.95rem;
+        }
+        .exercise-detail-panel p {
+            margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-dark); line-height: 1.5;
+        }
+        .video-btn {
+            display: inline-flex; align-items: center; gap: 6px; background: var(--navy-primary); color: #ffffff;
+            padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-decoration: none; transition: background 0.2s;
+        }
+        .video-btn:hover { background: var(--navy-light); }
+
+        .history-item-card {
+            background: #f8fafc; border: 1.5px solid var(--border-subtle); border-radius: 14px; padding: 16px; margin-bottom: 14px;
+        }
+        .history-top-bar {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+        }
+        .history-title {
+            font-weight: 800; color: var(--navy-primary); font-size: 0.95rem;
+        }
+        .history-meta {
+            font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;
+        }
+        .history-actions {
+            display: flex; gap: 8px; margin-top: 12px;
+        }
+        .btn-small {
+            padding: 8px 14px; border-radius: 8px; border: none; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-open-session { background: var(--navy-primary); color: white; }
+        .btn-open-session:hover { background: var(--navy-light); }
+        .btn-delete-session { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .btn-delete-session:hover { background: #fecaca; }
+        .history-expanded-body {
+            display: none; margin-top: 14px; padding-top: 14px; border-top: 1.5px dashed #cbd5e1;
+        }
+
+        .admin-drawer {
+            background: var(--card-surface);
+            border-radius: 16px;
+            border: 1.5px solid var(--border-subtle);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .admin-drawer-header {
+            background: var(--navy-primary);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .admin-drawer-header:hover {
+            background: var(--navy-medium);
+        }
+        .admin-drawer-body {
+            padding: 20px;
+            display: none;
+            background: #f8fafc;
+        }
+
+        .stat-bar-container {
+            margin-bottom: 12px;
+        }
+        .stat-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--navy-primary);
+            margin-bottom: 4px;
+        }
+        .stat-bar-track {
+            background: #e2e8f0;
+            border-radius: 6px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .stat-bar-fill {
+            background: var(--gold-accent);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.6s ease;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- HEADER PRINCIPAL -->
-    <header id="main-header" style="display: none;">
-        <button id="btn-atras" class="btn-icon" onclick="irA('scr-inicio')" style="display: none;">⬅️ Volver</button>
-        <h2>Melide Deporte</h2>
-        <button class="btn-icon" onclick="toggleFullScreen()" title="Pantalla completa">🔲</button>
+    <header id="main-header">
+        <button class="header-btn" id="btn-atras" onclick="irA('scr-inicio')" style="display: none; visibility: hidden;">&#8592;</button>
+        <div class="header-brand">
+            <img src="concello-de-melide.jpeg" alt="Logo Melide" style="height: 64px; width: auto; border-radius: 10px; object-fit: contain; background: rgba(255,255,255,0.08); padding: 3px;">
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <span style="font-weight: 800; letter-spacing: 0.5px; font-size: 1.25rem; line-height: 1.2; color: #ffffff;">FACENDO DEPORTE EN MELIDE</span>
+                <span style="font-size: 0.88rem; color: #cbd5e1; font-weight: 700; letter-spacing: 0.4px;">Servizo de Deportes</span>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <button class="header-btn" onclick="toggleFullScreen()" title="Pantalla completa">&#x26F6;</button>
+            <button class="header-btn" onclick="cerrarSesion()" title="Cerrar Sesión">&#127968;</button>
+        </div>
     </header>
 
-    <main class="app-container">
+    <!-- PANTALLA 1: INICIO -->
+    <div id="scr-inicio" class="screen active">
+        <div class="login-box">
+            <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" style="width: 220px; max-width: 80%; height: auto; margin-bottom: 20px; border-radius: 12px; object-fit: contain;">
+            
+            <h2 style="color: var(--navy-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.45rem; letter-spacing: 0.5px; font-weight: 800;">FACENDO DEPORTE EN MELIDE</h2>
+            
+            <div id="login-error" class="error-msg"></div>
 
-        <!-- 1. PANTALLA DE INICIO (LOGIN / ACCESO) -->
-        <section id="scr-inicio" class="screen active">
-            <div class="welcome-card">
-                <h1>🏋️‍♂️ Melide Deporte</h1>
-                <p>Plataforma de actividad física municipal y rutinas personalizadas.</p>
-                
-                <form onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="login-user">Usuario (DNI, Correo o Alias) o Admin (Tonecho):</label>
-                        <input type="text" id="login-user" required placeholder="Introduce tu usuario o Tonecho">
-                    </div>
-                    <div class="form-group">
-                        <label for="login-pass">Contraseña:</label>
-                        <input type="password" id="login-pass" required placeholder="Contraseña">
-                    </div>
-                    <button type="submit" class="btn-main btn-primary">ENTRAR EN LA APLICACIÓN</button>
-                </form>
+            <form onsubmit="handleLogin(event)">
+                <input type="text" id="login-user" placeholder="Usuario / Correo / DNI" class="form-control" required>
+                <input type="password" id="login-pass" placeholder="Contraseña" class="form-control" required>
+                <button type="submit" class="btn-main btn-gold" style="margin-bottom: 14px;">ENTRAR</button>
+            </form>
 
-                <div id="login-error" class="error-msg" style="display: none;"></div>
-
-                <div class="register-prompt">
-                    <p>¿Eres vecino y aún no tienes cuenta?</p>
-                    <button type="button" class="btn-main btn-secondary" onclick="abrirRegistro()">REGISTRARSE COMO NUEVO VECINO</button>
-                </div>
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: 18px; margin-top: 8px;">
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600;">¿Primera vez en el programa?</p>
+                <button type="button" class="btn-main btn-registro" onclick="abrirRegistro()">REGISTRO NUEVO</button>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- 2. PANTALLA DE REGISTRO DE NUEVO VECINO -->
-        <section id="scr-registro" class="screen">
-            <div class="form-card">
-                <h2>📝 Registro de Nuevo Vecino</h2>
-                <p>Completa tus datos para empezar a generar tus rutinas personalizadas.</p>
+    <!-- PANTALLA 2: REGISTRO -->
+    <div id="scr-registro" class="screen">
+        <div class="login-box" style="max-width: 540px; width: 100%;">
+            <h2 style="color: var(--navy-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.35rem; text-align: center; font-weight: 800;">Nuevo Registro Vecinal</h2>
+            
+            <div id="reg-error" class="error-msg"></div>
 
-                <form id="form-registro" onsubmit="handleRegistro(event)">
-                    <div class="form-group">
-                        <label>Nombre:</label>
-                        <input type="text" id="reg-nombre" required placeholder="Ej. Manuel">
-                    </div>
-                    <div class="form-group">
-                        <label>Apellidos:</label>
-                        <input type="text" id="reg-apellidos" required placeholder="Ej. Gómez Castro">
-                    </div>
-                    <div class="form-group">
-                        <label>Mote / Alias (para el saludo):</label>
-                        <input type="text" id="reg-mote" placeholder="Ej. Manolo el del Bombo">
-                    </div>
-                    <div class="form-group">
-                        <label>DNI:</label>
-                        <input type="text" id="reg-dni" required placeholder="12345678X">
-                    </div>
-                    <div class="form-group">
-                        <label>Teléfono:</label>
-                        <input type="tel" id="reg-tf" required placeholder="600123456">
-                    </div>
-                    <div class="form-group">
-                        <label>Edad:</label>
-                        <input type="number" id="reg-edad" required min="10" max="110" placeholder="45">
-                    </div>
-                    <div class="form-group">
-                        <label>Dirección / Zona en Melide:</label>
-                        <input type="text" id="reg-direccion" required placeholder="Ej. Rúa Principal">
-                    </div>
-                    <div class="form-group">
-                        <label>Peso (kg):</label>
-                        <input type="number" step="0.1" id="reg-peso" required placeholder="70">
-                    </div>
-                    <div class="form-group">
-                        <label>Estatura (cm):</label>
-                        <input type="number" id="reg-estatura" required placeholder="175">
-                    </div>
-                    <div class="form-group">
-                        <label>Hábitos de actividad habituales:</label>
-                        <select id="reg-habitos" required>
-                            <option value="Sedentario">Sedentario (poco o nada de ejercicio)</option>
-                            <option value="Moderado">Moderado (caminatas o actividad ligera)</option>
-                            <option value="Activo">Activo (ejercicio habitual)</option>
-                            <option value="Persona Mayor">Persona Mayor (enfoque de movilidad)</option>
+            <form id="form-registro" onsubmit="handleRegistro(event)" style="text-align: left;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Nombre *</label><input type="text" id="reg-nombre" class="form-control" placeholder="Tu nombre" required></div>
+                    <div><label class="form-label">Apellidos *</label><input type="text" id="reg-apellidos" class="form-control" placeholder="Tus apellidos" required></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Mote *</label><input type="text" id="reg-mote" class="form-control" placeholder="Alias" required></div>
+                    <div><label class="form-label">DNI *</label><input type="text" id="reg-dni" class="form-control" placeholder="12345678A" pattern="[0-9]{8}[A-Za-z]" maxlength="9" style="text-transform: uppercase;" required></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Teléfono *</label><input type="tel" id="reg-tf" class="form-control" placeholder="600123456" pattern="[0-9]{9}" maxlength="9" inputmode="numeric" required></div>
+                    <div><label class="form-label">Edad *</label><input type="number" id="reg-edad" class="form-control" placeholder="Años" min="5" max="115" required></div>
+                </div>
+
+                <div><label class="form-label">Dirección *</label><input type="text" id="reg-direccion" class="form-control" placeholder="Calle, número, piso / parroquia" required></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Peso (kg) *</label><input type="number" step="0.1" id="reg-peso" class="form-control" placeholder="Ej. 70.5" min="15" max="300" required></div>
+                    <div><label class="form-label">Estatura (cm) *</label><input type="number" id="reg-estatura" class="form-control" placeholder="Ej. 175" min="50" max="250" required></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label class="form-label">Hábitos *</label>
+                        <select id="reg-habitos" class="form-control" required>
+                            <option value="Saludables">Saludables</option>
+                            <option value="Sedentarios">Sedentarios</option>
+                            <option value="Persona Mayor">Persona Mayor</option>
+                            <option value="Activo">Activo</option>
+                            <option value="Ninguno">Ninguno</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Condición física autopercibida:</label>
-                        <select id="reg-condicion" required>
-                            <option value="Muy mala">Muy mala</option>
+                    <div>
+                        <label class="form-label">Condición Física *</label>
+                        <select id="reg-condicion" class="form-control" required>
+                            <option value="Normal">Normal</option>
                             <option value="Mala">Mala</option>
-                            <option value="Regular" selected>Regular</option>
                             <option value="Buena">Buena</option>
                             <option value="Muy buena">Muy buena</option>
+                            <option value="Muy mala">Muy mala</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Correo electrónico:</label>
-                        <input type="email" id="reg-email" required placeholder="correo@ejemplo.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirma tu correo electrónico:</label>
-                        <input type="email" id="reg-email-confirm" required placeholder="correo@ejemplo.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Contraseña:</label>
-                        <input type="password" id="reg-password" required placeholder="Contraseña segura">
-                    </div>
-                    <div class="form-group">
-                        <label>Confirma tu contraseña:</label>
-                        <input type="password" id="reg-password-confirm" required placeholder="Repite la contraseña">
-                    </div>
+                </div>
 
-                    <div id="reg-error" class="error-msg" style="display: none;"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Correo *</label><input type="email" id="reg-email" class="form-control" placeholder="correo@melide.gal" required></div>
+                    <div><label class="form-label">Confirmar Correo *</label><input type="email" id="reg-email-confirm" class="form-control" placeholder="Repite tu correo" required></div>
+                </div>
 
-                    <button type="submit" class="btn-main btn-primary" style="margin-top: 15px;">COMPLETAR REGISTRO Y ENTRAR</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Contraseña *</label><input type="password" id="reg-password" class="form-control" placeholder="Mín. 4 caracteres" minlength="4" required></div>
+                    <div><label class="form-label">Confirmar Contraseña *</label><input type="password" id="reg-password-confirm" class="form-control" placeholder="Repite contraseña" minlength="4" required></div>
+                </div>
+
+                <button type="submit" class="btn-main btn-gold" style="margin-top: 12px;">GUARDAR Y ACCEDER</button>
+            </form>
+
+            <button type="button" class="btn-main" style="background: transparent; color: var(--navy-primary); box-shadow: none; margin-top: 12px;" onclick="irA('scr-inicio')">← Volver al inicio</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: ZONA DE USUARIO (3 PESTAÑAS) -->
+    <div id="scr-dash" class="screen">
+        <div class="dash-hero">
+            <h2 id="saludo-principal">¡Hola!</h2>
+            <p>Configura tu sesión personalizada, consulta tu historial o edita tu ficha</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button id="tab-btn-actividad" class="tab-btn active" onclick="cambiarPestanaUsuario('actividad')">🏃 Actividad</button>
+            <button id="tab-btn-historial" class="tab-btn" onclick="cambiarPestanaUsuario('historial')">📋 Sesiones</button>
+            <button id="tab-btn-perfil" class="tab-btn" onclick="cambiarPestanaUsuario('perfil')">👤 Mis Datos</button>
+        </div>
+
+        <!-- SUBVISTA A: CONFIGURAR ACTIVIDAD Y GENERADOR -->
+        <div id="subvista-actividad" style="width: 100%; max-width: 560px;">
+            <div class="login-box" style="max-width: 100%; text-align: left; margin-bottom: 16px;">
+                <h3 style="color: var(--navy-primary); margin-top: 0; margin-bottom: 18px; font-size: 1.2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; font-weight: 800;">Configurador de Sesión</h3>
+                <div id="actividad-msg" class="success-msg"></div>
+
+                <form onsubmit="generarSesionEntrenamiento(event)">
+                    <label class="form-label">1. Instalación / Lugar</label>
+                    <select id="pref-instalacion" class="form-control">
+                        <option value="Gimnasio municipal">Gimnasio municipal</option>
+                        <option value="Exterior">Exterior (Parques / Calle / Mobiliario urbano)</option>
+                        <option value="Ruta">Ruta (Caminos / Árboles / Bancos / Señales)</option>
+                        <option value="En Casa">En Casa (Sillas, botellas, mobiliario doméstico...)</option>
+                    </select>
+
+                    <label class="form-label">2. Material disponible</label>
+                    <select id="pref-material" class="form-control">
+                        <option value="Sin material">Sin material (Peso corporal)</option>
+                        <option value="Accesorios de casa">Accesorios de casa (Escobas, botellas, sillas...)</option>
+                        <option value="Mobiliario urbano / Exterior">Mobiliario urbano / Elementos del parque</option>
+                        <option value="Elementos de rutas">Elementos de rutas (Bancos, árboles, señales...)</option>
+                        <option value="Material de gimnasio en casa">Material de gimnasio en casa (Mancuernas, bandas...)</option>
+                    </select>
+
+                    <label class="form-label">3. Tiempo disponible</label>
+                    <select id="pref-tiempo" class="form-control">
+                        <option value="45 minutos" selected>45 minutos</option>
+                        <option value="60 minutos">60 minutos</option>
+                    </select>
+
+                    <label class="form-label">4. Objetivo principal de hoy</label>
+                    <select id="pref-objetivo" class="form-control">
+                        <option value="Movilidad y Salud">Movilidad y Salud</option>
+                        <option value="Cardio y Resistencia">Cardio y Resistencia</option>
+                        <option value="Fuerza y Tonificación">Fuerza y Tonificación</option>
+                    </select>
+
+                    <button type="submit" class="btn-main btn-gold" style="margin-top: 8px;">⚡ GENERAR MI SESIÓN DE HOY</button>
                 </form>
             </div>
-        </section>
 
-        <!-- 3. PANEL DE USUARIO (DASHBOARD) -->
-        <section id="scr-dash" class="screen">
-            <div class="user-dash-header">
-                <h3 id="saludo-principal">¡Hola!</h3>
-                <button class="btn-small btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
-            </div>
+            <!-- CONTENEDOR DONDE SE MUESTRA LA SESIÓN GENERADA -->
+            <div id="resultado-sesion-container" style="display: none;"></div>
+        </div>
 
-            <!-- Pestañas de navegación de usuario -->
-            <div class="user-tabs">
-                <button id="tab-btn-actividad" class="tab-btn active" onclick="cambiarPestanaUsuario('actividad')">🏋️ Actividad</button>
-                <button id="tab-btn-historial" class="tab-btn" onclick="cambiarPestanaUsuario('historial')">📅 Sesiones</button>
-                <button id="tab-btn-perfil" class="tab-btn" onclick="cambiarPestanaUsuario('perfil')">⚙️ Mi Ficha</button>
-            </div>
+        <!-- SUBVISTA B: HISTORIAL DE SESIONES HECHAS -->
+        <div id="subvista-historial" class="login-box" style="max-width: 560px; width: 100%; text-align: left; display: none;">
+            <h3 style="color: var(--navy-primary); margin-top: 0; margin-bottom: 18px; font-size: 1.2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; font-weight: 800;">Mis Sesiones Guardadas</h3>
+            <div id="lista-sesiones-hechas" style="font-size: 0.88rem; color: var(--text-dark);"></div>
+        </div>
 
-            <!-- Subvista 1: Generador de Actividad -->
-            <div id="subvista-actividad" class="subscreen active">
-                <div class="config-card">
-                    <h4>Generar Nueva Sesión de Entrenamiento</h4>
-                    <form onsubmit="generarSesionEntrenamiento(event)">
-                        <div class="form-group">
-                            <label>Lugar de práctica:</label>
-                            <select id="pref-instalacion">
-                                <option value="Gimnasio municipal">Gimnasio municipal</option>
-                                <option value="Exterior">Exterior (Parques / Calles)</option>
-                                <option value="Ruta">Ruta (Caminos / Senderos)</option>
-                                <option value="En Casa">En Casa</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Material disponible:</label>
-                            <select id="pref-material">
-                                <option value="Sin material">Sin material (Peso corporal)</option>
-                                <option value="Mancuernas">Mancuernas / Pesas</option>
-                                <option value="Gomas elásticas">Gomas elásticas</option>
-                                <option value="Banco / Silla">Banco / Silla firme</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Tiempo disponible:</label>
-                            <select id="pref-tiempo">
-                                <option value="30 minutos">30 minutos</option>
-                                <option value="45 minutos" selected>45 minutos</option>
-                                <option value="60 minutos">60 minutos</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Objetivo principal:</label>
-                            <select id="pref-objetivo">
-                                <option value="Movilidad y Salud">Movilidad y Salud</option>
-                                <option value="Fuerza Funcional">Fuerza Funcional</option>
-                                <option value="Cardio y Resistencia">Cardio y Resistencia</option>
-                                <option value="Tonificación General">Tonificación General</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-main btn-gold">🚀 GENERAR RUTINA PERSONALIZADA</button>
-                    </form>
-                    <div id="actividad-msg" class="success-msg" style="display: none; margin-top: 10px;"></div>
+        <!-- SUBVISTA C: MODIFICAR FICHA Y GUSTOS -->
+        <div id="subvista-perfil" class="login-box" style="max-width: 560px; width: 100%; text-align: left; display: none;">
+            <h3 style="color: var(--navy-primary); margin-top: 0; margin-bottom: 18px; font-size: 1.2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; font-weight: 800;">Modificar Ficha y Gustos</h3>
+            <div id="perfil-msg" class="success-msg"></div>
+
+            <form onsubmit="actualizarDatosUsuario(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Nombre</label><input type="text" id="edit-nombre" class="form-control" required></div>
+                    <div><label class="form-label">Apellidos</label><input type="text" id="edit-apellidos" class="form-control" required></div>
                 </div>
-
-                <!-- Contenedor donde aparece la rutina generada -->
-                <div id="resultado-sesion-container" style="display: none; margin-top: 20px;"></div>
-            </div>
-
-            <!-- Subvista 2: Historial de Sesiones Guardadas -->
-            <div id="subvista-historial" class="subscreen" style="display: none;">
-                <h4>Mis Sesiones Guardadas</h4>
-                <div id="lista-sesiones-hechas">
-                    <!-- Se carga dinámicamente -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Mote</label><input type="text" id="edit-mote" class="form-control" required></div>
+                    <div><label class="form-label">DNI</label><input type="text" id="edit-dni" class="form-control" style="background: #e2e8f0; color: #64748b;" readonly></div>
                 </div>
-            </div>
-
-            <!-- Subvista 3: Editar Perfil / Ficha -->
-            <div id="subvista-perfil" class="subscreen" style="display: none;">
-                <div class="form-card" style="box-shadow: none; padding: 0;">
-                    <h4>Editar Mi Ficha Personal</h4>
-                    <form onsubmit="actualizarDatosUsuario(event)">
-                        <div class="form-group"><label>Nombre:</label><input type="text" id="edit-nombre" required></div>
-                        <div class="form-group"><label>Apellidos:</label><input type="text" id="edit-apellidos" required></div>
-                        <div class="form-group"><label>Mote / Alias:</label><input type="text" id="edit-mote"></div>
-                        <div class="form-group"><label>DNI:</label><input type="text" id="edit-dni" disabled style="background:#e2e8f0;"></div>
-                        <div class="form-group"><label>Teléfono:</label><input type="tel" id="edit-tf" required></div>
-                        <div class="form-group"><label>Edad:</label><input type="number" id="edit-edad" required></div>
-                        <div class="form-group"><label>Dirección:</label><input type="text" id="edit-direccion" required></div>
-                        <div class="form-group"><label>Peso (kg):</label><input type="number" step="0.1" id="edit-peso" required></div>
-                        <div class="form-group"><label>Estatura (cm):</label><input type="number" id="edit-estatura" required></div>
-                        <div class="form-group"><label>Observaciones / Gustos personales:</label><textarea id="edit-gustos" rows="3" placeholder="Ej. Lesión leve en rodilla izq..."></textarea></div>
-                        
-                        <div id="perfil-msg" class="success-msg" style="display: none; margin-bottom: 10px;"></div>
-                        <button type="submit" class="btn-main btn-primary">💾 GUARDAR CAMBIOS</button>
-                    </form>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Teléfono</label><input type="tel" id="edit-tf" class="form-control" required></div>
+                    <div><label class="form-label">Edad</label><input type="number" id="edit-edad" class="form-control" required></div>
                 </div>
-            </div>
-        </section>
-
-        <!-- 4. PANEL DE ADMINISTRACIÓN (TONECHO) -->
-        <section id="scr-admin" class="screen">
-            <div class="admin-header">
-                <h3>👑 Panel de Gestión Municipal (Tonecho)</h3>
-                <button class="btn-small btn-logout" onclick="cerrarSesion()">Salir</button>
-            </div>
-
-            <!-- Cajón 1: Gestión de Vecinos Registrados -->
-            <div class="admin-drawer-card">
-                <div class="admin-drawer-title" onclick="toggleAdminDrawer('admin-cajon-usuarios')">
-                    <span>👥 Gestión de Vecinos Registrados</span>
-                    <span id="icon-admin-cajon-usuarios">▼</span>
+                <div><label class="form-label">Dirección</label><input type="text" id="edit-direccion" class="form-control" required></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div><label class="form-label">Peso (kg)</label><input type="number" step="0.1" id="edit-peso" class="form-control" required></div>
+                    <div><label class="form-label">Estatura (cm)</label><input type="number" id="edit-estatura" class="form-control" required></div>
                 </div>
-                <div id="admin-cajon-usuarios" class="admin-drawer-body" style="display: block;">
+                <div><label class="form-label">Gustos / Deportes favoritos</label><input type="text" id="edit-gustos" class="form-control" placeholder="Ej. Caminar, natación..."></div>
+                <button type="submit" class="btn-main btn-gold" style="margin-top: 10px;">GUARDAR CAMBIOS</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PANTALLA 4: ADMINISTRACIÓN (Tonecho / 0010) -->
+    <div id="scr-admin" class="screen">
+        <div id="admin-content-area" style="width: 100%; max-width: 680px; box-sizing: border-box;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold-accent); padding-bottom: 12px; margin-bottom: 24px;">
+                <div>
+                    <span style="background: #991b1b; color: white; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.5px;">PANEL DE GESTIÓN MUNICIPAL</span>
+                    <h2 style="color: #ffffff; margin: 6px 0 0 0; font-size: 1.5rem; font-weight: 800;">Servizo de Deportes - Tonecho</h2>
+                </div>
+                <span style="font-size: 2.2rem;">📊</span>
+            </div>
+
+            <!-- CAJÓN 1: USUARIOS REGISTRADOS -->
+            <div class="admin-drawer">
+                <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-usuarios')">
+                    <span>👥 1. Usuarios Registrados (Orden alfabético)</span>
+                    <span id="icon-drawer-usuarios">▼</span>
+                </div>
+                <div id="drawer-usuarios" class="admin-drawer-body">
                     <div id="admin-lista-usuarios-completa"></div>
                 </div>
             </div>
 
-            <!-- Cajón 2: Todas las Sesiones Creadas -->
-            <div class="admin-drawer-card">
-                <div class="admin-drawer-title" onclick="toggleAdminDrawer('admin-cajon-sesiones')">
-                    <span>📋 Historial Global de Sesiones</span>
-                    <span id="icon-admin-cajon-sesiones">▼</span>
+            <!-- CAJÓN 2: TODAS LAS SESIONES -->
+            <div class="admin-drawer">
+                <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-sesiones')">
+                    <span>📋 2. Todas las Sesiones Creadas</span>
+                    <span id="icon-drawer-sesiones">▼</span>
                 </div>
-                <div id="admin-cajon-sesiones" class="admin-drawer-body" style="display: none;">
+                <div id="drawer-sesiones" class="admin-drawer-body">
                     <div id="admin-lista-todas-sesiones"></div>
                 </div>
             </div>
 
-            <!-- Cajón 3: Estadísticas, Gráficas y Usos -->
-            <div class="admin-drawer-card">
-                <div class="admin-drawer-title" onclick="toggleAdminDrawer('admin-cajon-stats')">
-                    <span>📊 Estadísticas y Gráficas de Uso</span>
-                    <span id="icon-admin-cajon-stats">▼</span>
+            <!-- CAJÓN 3: ESTADÍSTICAS, GRÁFICAS Y USOS -->
+            <div class="admin-drawer">
+                <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-stats')">
+                    <span>📊 3. Estadísticas, Gráficas y Temporalización</span>
+                    <span id="icon-drawer-stats">▼</span>
                 </div>
-                <div id="admin-cajon-stats" class="admin-drawer-body" style="display: none;">
+                <div id="drawer-stats" class="admin-drawer-body">
                     <div id="admin-estadisticas-contenido"></div>
                 </div>
             </div>
-        </section>
 
-    </main>
-
-    <!-- MODAL PARA VER DETALLE DE SESIONES EN ADMIN -->
-    <div id="admin-modal-sesion" class="modal-overlay" style="display: none;" onclick="cerrarModalAdmin()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="margin: 0; color: var(--navy-primary);">Detalle de Sesión</h3>
-                <button class="btn-small" onclick="cerrarModalAdmin()">✕ Cerrar</button>
+            <div style="margin-top: 24px; text-align: center;">
+                <button type="button" class="btn-main btn-registro" style="max-width: 200px;" onclick="cerrarSesion()">SALIR DE ADMINISTRACIÓN</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE SOLO LECTURA PARA SESIONES EN ADMIN -->
+    <div id="admin-modal-sesion" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
+        <div style="background: #ffffff; border-radius: 16px; padding: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+            <button onclick="cerrarModalAdmin()" style="position: absolute; top: 15px; right: 15px; background: #fee2e2; color: #991b1b; border: none; font-weight: 800; padding: 6px 12px; border-radius: 8px; cursor: pointer;">✕ Cerrar</button>
+            <h3 style="color: var(--navy-primary); margin-top: 0;">Detalle de la Sesión (Solo Lectura)</h3>
             <div id="admin-modal-body"></div>
         </div>
     </div>
 
-    <!-- Librería oficial de Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- ENLACE AL ARCHIVO DE LÓGICA -->
-    <script src="script.js"></script>
+    <script>
+        // --- CONFIGURACIÓN DE SUPABASE ---
+        const SUPABASE_URL = 'https://xkjywagvdxzbyqbjxser.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_6qZukJ1d6KEROUEI5sH3ew_0R9iiXVb';
+
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
+        let sesionGeneradaActual = null;
+        let cacheTodasLasSesionesAdmin = [];
+        let cacheUsuariosMemoria = [];
+
+        // Funciones de sincronización con Supabase en la nube
+        async function obtenerUsuariosAsync() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('app_store')
+                    .select('*')
+                    .eq('id', 'datos_globales')
+                    .single();
+
+                if (error || !data) {
+                    return cacheUsuariosMemoria;
+                }
+                cacheUsuariosMemoria = data.contenido || [];
+                return cacheUsuariosMemoria;
+            } catch (e) {
+                console.error('Error al conectar con Supabase:', e);
+                return cacheUsuariosMemoria;
+            }
+        }
+
+        async function guardarUsuariosAsync(listaUsuarios) {
+            cacheUsuariosMemoria = listaUsuarios;
+            try {
+                const { error } = await supabaseClient
+                    .from('app_store')
+                    .upsert({ 
+                        id: 'datos_globales', 
+                        contenido: listaUsuarios 
+                    });
+
+                if (error) {
+                    console.error('Error al guardar en Supabase:', error);
+                }
+            } catch (e) {
+                console.error('Excepción al guardar en Supabase:', e);
+            }
+        }
+
+        // Compatibilidad síncrona para la app
+        function obtenerUsuarios() {
+            return cacheUsuariosMemoria;
+        }
+
+        function guardarUsuarios(lista) {
+            guardarUsuariosAsync(lista);
+        }
+
+        // Cargar datos al iniciar la app
+        document.addEventListener("DOMContentLoaded", async () => {
+            await obtenerUsuariosAsync();
+        });
+
+        function generarRutinaDinamica(instalacion, material, tiempo, objetivo, usuario) {
+            const mins = parseInt(tiempo, 10) || 45;
+            const edad = usuario.edad || 40;
+            const esAdaptado = edad >= 65 || usuario.habitos === 'Persona Mayor' || usuario.condicion === 'Mala' || usuario.condicion === 'Muy mala';
+            const dosificacion = esAdaptado ? '2 series de 8-10 reps (ritmo pausado, descanso 60s)' : '3 series de 12 reps (ritmo controlado, descanso 45s)';
+
+            const soporteEntorno = {
+                'Gimnasio municipal': { apoyo: 'máquina guiada o banco', resistencia: 'carga ligera regulable', entorno: 'sala' },
+                'Exterior': { apoyo: 'banco urbano o barandilla', resistencia: 'peso corporal e inclinación', entorno: 'parque' },
+                'Ruta': { apoyo: 'banco del camino o tronco firme', resistencia: 'desnivel y empuje', entorno: 'sendero' },
+                'En Casa': { apoyo: 'silla firme o pared', resistencia: material === 'Sin material' ? 'peso corporal' : material.toLowerCase(), entorno: 'hogar' }
+            }[instalacion];
+
+            const motoresCalentamiento = [
+                { zona: 'Cervical y escapular', accion: 'Rotaciones circulares lentas en ambos sentidos (8 reps por lado)', foco: 'movilidad cuello y hombros' },
+                { zona: 'Cadera y cintura pélvica', accion: 'Círculos amplios con manos en cintura para lubricar articulación (10 reps)', foco: 'movilidad de cadera calentamiento' },
+                { zona: 'Activación cardiorrespiratoria', accion: `Desplazamiento suave en ${soporteEntorno.entorno} elevando rodillas alternas durante 3 min`, foco: 'marcha calentamiento articular' }
+            ];
+
+            const calentamiento = motoresCalentamiento.map((m, idx) => ({
+                titulo: `🔄 ${idx + 1}. Movilidad: ${m.zona}`,
+                resumen: m.accion,
+                detalle: `Mantén la espalda erguida y respira de forma fluida. Ejecuta: ${m.accion}. Evita movimientos bruscos o rebotes.`,
+                query: m.foco
+            }));
+
+            const patronesMotores = [
+                { patron: 'Dominante de rodilla (Sentadilla)', ejecucion: `Flexión controlada de piernas utilizando ${soporteEntorno.apoyo} como referencia de seguridad`, busqueda: 'sentadilla tecnica correcta' },
+                { patron: 'Tracción horizontal (Remo)', ejecucion: `Tracción de brazos llevando codos atrás con ${soporteEntorno.resistencia}`, busqueda: 'remo espalda tecnica' },
+                { patron: 'Empuje horizontal (Flexión)', ejecucion: `Empuje controlado de torso apoyando manos en ${soporteEntorno.apoyo}`, busqueda: 'flexiones inclinadas tecnica' },
+                { patron: 'Unilateral de tren inferior (Zancada/Paso)', ejecucion: `Paso alterno controlado manteniendo estabilidad con ${soporteEntorno.apoyo}`, busqueda: 'zancadas tecnica correcta' },
+                { patron: objetivo === 'Cardio y Resistencia' ? 'Bloque aeróbico continuo' : 'Empuje vertical / Elevación', ejecucion: objetivo === 'Cardio y Resistencia' ? `Ritmo vivo sostenido de marcha o desplazamiento en ${soporteEntorno.entorno} (4 min)` : `Elevación controlada de brazos sobre hombros usando ${soporteEntorno.resistencia}`, busqueda: objetivo === 'Cardio y Resistencia' ? 'caminata aerobica tecnica' : 'press hombros tecnica' },
+                { patron: 'Estabilidad central (Core)', ejecucion: `Activación profunda de abdomen y glúteos manteniendo postura alineada en ${soporteEntorno.apoyo} (25-30 seg)`, busqueda: 'plancha abdominal tecnica' }
+            ];
+
+            const principal = patronesMotores.map((p, idx) => ({
+                titulo: `💪 ${idx + 1}. ${p.patron}`,
+                resumen: `${p.ejecucion}.`,
+                detalle: `Configuración personalizada (${objetivo}): ${p.ejecucion}. Dosificación recomendada: ${dosificacion}. Mantén el abdomen activo en todo momento.`,
+                query: p.busqueda
+            }));
+
+            const motoresCalma = [
+                { titulo: '🌬️ 1. Regulación respiratoria diafragmática', resumen: 'Inhalación nasal profunda (4s) y exhalación lenta (6s).', detalle: 'Coloca una mano en el abdomen, toma aire despacio por la nariz notando cómo sube y suéltalo muy lento por la boca. Repite 6 ciclos.', query: 'respiracion diafragmatica relajacion' },
+                { titulo: '🧘 2. Estiramiento global de descarga', resumen: `Alargamiento suave de piernas y espalda apoyado en ${soporteEntorno.apoyo}.`, detalle: `Utiliza ${soporteEntorno.apoyo} para mantener el equilibrio mientras estiras cuádriceps, gemelos y columna durante 20 segundos por lado sin rebotes.`, query: 'estiramientos suaves post entrenamiento' }
+            ];
+
+            return {
+                tiempoCalentamiento: '8 min',
+                tiempoPrincipal: (mins - 15) + ' min',
+                tiempoCalma: '7 min',
+                calentamiento,
+                principal,
+                calma: motoresCalma
+            };
+        }
+
+        function renderEjercicioInteractivo(titulo, resumen, explicacionDetallada, queryBusqueda) {
+            const idUnico = 'ex_' + Math.random().toString(36).substring(2, 9);
+            const urlVideo = `https://www.youtube.com/results?search_query=${encodeURIComponent(queryBusqueda)}`;
+
+            return `
+                <div class="interactive-exercise-card" onclick="toggleDetalleEjercicio('${idUnico}')">
+                    <div class="ex-title-row">
+                        <span>${titulo}</span>
+                        <span class="ex-hint">🔍 Ver detalle</span>
+                    </div>
+                    <p class="ex-brief">${resumen}</p>
+                </div>
+                <div id="${idUnico}" class="exercise-detail-panel">
+                    <h5>📖 Guía de ejecución paso a paso:</h5>
+                    <p>${explicacionDetallada}</p>
+                    <a href="${urlVideo}" target="_blank" rel="noopener noreferrer" class="video-btn" onclick="event.stopPropagation();">
+                        🎥 Buscar vídeo demostrativo
+                    </a>
+                </div>
+            `;
+        }
+
+        function toggleDetalleEjercicio(id) {
+            const panel = document.getElementById(id);
+            if (panel) {
+                panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+            }
+        }
+
+        function obtenerUsuarioActivo() {
+            const dniActivo = localStorage.getItem(STORAGE_KEY_SESSION);
+            if (!dniActivo) return null;
+            return obtenerUsuarios().find(u => u.dni === dniActivo) || null;
+        }
+
+        function irA(idPantalla) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(idPantalla).classList.add('active');
+
+            const header = document.getElementById('main-header');
+            const btnAtras = document.getElementById('btn-atras');
+
+            if (idPantalla === 'scr-inicio') {
+                header.style.display = 'none';
+            } else {
+                header.style.display = 'flex';
+                if (idPantalla === 'scr-registro') {
+                    btnAtras.style.display = 'block';
+                    btnAtras.style.visibility = 'visible';
+                } else {
+                    btnAtras.style.display = 'none';
+                }
+            }
+        }
+
+        function abrirRegistro() {
+            const form = document.getElementById('form-registro');
+            if (form) form.reset();
+            const errorBox = document.getElementById('reg-error');
+            if (errorBox) errorBox.style.display = 'none';
+            irA('scr-registro');
+        }
+
+        function cambiarPestanaUsuario(pestana) {
+            const subActividad = document.getElementById('subvista-actividad');
+            const subHistorial = document.getElementById('subvista-historial');
+            const subPerfil = document.getElementById('subvista-perfil');
+            
+            const btnActividad = document.getElementById('tab-btn-actividad');
+            const btnHistorial = document.getElementById('tab-btn-historial');
+            const btnPerfil = document.getElementById('tab-btn-perfil');
+
+            subActividad.style.display = 'none';
+            subHistorial.style.display = 'none';
+            subPerfil.style.display = 'none';
+            btnActividad.classList.remove('active');
+            btnHistorial.classList.remove('active');
+            btnPerfil.classList.remove('active');
+
+            if (pestana === 'actividad') {
+                subActividad.style.display = 'block';
+                btnActividad.classList.add('active');
+            } else if (pestana === 'historial') {
+                subHistorial.style.display = 'block';
+                btnHistorial.classList.add('active');
+                cargarHistorialSesiones();
+            } else {
+                subPerfil.style.display = 'block';
+                btnPerfil.classList.add('active');
+                cargarDatosEnFormularioEdicion();
+            }
+        }
+
+        async function handleRegistro(e) {
+            e.preventDefault();
+            const errorBox = document.getElementById('reg-error');
+            errorBox.style.display = 'none';
+
+            // Descarga datos frescos de la nube antes de validar
+            const usuarios = await obtenerUsuariosAsync();
+
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const emailConfirm = document.getElementById('reg-email-confirm').value.trim().toLowerCase();
+            const pass = document.getElementById('reg-password').value;
+            const passConfirm = document.getElementById('reg-password-confirm').value;
+            const dni = document.getElementById('reg-dni').value.trim().toUpperCase();
+
+            if (email !== emailConfirm) { mostrarError('reg-error', '⚠️ Los correos no coinciden.'); return; }
+            if (pass !== passConfirm) { mostrarError('reg-error', '⚠️ Las contraseñas no coinciden.'); return; }
+
+            if (usuarios.some(u => u.dni === dni)) { mostrarError('reg-error', '⚠️ Ya existe un usuario con ese DNI.'); return; }
+
+            const nuevoUsuario = {
+                nombre: document.getElementById('reg-nombre').value.trim(),
+                apellidos: document.getElementById('reg-apellidos').value.trim(),
+                mote: document.getElementById('reg-mote').value.trim(),
+                dni: dni,
+                telefono: document.getElementById('reg-tf').value.trim(),
+                edad: parseInt(document.getElementById('reg-edad').value, 10),
+                direccion: document.getElementById('reg-direccion').value.trim(),
+                peso: parseFloat(document.getElementById('reg-peso').value),
+                estatura: parseInt(document.getElementById('reg-estatura').value, 10),
+                habitos: document.getElementById('reg-habitos').value,
+                condicion: document.getElementById('reg-condicion').value,
+                email: email,
+                password: pass,
+                gustos: '',
+                preferenciasSesion: { instalacion: 'Gimnasio municipal', material: 'Sin material', tiempo: '45 minutos', objetivo: 'Movilidad y Salud' },
+                historialSesiones: []
+            };
+
+            usuarios.push(nuevoUsuario);
+            await guardarUsuariosAsync(usuarios);
+            localStorage.setItem(STORAGE_KEY_SESSION, nuevoUsuario.dni);
+            iniciarZonaUsuario(nuevoUsuario);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const errorBox = document.getElementById('login-error');
+            errorBox.style.display = 'none';
+
+            const userInput = document.getElementById('login-user').value.trim();
+            const passInput = document.getElementById('login-pass').value.trim();
+
+            if (userInput.toLowerCase() === 'tonecho' && passInput === '0010') {
+                await cargarPanelAdministracion();
+                irA('scr-admin');
+                return;
+            }
+
+            const usuarios = await obtenerUsuariosAsync();
+            const encontrado = usuarios.find(u => 
+                (u.email && u.email.toLowerCase() === userInput.toLowerCase() || 
+                 u.dni && u.dni.toUpperCase() === userInput.toUpperCase() ||
+                 u.mote && u.mote.toLowerCase() === userInput.toLowerCase()) && 
+                u.password === passInput
+            );
+
+            if (!encontrado) {
+                mostrarError('login-error', '⚠️ Usuario o contraseña incorrectos.');
+                return;
+            }
+
+            localStorage.setItem(STORAGE_KEY_SESSION, encontrado.dni);
+            iniciarZonaUsuario(encontrado);
+        }
+
+        function iniciarZonaUsuario(usuario) {
+            document.getElementById('saludo-principal').innerText = `¡Hola, ${usuario.mote || usuario.nombre}!`;
+            document.getElementById('resultado-sesion-container').style.display = 'none';
+            sesionGeneradaActual = null;
+            
+            const prefs = usuario.preferenciasSesion || {
+                instalacion: 'Gimnasio municipal',
+                material: 'Sin material',
+                tiempo: '45 minutos',
+                objetivo: 'Movilidad y Salud'
+            };
+
+            document.getElementById('pref-instalacion').value = prefs.instalacion;
+            document.getElementById('pref-material').value = prefs.material;
+            document.getElementById('pref-tiempo').value = prefs.tiempo;
+            document.getElementById('pref-objetivo').value = prefs.objetivo;
+
+            cambiarPestanaUsuario('actividad');
+            irA('scr-dash');
+        }
+
+        function generarSesionEntrenamiento(e) {
+            e.preventDefault();
+            const usuario = obtenerUsuarioActivo();
+            if (!usuario) return;
+
+            const instalacion = document.getElementById('pref-instalacion').value;
+            const material = document.getElementById('pref-material').value;
+            const tiempo = document.getElementById('pref-tiempo').value;
+            const objetivo = document.getElementById('pref-objetivo').value;
+
+            usuario.preferenciasSesion = { instalacion, material, tiempo, objetivo };
+            actualizarUsuarioEnStorage(usuario);
+
+            const rutina = generarRutinaDinamica(instalacion, material, tiempo, objetivo, usuario);
+            sesionGeneradaActual = {
+                id: 'ses_' + Date.now(),
+                fecha: new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'}),
+                timestamp: Date.now(),
+                usuarioDni: usuario.dni,
+                usuarioNombre: `${usuario.nombre} ${usuario.apellidos} (${usuario.mote})`,
+                instalacion,
+                material,
+                tiempo,
+                objetivo,
+                ...rutina
+            };
+
+            const contenedor = document.getElementById('resultado-sesion-container');
+            contenedor.innerHTML = `
+                <div class="routine-card">
+                    <div class="routine-header">
+                        <strong>📍 Lugar:</strong> ${instalacion}<br>
+                        <strong>🛠️ Material:</strong> ${material}<br>
+                        <strong>⏱️ Duración:</strong> ${tiempo} &nbsp;|&nbsp; <strong>🎯 Objetivo:</strong> ${objetivo}
+                    </div>
+
+                    <div class="routine-block">
+                        <h4>🔥 1. Calentamiento (${rutina.tiempoCalentamiento})</h4>
+                        <div>${rutina.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                    </div>
+
+                    <div class="routine-block">
+                        <h4>💪 2. Parte Principal (${rutina.tiempoPrincipal})</h4>
+                        <div>${rutina.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                    </div>
+
+                    <div class="routine-block">
+                        <h4>🧘 3. Vuelta a la Calma (${rutina.tiempoCalma})</h4>
+                        <div>${rutina.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                    </div>
+
+                    <button type="button" class="btn-main btn-gold" style="margin-top: 14px;" onclick="guardarSesionEnHistorial()">
+                        💾 GUARDAR ESTA SESIÓN EN MI HISTORIAL
+                    </button>
+                </div>
+            `;
+            contenedor.style.display = 'block';
+            contenedor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function guardarSesionEnHistorial() {
+            const usuario = obtenerUsuarioActivo();
+            if (!usuario || !sesionGeneradaActual) return;
+
+            if (!usuario.historialSesiones) usuario.historialSesiones = [];
+            usuario.historialSesiones.unshift(sesionGeneradaActual);
+            await actualizarUsuarioEnStorageAsync(usuario);
+
+            const msg = document.getElementById('actividad-msg');
+            msg.innerText = '✅ ¡Sesión guardada en la nube y en tu historial!';
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3500);
+        }
+
+        function cargarHistorialSesiones() {
+            const usuario = obtenerUsuarioActivo();
+            if (!usuario) return;
+
+            const contenedor = document.getElementById('lista-sesiones-hechas');
+            const historial = usuario.historialSesiones || [];
+
+            if (historial.length === 0) {
+                contenedor.innerHTML = '<p style="margin:0; color:var(--text-muted);">Aún no has guardado ninguna sesión. Genera una en la pestaña "Actividad" y guárdala aquí.</p>';
+                return;
+            }
+
+            contenedor.innerHTML = historial.map((s, index) => {
+                const bodyId = 'hist_body_' + index;
+                return `
+                    <div class="history-item-card">
+                        <div class="history-top-bar">
+                            <div>
+                                <div class="history-title">📅 ${s.fecha} — ${s.instalacion}</div>
+                                <div class="history-meta">⏱️ ${s.tiempo} &nbsp;|&nbsp; 🎯 ${s.objetivo} &nbsp;|&nbsp; 🛠️ ${s.material}</div>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button type="button" class="btn-small btn-open-session" onclick="toggleSesionHistorial('${bodyId}', this)">
+                                📂 Abrir sesión
+                            </button>
+                            <button type="button" class="btn-small btn-delete-session" onclick="eliminarSesionHistorial(${index})">
+                                🗑️ Eliminar
+                            </button>
+                        </div>
+                        <div id="${bodyId}" class="history-expanded-body">
+                            ${s.calentamiento ? `
+                                <p style="margin: 0 0 6px 0; color: var(--navy-primary); font-weight: 800;">🔥 Calentamiento (${s.tiempoCalentamiento || '8 min'}):</p>
+                                <div style="margin-bottom: 12px;">${s.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                                <p style="margin: 0 0 6px 0; color: var(--navy-primary); font-weight: 800;">💪 Parte Principal (${s.tiempoPrincipal || '30 min'}):</p>
+                                <div style="margin-bottom: 12px;">${s.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                                <p style="margin: 0 0 6px 0; color: var(--navy-primary); font-weight: 800;">🧘 Vuelta a la Calma (${s.tiempoCalma || '7 min'}):</p>
+                                <div>${s.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                            ` : '<p>Detalles no disponibles.</p>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleSesionHistorial(bodyId, btn) {
+            const body = document.getElementById(bodyId);
+            if (!body) return;
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            btn.innerHTML = isOpen ? '📂 Abrir sesión' : '🔼 Cerrar sesión';
+        }
+
+        async function eliminarSesionHistorial(index) {
+            const usuario = obtenerUsuarioActivo();
+            if (!usuario || !usuario.historialSesiones) return;
+
+            usuario.historialSesiones.splice(index, 1);
+            await actualizarUsuarioEnStorageAsync(usuario);
+            cargarHistorialSesiones();
+        }
+
+        // --- LÓGICA DEL PANEL DE ADMINISTRACIÓN (Tonecho / 0010) ---
+        function toggleAdminDrawer(drawerId) {
+            const body = document.getElementById(drawerId);
+            const icon = document.getElementById('icon-' + drawerId);
+            if (!body) return;
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            if (icon) icon.innerText = isOpen ? '▼' : '▲';
+        }
+
+        async function cargarPanelAdministracion() {
+            const usuarios = await obtenerUsuariosAsync();
+            
+            // 1. CAJÓN DE USUARIOS (Ordenados alfabéticamente)
+            usuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+            const contenedorUsuarios = document.getElementById('admin-lista-usuarios-completa');
+            
+            if (usuarios.length === 0) {
+                contenedorUsuarios.innerHTML = '<p style="color:var(--text-muted);">No hay vecinos registrados todavía.</p>';
+            } else {
+                contenedorUsuarios.innerHTML = usuarios.map(u => {
+                    const sesionesCount = (u.historialSesiones || []).length;
+                    return `
+                        <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: var(--navy-primary); font-size: 0.95rem;">${u.nombre} ${u.apellidos}</strong> (${u.mote || 'Sin alias'})<br>
+                                <span style="font-size: 0.78rem; color: var(--text-muted);">DNI: ${u.dni} | Edad: ${u.edad} años | Tel: ${u.telefono}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${sesionesCount} sesiones</span>
+                                ${sesionesCount > 0 ? `<button class="btn-small btn-open-session" onclick="verSesionesDeUsuario('${u.dni}')">Ver sesiones</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 2. CAJÓN DE TODAS LAS SESIONES (Globales de todos los usuarios)
+            const contenedorSesiones = document.getElementById('admin-lista-todas-sesiones');
+            cacheTodasLasSesionesAdmin = [];
+            usuarios.forEach(u => {
+                if (u.historialSesiones) {
+                    u.historialSesiones.forEach(s => {
+                        cacheTodasLasSesionesAdmin.push({ ...s, propietario: `${u.nombre} ${u.apellidos} (${u.mote})` });
+                    });
+                }
+            });
+
+            cacheTodasLasSesionesAdmin.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            if (cacheTodasLasSesionesAdmin.length === 0) {
+                contenedorSesiones.innerHTML = '<p style="color:var(--text-muted);">No se ha generado ninguna sesión en la aplicación todavía.</p>';
+            } else {
+                contenedorSesiones.innerHTML = cacheTodasLasSesionesAdmin.map((s, idx) => `
+                    <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <strong style="color: var(--navy-primary); font-size: 0.9rem;">${s.propietario}</strong><br>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">📅 ${s.fecha} | 📍 ${s.instalacion} (${s.tiempo})</span>
+                        </div>
+                        <button class="btn-small btn-open-session" onclick="abrirModalSesionGlobal(${idx})">Ver rutina completa</button>
+                    </div>
+                `).join('');
+            }
+
+            // 3. CAJÓN DE ESTADÍSTICAS, GRÁFICAS Y TEMPORALIZACIÓN
+            const contenedorStats = document.getElementById('admin-estadisticas-contenido');
+            const totalUsuarios = usuarios.length;
+            const totalSesiones = cacheTodasLasSesionesAdmin.length;
+            const edadSuma = usuarios.reduce((acc, u) => acc + (u.edad || 0), 0);
+            const edadMedia = totalUsuarios > 0 ? Math.round(edadSuma / totalUsuarios) : 0;
+
+            const ahora = Date.now();
+            const unDia = 24 * 60 * 60 * 1000;
+            const unaSemana = 7 * unDia;
+            const unMes = 30 * unDia;
+
+            const sesionesHoy = cacheTodasLasSesionesAdmin.filter(s => {
+                const ts = s.timestamp || ahora;
+                return (ahora - ts) < unDia;
+            }).length;
+
+            const sesionesSemana = cacheTodasLasSesionesAdmin.filter(s => {
+                const ts = s.timestamp || ahora;
+                return (ahora - ts) < unaSemana;
+            }).length;
+
+            const sesionesMes = cacheTodasLasSesionesAdmin.filter(s => {
+                const ts = s.timestamp || ahora;
+                return (ahora - ts) < unMes;
+            }).length;
+
+            const maxRef = Math.max(totalSesiones, 1);
+            const pctHoy = Math.min(Math.round((sesionesHoy / maxRef) * 100), 100);
+            const pctSemana = Math.min(Math.round((sesionesSemana / maxRef) * 100), 100);
+            const pctMes = Math.min(Math.round((sesionesMes / maxRef) * 100), 100);
+
+            let instGimnasio = 0, instExterior = 0, instRuta = 0, instCasa = 0;
+            cacheTodasLasSesionesAdmin.forEach(s => {
+                if (s.instalacion === 'Gimnasio municipal') instGimnasio++;
+                else if (s.instalacion === 'Exterior') instExterior++;
+                else if (s.instalacion === 'Ruta') instRuta++;
+                else if (s.instalacion === 'En Casa') instCasa++;
+            });
+            const maxInst = Math.max(totalSesiones, 1);
+            const pctGimnasio = Math.round((instGimnasio / maxInst) * 100);
+            const pctExterior = Math.round((instExterior / maxInst) * 100);
+            const pctRuta = Math.round((instRuta / maxInst) * 100);
+            const pctCasa = Math.round((instCasa / maxInst) * 100);
+
+            let edadJoven = 0, edadAdulto = 0, edadSenior = 0, edadMayor = 0;
+            usuarios.forEach(u => {
+                const e = u.edad || 0;
+                if (e < 30) edadJoven++;
+                else if (e <= 50) edadAdulto++;
+                else if (e <= 65) edadSenior++;
+                else edadMayor++;
+            });
+            const maxUser = Math.max(totalUsuarios, 1);
+            const pctJoven = Math.round((edadJoven / maxUser) * 100);
+            const pctAdulto = Math.round((edadAdulto / maxUser) * 100);
+            const pctSenior = Math.round((edadSenior / maxUser) * 100);
+            const pctMayor = Math.round((edadMayor / maxUser) * 100);
+
+            contenedorStats.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;">
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-primary); display: block;">${totalUsuarios}</span>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">USUARIOS TOTALES</span>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-primary); display: block;">${totalSesiones}</span>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">SESIONES CREADAS</span>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-primary); display: block;">${edadMedia} años</span>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">EDAD MEDIA VECINAL</span>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📈 Gráficas de Usos Temporales</h5>
+                    
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Últimas 24 horas (Día)</span><span>${sesionesHoy} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctHoy}%;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Últimos 7 días (Semana)</span><span>${sesionesSemana} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctSemana}%;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Últimos 30 días (Mes)</span><span>${sesionesMes} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctMes}%;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container" style="margin-bottom: 0;">
+                        <div class="stat-bar-label"><span>Histórico completo (Años)</span><span>${totalSesiones} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: 100%; background: var(--navy-primary);"></div></div>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
+                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📍 Uso por Tipo de Instalación</h5>
+                    
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Gimnasio municipal</span><span>${instGimnasio} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctGimnasio}%; background: #0369a1;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Exterior (Parques / Calle)</span><span>${instExterior} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctExterior}%; background: #0d9488;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Ruta (Caminos / Senderos)</span><span>${instRuta} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctRuta}%; background: #16a34a;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container" style="margin-bottom: 0;">
+                        <div class="stat-bar-label"><span>En Casa</span><span>${instCasa} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctCasa}%; background: #ca8a04;"></div></div>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">👥 Distribución de Usuarios por Edad</h5>
+                    
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Menores de 30 años</span><span>${edadJoven} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctJoven}%; background: #6366f1;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>De 30 a 50 años</span><span>${edadAdulto} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctAdulto}%; background: #3b82f6;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>De 51 a 65 años</span><span>${edadSenior} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctSenior}%; background: #0284c7;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container" style="margin-bottom: 0;">
+                        <div class="stat-bar-label"><span>Mayores de 65 años</span><span>${edadMayor} usuarios</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctMayor}%; background: #d97706;"></div></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function verSesionesDeUsuario(dni) {
+            const usuarios = obtenerUsuarios();
+            const u = usuarios.find(x => x.dni === dni);
+            if (!u || !u.historialSesiones) return;
+
+            let html = `<h4 style="color:var(--navy-primary); margin-top:0;">Sesiones de ${u.nombre} ${u.apellidos} (${u.mote})</h4>`;
+            u.historialSesiones.forEach((s, idx) => {
+                html += `
+                    <div style="background:#f8fafc; border:1px solid var(--border-subtle); border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>📅 ${s.fecha} — 📍 ${s.instalacion} (${s.tiempo})</span>
+                        <button class="btn-small btn-open-session" onclick="abrirModalSesionUsuario('${u.dni}', ${idx})">Ver</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('admin-modal-body').innerHTML = html;
+            document.getElementById('admin-modal-sesion').style.display = 'flex';
+        }
+
+        function abrirModalSesionGlobal(idx) {
+            const s = cacheTodasLasSesionesAdmin[idx];
+            if (s) mostrarDetalleSesionEnModal(s);
+        }
+
+        function abrirModalSesionUsuario(dni, idx) {
+            const u = obtenerUsuarios().find(x => x.dni === dni);
+            if (u && u.historialSesiones && u.historialSesiones[idx]) {
+                mostrarDetalleSesionEnModal(u.historialSesiones[idx]);
+            }
+        }
+
+        function mostrarDetalleSesionEnModal(s) {
+            let html = `
+                <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
+                    <strong>Propietario:</strong> ${s.usuarioNombre || 'Usuario municipal'}<br>
+                    <strong>Fecha:</strong> ${s.fecha} | <strong>Lugar:</strong> ${s.instalacion} | <strong>Duración:</strong> ${s.tiempo} | <strong>Objetivo:</strong> ${s.objetivo}
+                </div>
+            `;
+
+            if (s.calentamiento) {
+                html += `
+                    <p style="margin: 0 0 4px 0; color: var(--navy-primary); font-weight: 800;">🔥 Calentamiento (${s.tiempoCalentamiento}):</p>
+                    <div style="margin-bottom: 10px;">${s.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                    <p style="margin: 0 0 4px 0; color: var(--navy-primary); font-weight: 800;">💪 Parte Principal (${s.tiempoPrincipal}):</p>
+                    <div style="margin-bottom: 10px;">${s.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                    <p style="margin: 0 0 4px 0; color: var(--navy-primary); font-weight: 800;">🧘 Vuelta a la Calma (${s.tiempoCalma}):</p>
+                    <div>${s.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                `;
+            } else {
+                html += `<p>Información detallada no disponible.</p>`;
+            }
+
+            document.getElementById('admin-modal-body').innerHTML = html;
+            document.getElementById('admin-modal-sesion').style.display = 'flex';
+        }
+
+        function cerrarModalAdmin() {
+            document.getElementById('admin-modal-sesion').style.display = 'none';
+        }
+
+        function cargarDatosEnFormularioEdicion() {
+            const usuario = obtenerUsuarioActivo();
+            if (!usuario) return;
+            document.getElementById('edit-nombre').value = usuario.nombre || '';
+            document.getElementById('edit-apellidos').value = usuario.apellidos || '';
+            document.getElementById('edit-mote').value = usuario.mote || '';
+            document.getElementById('edit-dni').value = usuario.dni || '';
+            document.getElementById('edit-tf').value = usuario.telefono || '';
+            document.getElementById('edit-edad').value = usuario.edad || '';
+            document.getElementById('edit-direccion').value = usuario.direccion || '';
+            document.getElementById('edit-peso').value = usuario.peso || '';
+            document.getElementById('edit-estatura').value = usuario.estatura || '';
+            document.getElementById('edit-gustos').value = usuario.gustos || '';
+        }
+
+        async function actualizarDatosUsuario(e) {
+            e.preventDefault();
+            const usuario = obtenerUsuarioActivo();
+            if (!usuario) return;
+
+            usuario.nombre = document.getElementById('edit-nombre').value.trim();
+            usuario.apellidos = document.getElementById('edit-apellidos').value.trim();
+            usuario.mote = document.getElementById('edit-mote').value.trim();
+            usuario.telefono = document.getElementById('edit-tf').value.trim();
+            usuario.edad = parseInt(document.getElementById('edit-edad').value, 10);
+            usuario.direccion = document.getElementById('edit-direccion').value.trim();
+            usuario.peso = parseFloat(document.getElementById('edit-peso').value);
+            usuario.estatura = parseInt(document.getElementById('edit-estatura').value, 10);
+            usuario.gustos = document.getElementById('edit-gustos').value.trim();
+
+            await actualizarUsuarioEnStorageAsync(usuario);
+            document.getElementById('saludo-principal').innerText = `¡Hola, ${usuario.mote || usuario.nombre}!`;
+
+            const msg = document.getElementById('perfil-msg');
+            msg.innerText = '✅ Ficha actualizada y sincronizada correctamente.';
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }
+
+        async function actualizarUsuarioEnStorageAsync(usuarioActualizado) {
+            const usuarios = await obtenerUsuariosAsync();
+            const idx = usuarios.findIndex(u => u.dni === usuarioActualizado.dni);
+            if (idx !== -1) {
+                usuarios[idx] = usuarioActualizado;
+                await guardarUsuariosAsync(usuarios);
+            }
+        }
+
+        function actualizarUsuarioEnStorage(usuarioActualizado) {
+            actualizarUsuarioEnStorageAsync(usuarioActualizado);
+        }
+
+        function mostrarError(id, texto) {
+            const box = document.getElementById(id);
+            box.innerText = texto;
+            box.style.display = 'block';
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem(STORAGE_KEY_SESSION);
+            document.getElementById('login-user').value = '';
+            document.getElementById('login-pass').value = '';
+            irA('scr-inicio');
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+    </script>
 </body>
 </html>
