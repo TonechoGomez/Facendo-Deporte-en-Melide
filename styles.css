@@ -235,7 +235,7 @@ header {
     background: #f8fafc; border: 1.5px solid var(--border-subtle); border-radius: 14px; padding: 16px; margin-bottom: 14px;
 }
 .history-top-bar {
-    display: flex; justify-content: space-align; align-items: center; gap: 10px; flex-wrap: wrap;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
 }
 .history-title {
     font-weight: 800; color: var(--navy-primary); font-size: 0.95rem;
