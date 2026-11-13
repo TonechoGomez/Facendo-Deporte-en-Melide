@@ -2,17 +2,14 @@
 const SUPABASE_URL = 'https://xkjywagvdxzbyqbjxser.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_6qZukJ1d6KEROUEI5sH3ew_0R9iiXVb';
 
-// Inicializar el cliente de Supabase
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
 let sesionGeneradaActual = null;
 let cacheTodasLasSesionesAdmin = [];
-
-// Variable local en memoria para manejar los datos de forma fluida tras sincronizar con Supabase
 let cacheUsuariosMemoria = [];
 
-// Función para cargar los usuarios desde Supabase (síncrona con caché local o llamada asíncrona)
+// Funciones de sincronización con Supabase en la nube
 async function obtenerUsuariosAsync() {
     try {
         const { data, error } = await supabaseClient
@@ -22,11 +19,8 @@ async function obtenerUsuariosAsync() {
             .single();
 
         if (error || !data) {
-            // Si la tabla está vacía o no existe aún, devolvemos la caché o array vacío
             return cacheUsuariosMemoria;
         }
-
-        // El contenido guardado en la columna JSONB
         cacheUsuariosMemoria = data.contenido || [];
         return cacheUsuariosMemoria;
     } catch (e) {
@@ -35,7 +29,6 @@ async function obtenerUsuariosAsync() {
     }
 }
 
-// Función para guardar los usuarios en Supabase en la nube
 async function guardarUsuariosAsync(listaUsuarios) {
     cacheUsuariosMemoria = listaUsuarios;
     try {
@@ -54,7 +47,7 @@ async function guardarUsuariosAsync(listaUsuarios) {
     }
 }
 
-// Versión síncrona de compatibilidad para lecturas rápidas ya cacheadas
+// Compatibilidad síncrona para la app
 function obtenerUsuarios() {
     return cacheUsuariosMemoria;
 }
@@ -63,7 +56,7 @@ function guardarUsuarios(lista) {
     guardarUsuariosAsync(lista);
 }
 
-// Sincronizar datos al arrancar la aplicación
+// Cargar datos al iniciar la app
 document.addEventListener("DOMContentLoaded", async () => {
     await obtenerUsuariosAsync();
 });
@@ -461,10 +454,9 @@ function toggleAdminDrawer(drawerId) {
 }
 
 async function cargarPanelAdministracion() {
-    // Descarga siempre los datos más frescos directamente de Supabase
     const usuarios = await obtenerUsuariosAsync();
     
-    // 1. CAJÓN DE USUARIOS (Ordenados alfabéticamente con botón de borrado)
+    // 1. CAJÓN DE USUARIOS (Ordenados alfabéticamente)
     usuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
     const contenedorUsuarios = document.getElementById('admin-lista-usuarios-completa');
     
@@ -479,10 +471,9 @@ async function cargarPanelAdministracion() {
                         <strong style="color: var(--navy-primary); font-size: 0.95rem;">${u.nombre} ${u.apellidos}</strong> (${u.mote || 'Sin alias'})<br>
                         <span style="font-size: 0.78rem; color: var(--text-muted);">DNI: ${u.dni} | Edad: ${u.edad} años | Tel: ${u.telefono}</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${sesionesCount} sesiones</span>
                         ${sesionesCount > 0 ? `<button class="btn-small btn-open-session" onclick="verSesionesDeUsuario('${u.dni}')">Ver sesiones</button>` : ''}
-                        <button class="btn-small btn-delete-session" onclick="eliminarUsuarioAdmin('${u.dni}')">🗑️ Borrar</button>
                     </div>
                 </div>
             `;
@@ -516,7 +507,7 @@ async function cargarPanelAdministracion() {
         `).join('');
     }
 
-    // 3. CAJÓN DE ESTADÍSTICAS, GRÁFICAS Y USOS
+    // 3. CAJÓN DE ESTADÍSTICAS, GRÁFICAS Y TEMPORALIZACIÓN
     const contenedorStats = document.getElementById('admin-estadisticas-contenido');
     const totalUsuarios = usuarios.length;
     const totalSesiones = cacheTodasLasSesionesAdmin.length;
@@ -665,19 +656,6 @@ async function cargarPanelAdministracion() {
     `;
 }
 
-async function eliminarUsuarioAdmin(dni) {
-    if (!confirm(`¿Estás seguro de que deseas eliminar al usuario con DNI ${dni}? Se borrará su ficha y todas sus sesiones guardadas.`)) {
-        return;
-    }
-
-    let usuarios = await obtenerUsuariosAsync();
-    usuarios = usuarios.filter(u => u.dni !== dni);
-    await guardarUsuariosAsync(usuarios);
-
-    // Recargar el panel de administración
-    cargarPanelAdministracion();
-}
-
 function verSesionesDeUsuario(dni) {
     const usuarios = obtenerUsuarios();
     const u = usuarios.find(x => x.dni === dni);
@@ -784,6 +762,10 @@ async function actualizarUsuarioEnStorageAsync(usuarioActualizado) {
         usuarios[idx] = usuarioActualizado;
         await guardarUsuariosAsync(usuarios);
     }
+}
+
+function actualizarUsuarioEnStorage(usuarioActualizado) {
+    actualizarUsuarioEnStorageAsync(usuarioActualizado);
 }
 
 function mostrarError(id, texto) {
