@@ -7,139 +7,215 @@
 
     <style>
         :root {
-            --melide-primary: #102a4c;
-            --melide-accent: #e5b80b;
-            --bg-gradient: linear-gradient(135deg, #cce0f5 0%, #b3d1f2 100%);
+            --melide-primary: #0f284a;
+            --melide-secondary: #1e3a8a;
+            --melide-accent: #d97706;
+            --melide-gold: #fbbf24;
+            --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            --card-bg: #ffffff;
+            --text-main: #102a4c;
+            --text-muted: #486581;
+            --border-color: #bcccdc;
         }
 
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             background: var(--bg-gradient); 
-            color: #102a4c; margin: 0; height: 100vh; 
-            display: flex; flex-direction: column; overflow: hidden; 
+            color: var(--text-main); 
+            margin: 0; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden;
         }
 
         header { 
-            background: var(--melide-primary); color: white; padding: 0 15px; 
-            display: none; align-items: center; justify-content: space-between;
-            height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 100; flex-shrink: 0;
+            background: var(--melide-primary); 
+            color: white; 
+            padding: 0 24px; 
+            display: none; 
+            align-items: center; 
+            justify-content: space-between;
+            height: 70px; 
+            box-shadow: 0 4px 12px rgba(15, 40, 74, 0.15); 
+            z-index: 100; 
+            flex-shrink: 0;
         }
 
-        .screen { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 20px; }
+        .screen { 
+            flex: 1; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center;
+            overflow-y: auto; 
+            padding: 24px 16px; 
+            box-sizing: border-box;
+        }
         .screen.active { display: flex; }
 
-        #scr-inicio { justify-content: center; align-items: center; text-align: center; }
-        #scr-registro, #scr-perfil, #scr-dash, #scr-admin { justify-content: flex-start; align-items: center; padding-bottom: 40px; }
-
-        .login-box {
-            background: #b3d1f2; padding: 25px; border-radius: 25px; width: 100%; max-width: 480px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 2px solid var(--melide-accent);
-            box-sizing: border-box; margin: 0 auto 20px auto;
+        #scr-inicio { 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 20px;
         }
 
-        #scr-inicio .login-box { margin: auto 0; max-width: 440px; }
+        .login-box {
+            background: var(--card-bg); 
+            padding: 36px 30px; 
+            border-radius: 20px; 
+            width: 100%; 
+            max-width: 460px; 
+            box-shadow: 0 10px 30px rgba(16, 42, 76, 0.08); 
+            border: 1px solid var(--border-color);
+            box-sizing: border-box; 
+            margin: 0 auto;
+        }
+
+        /* Adaptabilidad profesional para tablets y ordenadores */
+        @media (min-width: 768px) {
+            .login-box { max-width: 520px; padding: 40px; }
+            .screen { padding: 32px 24px; }
+            #subvista-actividad, #subvista-historial, #subvista-perfil { max-width: 640px !important; }
+        }
+
+        @media (min-width: 1024px) {
+            .login-box { max-width: 560px; }
+            .nav-tabs { max-width: 640px !important; }
+        }
 
         .form-label {
-            display: block; font-size: 0.72rem; font-weight: bold; color: var(--melide-primary); 
-            margin-bottom: 4px; text-transform: uppercase;
+            display: block; 
+            font-size: 0.75rem; 
+            font-weight: 700; 
+            color: var(--text-muted); 
+            margin-bottom: 6px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
         }
 
         .form-control {
-            width: 100%; padding: 11px 13px; margin-bottom: 12px; border-radius: 12px; 
-            border: 2px solid #93c5fd; background: #eff6ff; color: #102a4c; font-weight: bold; font-size: 0.9rem;
-            box-sizing: border-box; outline: none;
+            width: 100%; 
+            padding: 12px 14px; 
+            margin-bottom: 16px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border-color); 
+            background: #f8fafc; 
+            color: var(--text-main); 
+            font-weight: 600; 
+            font-size: 0.95rem;
+            box-sizing: border-box; 
+            outline: none;
+            transition: all 0.2s ease;
         }
-        .form-control:focus { border-color: var(--melide-accent); }
+        .form-control:focus { 
+            border-color: var(--melide-secondary); 
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
 
         .btn-main { 
-            width: 100%; padding: 14px; border-radius: 12px; border: none; 
-            background: var(--melide-primary); color: white; font-weight: bold; cursor: pointer; font-size: 1rem; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: background 0.2s;
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            border: none; 
+            background: var(--melide-primary); 
+            color: white; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            box-shadow: 0 4px 10px rgba(15, 40, 74, 0.2); 
+            transition: all 0.2s ease;
         }
-        .btn-main:hover { background: #1e3a8a; }
+        .btn-main:hover { background: var(--melide-secondary); transform: translateY(-1px); }
 
-        .btn-registro { background: #d32f2f; }
-        .btn-registro:hover { background: #b91c1c; }
+        .btn-registro { background: #b91c1c; }
+        .btn-registro:hover { background: #991b1b; }
 
-        .header-btn { background:none; border:none; color:white; font-size: 1.8rem; cursor:pointer; padding: 5px 10px; }
+        .header-btn { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background 0.2s; }
+        .header-btn:hover { background: rgba(255,255,255,0.1); }
 
         .error-msg {
-            background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; 
-            padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; 
-            margin-bottom: 12px; display: none; text-align: center;
+            background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; 
+            padding: 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; 
+            margin-bottom: 16px; display: none; text-align: center;
         }
 
         .success-msg {
-            background: #d1fae5; color: #065f46; border: 2px solid #10b981; 
-            padding: 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; 
-            margin-bottom: 12px; display: none; text-align: center;
+            background: #f0fdf4; color: #166534; border: 1px solid #86efac; 
+            padding: 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; 
+            margin-bottom: 16px; display: none; text-align: center;
         }
 
-        .nav-tabs { display: flex; gap: 6px; width: 100%; max-width: 520px; margin-bottom: 20px; }
+        .nav-tabs { display: flex; gap: 8px; width: 100%; max-width: 520px; margin-bottom: 24px; }
         .tab-btn {
-            flex: 1; padding: 10px 6px; border-radius: 12px; border: 2px solid var(--melide-primary);
-            background: #eff6ff; color: var(--melide-primary); font-weight: bold; cursor: pointer;
-            font-size: 0.82rem; text-align: center; transition: all 0.2s;
+            flex: 1; padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border-color);
+            background: var(--card-bg); color: var(--text-muted); font-weight: 700; cursor: pointer;
+            font-size: 0.88rem; text-align: center; transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .tab-btn.active { background: var(--melide-primary); color: white; border-color: var(--melide-accent); }
+        .tab-btn:hover { border-color: var(--melide-primary); color: var(--text-main); }
+        .tab-btn.active { background: var(--melide-primary); color: white; border-color: var(--melide-primary); box-shadow: 0 4px 10px rgba(15, 40, 74, 0.15); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; width: 100%; margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; width: 100%; margin-bottom: 24px; }
         .stat-card {
-            background: #eff6ff; padding: 20px 15px; border-radius: 18px; text-align: center;
-            border: 2px solid var(--melide-accent); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: var(--card-bg); padding: 24px 16px; border-radius: 16px; text-align: center;
+            border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
-        .stat-card .num { font-size: 2rem; font-weight: 800; color: var(--melide-primary); display: block; }
-        .stat-card .lbl { font-size: 0.75rem; font-weight: bold; color: #475569; text-transform: uppercase; }
+        .stat-card .num { font-size: 2.2rem; font-weight: 800; color: var(--melide-primary); display: block; margin-bottom: 4px; }
+        .stat-card .lbl { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* Estilos para la Tarjeta de Sesión Generada */
         .routine-card {
-            background: #ffffff; border-radius: 20px; padding: 20px; margin-top: 20px;
-            border: 2px solid var(--melide-primary); box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-            text-align: left;
+            background: var(--card-bg); border-radius: 20px; padding: 24px; margin-top: 24px;
+            border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(16, 42, 76, 0.08);
+            text-align: left; width: 100%; box-sizing: border-box;
         }
         .routine-header {
-            background: #eff6ff; padding: 12px; border-radius: 12px; border-left: 5px solid var(--melide-accent);
-            margin-bottom: 15px; font-size: 0.82rem; color: #1e293b;
+            background: #f8fafc; padding: 16px; border-radius: 12px; border-left: 4px solid var(--melide-accent);
+            margin-bottom: 20px; font-size: 0.88rem; color: var(--text-main); line-height: 1.5;
+            border-top: 1px solid var(--border-color); border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
         }
         .routine-block {
-            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;
         }
         .routine-block:last-of-type { border-bottom: none; margin-bottom: 10px; }
         .routine-block h4 {
-            margin: 0 0 10px 0; color: var(--melide-primary); font-size: 1rem; display: flex; align-items: center; gap: 6px;
+            margin: 0 0 12px 0; color: var(--melide-primary); font-size: 1.05rem; display: flex; align-items: center; gap: 8px;
         }
         
         /* Tarjetas de ejercicio interactivas */
         .interactive-exercise-card {
-            background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
-            cursor: pointer; transition: all 0.2s;
+            background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+            cursor: pointer; transition: all 0.2s ease;
         }
         .interactive-exercise-card:hover {
-            border-color: var(--melide-primary); background: #eff6ff;
+            border-color: var(--melide-secondary); background: #f0f4f8; transform: translateX(2px);
         }
         .ex-title-row {
-            display: flex; align-items: center; justify-content: space-between; font-weight: bold; color: var(--melide-primary); font-size: 0.88rem;
+            display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--text-main); font-size: 0.92rem;
         }
         .ex-hint {
-            font-size: 0.72rem; color: #0369a1; background: #e0f2fe; padding: 2px 6px; border-radius: 6px; font-weight: bold;
+            font-size: 0.72rem; color: var(--melide-secondary); background: #e0f2fe; padding: 3px 8px; border-radius: 6px; font-weight: 700;
         }
         .ex-brief {
-            font-size: 0.8rem; color: #334155; margin: 4px 0 0 0; line-height: 1.35;
+            font-size: 0.82rem; color: var(--text-muted); margin: 6px 0 0 0; line-height: 1.4;
         }
 
         /* Panel desplegable de detalle de ejercicio */
         .exercise-detail-panel {
-            background: #ffffff; border: 2px solid var(--melide-primary); border-radius: 12px; padding: 14px; margin-top: 6px; margin-bottom: 10px; display: none;
+            background: #ffffff; border: 1px solid var(--melide-secondary); border-radius: 12px; padding: 16px; margin-top: 8px; margin-bottom: 12px; display: none;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.05);
         }
         .exercise-detail-panel h5 {
-            margin: 0 0 6px 0; color: var(--melide-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;
+            margin: 0 0 8px 0; color: var(--melide-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;
         }
         .exercise-detail-panel p {
-            margin: 0 0 10px 0; font-size: 0.82rem; color: #334155; line-height: 1.4;
+            margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-main); line-height: 1.5;
         }
         .video-btn {
-            display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: #991b1b; border: 1px solid #ef4444;
-            padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: bold; text-decoration: none; transition: background 0.2s;
+            display: inline-flex; align-items: center; gap: 6px; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+            padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-decoration: none; transition: background 0.2s;
         }
         .video-btn:hover { background: #fecaca; }
     </style>
@@ -148,11 +224,11 @@
 
     <header id="main-header">
         <button class="header-btn" id="btn-atras" onclick="irA('scr-inicio')" style="display: none;">&#8592;</button>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="concello-de-melide.jpeg" alt="Logo" style="height: 44px; border-radius: 6px; object-fit: contain;">
-            <span style="font-weight: bold; letter-spacing: 0.5px; font-size: 0.95rem;">FACENDO DEPORTE EN MELIDE</span>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <img src="concello-de-melide.jpeg" alt="Logo" style="height: 44px; border-radius: 8px; object-fit: contain;">
+            <span style="font-weight: 800; letter-spacing: 0.5px; font-size: 1.05rem;">FACENDO DEPORTE EN MELIDE</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 5px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
             <button class="header-btn" onclick="toggleFullScreen()" title="Pantalla completa">&#x26F6;</button>
             <button class="header-btn" onclick="cerrarSesion()" title="Cerrar Sesión">&#127968;</button>
         </div>
@@ -161,20 +237,20 @@
     <!-- PANTALLA 1: INICIO -->
     <div id="scr-inicio" class="screen active">
         <div class="login-box">
-            <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" style="width: 240px; max-width: 85%; height: auto; margin-bottom: 18px; border-radius: 12px; object-fit: contain;">
+            <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" style="width: 220px; max-width: 80%; height: auto; margin-bottom: 20px; border-radius: 12px; object-fit: contain;">
             
-            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.35rem; letter-spacing: 0.5px;">FACENDO DEPORTE EN MELIDE</h2>
+            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.45rem; letter-spacing: 0.5px; font-weight: 800;">FACENDO DEPORTE EN MELIDE</h2>
             
             <div id="login-error" class="error-msg"></div>
 
             <form onsubmit="handleLogin(event)">
                 <input type="text" id="login-user" placeholder="Usuario / Correo / DNI" class="form-control" required>
                 <input type="password" id="login-pass" placeholder="Contraseña" class="form-control" required>
-                <button type="submit" class="btn-main" style="margin-bottom: 12px;">ENTRAR</button>
+                <button type="submit" class="btn-main" style="margin-bottom: 14px;">ENTRAR</button>
             </form>
 
-            <div style="border-top: 2px solid #93c5fd; padding-top: 15px; margin-top: 5px;">
-                <p style="font-size: 0.85rem; color: #1e293b; margin-bottom: 10px;">¿Primera vez en el programa?</p>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 18px; margin-top: 8px;">
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 600;">¿Primera vez en el programa?</p>
                 <button type="button" class="btn-main btn-registro" onclick="abrirRegistro()">REGISTRO NUEVO</button>
             </div>
         </div>
@@ -182,35 +258,35 @@
 
     <!-- PANTALLA 2: REGISTRO -->
     <div id="scr-registro" class="screen">
-        <div class="login-box" style="max-width: 500px; width: 100%;">
-            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; text-align: center;">Nuevo Registro Vecinal</h2>
+        <div class="login-box" style="max-width: 540px; width: 100%;">
+            <h2 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.35rem; text-align: center; font-weight: 800;">Nuevo Registro Vecinal</h2>
             
             <div id="reg-error" class="error-msg"></div>
 
             <form id="form-registro" onsubmit="handleRegistro(event)" style="text-align: left;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Nombre *</label><input type="text" id="reg-nombre" class="form-control" placeholder="Tu nombre" required></div>
                     <div><label class="form-label">Apellidos *</label><input type="text" id="reg-apellidos" class="form-control" placeholder="Tus apellidos" required></div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Mote *</label><input type="text" id="reg-mote" class="form-control" placeholder="Alias" required></div>
                     <div><label class="form-label">DNI *</label><input type="text" id="reg-dni" class="form-control" placeholder="12345678A" pattern="[0-9]{8}[A-Za-z]" maxlength="9" style="text-transform: uppercase;" required></div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Teléfono *</label><input type="tel" id="reg-tf" class="form-control" placeholder="600123456" pattern="[0-9]{9}" maxlength="9" inputmode="numeric" required></div>
                     <div><label class="form-label">Edad *</label><input type="number" id="reg-edad" class="form-control" placeholder="Años" min="5" max="115" required></div>
                 </div>
 
                 <div><label class="form-label">Dirección *</label><input type="text" id="reg-direccion" class="form-control" placeholder="Calle, número, piso / parroquia" required></div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Peso (kg) *</label><input type="number" step="0.1" id="reg-peso" class="form-control" placeholder="Ej. 70.5" min="15" max="300" required></div>
                     <div><label class="form-label">Estatura (cm) *</label><input type="number" id="reg-estatura" class="form-control" placeholder="Ej. 175" min="50" max="250" required></div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
                         <label class="form-label">Hábitos *</label>
                         <select id="reg-habitos" class="form-control" required>
@@ -233,28 +309,28 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Correo *</label><input type="email" id="reg-email" class="form-control" placeholder="correo@melide.gal" required></div>
                     <div><label class="form-label">Confirmar Correo *</label><input type="email" id="reg-email-confirm" class="form-control" placeholder="Repite tu correo" required></div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Contraseña *</label><input type="password" id="reg-password" class="form-control" placeholder="Mín. 4 caracteres" minlength="4" required></div>
                     <div><label class="form-label">Confirmar Contraseña *</label><input type="password" id="reg-password-confirm" class="form-control" placeholder="Repite contraseña" minlength="4" required></div>
                 </div>
 
-                <button type="submit" class="btn-main" style="background-color: #059669; margin-top: 8px;">GUARDAR Y ACCEDER</button>
+                <button type="submit" class="btn-main" style="background-color: #059669; margin-top: 12px;">GUARDAR Y ACCEDER</button>
             </form>
 
-            <button type="button" class="btn-main" style="background: transparent; color: var(--melide-primary); box-shadow: none; margin-top: 8px;" onclick="irA('scr-inicio')">← Volver al inicio</button>
+            <button type="button" class="btn-main" style="background: transparent; color: var(--melide-primary); box-shadow: none; margin-top: 12px;" onclick="irA('scr-inicio')">← Volver al inicio</button>
         </div>
     </div>
 
     <!-- PANTALLA 3: ZONA DE USUARIO (3 PESTAÑAS) -->
     <div id="scr-dash" class="screen">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <h2 id="saludo-principal" style="color: var(--melide-primary); margin: 0; font-size: 1.4rem;">¡Hola!</h2>
-            <p style="color: #1e293b; font-size: 0.85rem; margin-top: 4px;">Configura tu sesión, revisa tus sesiones o modifica tus datos</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h2 id="saludo-principal" style="color: var(--melide-primary); margin: 0; font-size: 1.5rem; font-weight: 800;">¡Hola!</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px; font-weight: 600;">Configura tu sesión algorítmica, revisa tus sesiones o modifica tus datos</p>
         </div>
 
         <div class="nav-tabs">
@@ -263,10 +339,10 @@
             <button id="tab-btn-perfil" class="tab-btn" onclick="cambiarPestanaUsuario('perfil')">👤 Mis Datos</button>
         </div>
 
-        <!-- SUBVISTA A: CONFIGURAR ACTIVIDAD Y GENERADOR DE SESIONES -->
-        <div id="subvista-actividad" style="width: 100%; max-width: 520px;">
-            <div class="login-box" style="max-width: 100%; text-align: left; margin-bottom: 10px;">
-                <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">¿Qué quieres hacer hoy?</h3>
+        <!-- SUBVISTA A: CONFIGURAR ACTIVIDAD Y GENERADOR ALGORÍTMICO -->
+        <div id="subvista-actividad" style="width: 100%; max-width: 560px;">
+            <div class="login-box" style="max-width: 100%; text-align: left; margin-bottom: 16px;">
+                <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 18px; font-size: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-weight: 700;">Generador Algorítmico Inteligente</h3>
                 <div id="actividad-msg" class="success-msg"></div>
 
                 <form onsubmit="generarSesionEntrenamiento(event)">
@@ -275,12 +351,12 @@
                         <option value="Gimnasio municipal">Gimnasio municipal</option>
                         <option value="Exterior">Exterior (Parques / Calle / Mobiliario urbano)</option>
                         <option value="Ruta">Ruta (Caminos / Árboles / Bancos / Señales)</option>
-                        <option value="En Casa">En Casa (Picas, botellas, bolsas de guisantes, sillas...)</option>
+                        <option value="En Casa">En Casa (Sillas, botellas, mobiliario doméstico...)</option>
                     </select>
 
                     <label class="form-label">2. Material disponible</label>
                     <select id="pref-material" class="form-control">
-                        <option value="Sin material">Sin material</option>
+                        <option value="Sin material">Sin material (Peso corporal)</option>
                         <option value="Accesorios de casa">Accesorios de casa (Escobas, botellas, sillas...)</option>
                         <option value="Mobiliario urbano / Exterior">Mobiliario urbano / Elementos del parque</option>
                         <option value="Elementos de rutas">Elementos de rutas (Bancos, árboles, señales...)</option>
@@ -300,7 +376,7 @@
                         <option value="Fuerza y Tonificación">Fuerza y Tonificación</option>
                     </select>
 
-                    <button type="submit" class="btn-main" style="background-color: var(--melide-primary); margin-top: 5px;">⚡ GENERAR MI SESIÓN DE HOY</button>
+                    <button type="submit" class="btn-main" style="background-color: var(--melide-primary); margin-top: 8px;">⚡ GENERAR SESIÓN ALGORÍTMICA</button>
                 </form>
             </div>
 
@@ -309,49 +385,49 @@
         </div>
 
         <!-- SUBVISTA B: HISTORIAL DE SESIONES HECHAS -->
-        <div id="subvista-historial" class="login-box" style="max-width: 520px; width: 100%; text-align: left; display: none;">
-            <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">Historial de Sesiones Realizadas</h3>
-            <div id="lista-sesiones-hechas" style="font-size: 0.85rem; color: #1e293b;"></div>
+        <div id="subvista-historial" class="login-box" style="max-width: 560px; width: 100%; text-align: left; display: none;">
+            <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 18px; font-size: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-weight: 700;">Historial de Sesiones Realizadas</h3>
+            <div id="lista-sesiones-hechas" style="font-size: 0.88rem; color: var(--text-main);"></div>
         </div>
 
         <!-- SUBVISTA C: MODIFICAR FICHA Y GUSTOS -->
-        <div id="subvista-perfil" class="login-box" style="max-width: 520px; width: 100%; text-align: left; display: none;">
-            <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15rem; border-bottom: 2px solid #93c5fd; padding-bottom: 8px;">Modificar Ficha y Gustos</h3>
+        <div id="subvista-perfil" class="login-box" style="max-width: 560px; width: 100%; text-align: left; display: none;">
+            <h3 style="color: var(--melide-primary); margin-top: 0; margin-bottom: 18px; font-size: 1.2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; font-weight: 700;">Modificar Ficha y Gustos</h3>
             <div id="perfil-msg" class="success-msg"></div>
 
             <form onsubmit="actualizarDatosUsuario(event)">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Nombre</label><input type="text" id="edit-nombre" class="form-control" required></div>
                     <div><label class="form-label">Apellidos</label><input type="text" id="edit-apellidos" class="form-control" required></div>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Mote</label><input type="text" id="edit-mote" class="form-control" required></div>
-                    <div><label class="form-label">DNI</label><input type="text" id="edit-dni" class="form-control" style="background: #cbd5e1; color: #475569;" readonly></div>
+                    <div><label class="form-label">DNI</label><input type="text" id="edit-dni" class="form-control" style="background: #e2e8f0; color: #64748b;" readonly></div>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Teléfono</label><input type="tel" id="edit-tf" class="form-control" required></div>
                     <div><label class="form-label">Edad</label><input type="number" id="edit-edad" class="form-control" required></div>
                 </div>
                 <div><label class="form-label">Dirección</label><input type="text" id="edit-direccion" class="form-control" required></div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div><label class="form-label">Peso (kg)</label><input type="number" step="0.1" id="edit-peso" class="form-control" required></div>
                     <div><label class="form-label">Estatura (cm)</label><input type="number" id="edit-estatura" class="form-control" required></div>
                 </div>
                 <div><label class="form-label">Gustos / Deportes favoritos</label><input type="text" id="edit-gustos" class="form-control" placeholder="Ej. Caminar, natación..."></div>
-                <button type="submit" class="btn-main" style="background-color: var(--melide-primary); margin-top: 5px;">GUARDAR CAMBIOS</button>
+                <button type="submit" class="btn-main" style="background-color: var(--melide-primary); margin-top: 10px;">GUARDAR CAMBIOS</button>
             </form>
         </div>
     </div>
 
     <!-- PANTALLA 4: ADMINISTRACIÓN -->
     <div id="scr-admin" class="screen">
-        <div class="login-box" style="max-width: 650px; width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--melide-primary); padding-bottom: 10px; margin-bottom: 20px;">
+        <div class="login-box" style="max-width: 680px; width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--melide-primary); padding-bottom: 12px; margin-bottom: 24px;">
                 <div>
-                    <span style="background: #d32f2f; color: white; font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 6px;">ADMINISTRACIÓN</span>
-                    <h2 style="color: var(--melide-primary); margin: 5px 0 0 0; font-size: 1.4rem;">Panel de Estadísticas</h2>
+                    <span style="background: #b91c1c; color: white; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.5px;">ADMINISTRACIÓN</span>
+                    <h2 style="color: var(--melide-primary); margin: 6px 0 0 0; font-size: 1.5rem; font-weight: 800;">Panel de Estadísticas</h2>
                 </div>
-                <span style="font-size: 2rem;">📊</span>
+                <span style="font-size: 2.2rem;">📊</span>
             </div>
 
             <div class="stats-grid">
@@ -359,9 +435,9 @@
                 <div class="stat-card"><span class="num" id="stat-edad-media">--</span><span class="lbl">Edad Media</span></div>
             </div>
 
-            <div style="background: #eff6ff; padding: 15px; border-radius: 16px; border: 2px solid #93c5fd; margin-bottom: 20px; text-align: left;">
-                <h4 style="margin: 0 0 10px 0; color: var(--melide-primary); font-size: 0.95rem;">Últimos Vecinos Registrados</h4>
-                <div id="admin-lista-usuarios" style="font-size: 0.85rem; color: #1e293b;"></div>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 24px; text-align: left;">
+                <h4 style="margin: 0 0 12px 0; color: var(--melide-primary); font-size: 1rem; font-weight: 700;">Últimos Vecinos Registrados</h4>
+                <div id="admin-lista-usuarios" style="font-size: 0.88rem; color: var(--text-main);"></div>
             </div>
 
             <button type="button" class="btn-main btn-registro" onclick="cerrarSesion()">SALIR</button>
@@ -373,7 +449,262 @@
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
         let sesionGeneradaActual = null;
 
-        // Generador de tarjetas interactivas con panel de detalle y vídeo preconfigurado
+        // MOTOR ALGORÍTMICO DINÁMICO DE CREACIÓN DE EJERCICIOS
+        function construirSesionAlgoritmica(instalacion, material, tiempo, objetivo, usuario) {
+            const edad = usuario.edad || 40;
+            const esSenior = edad >= 65 || usuario.habitos === 'Persona Mayor' || usuario.condicion === 'Mala' || usuario.condicion === 'Muy mala';
+            const seriesAlgoritmo = esSenior ? '2 series de 8-10 repeticiones (ritmo pausado)' : '3 series de 10-12 repeticiones (descanso de 45s)';
+
+            // Banco modular algorítmico de componentes de entrenamiento
+            const bancoCalentamiento = [
+                {
+                    titulo: "🔄 1. Movilidad articular de cuello y hombros",
+                    resumen: "Giros circulares controlados para lubricar articulaciones superiores.",
+                    detalle: "De pie o sentado con la espalda recta, realiza 8 giros suaves de cabeza hacia la derecha y 8 hacia la izquierda. Eleva los hombros y muévelos en círculos hacia atrás lentamente 10 veces.",
+                    query: "movilidad articular cuello y hombros calentamiento"
+                },
+                {
+                    titulo: "🔄 2. Movilidad de cadera y rotación lumbar",
+                    resumen: "Rotaciones amplias de cadera para preparar el tronco.",
+                    detalle: "Con las manos en la cadera y los pies separados, dibuja círculos amplios y lentos con la cadera (8 en cada sentido).",
+                    query: "movilidad de cadera calentamiento"
+                },
+                {
+                    titulo: "🚶 3. Activación cardiovascular dinámica (" + instalacion + ")",
+                    resumen: "Elevación suave de pulsaciones adaptada al entorno.",
+                    detalle: "Realiza marcha suave combinada o ligera activación adaptada al espacio disponible durante 3 minutos.",
+                    query: "activacion cardiovascular calentamiento"
+                }
+            ];
+
+            const bancoCalma = [
+                {
+                    titulo: "🌬️ 1. Respiración diafragmática profunda",
+                    resumen: "Control de la respiración para reducir pulsaciones.",
+                    detalle: "Inhala despacio por la nariz durante 4 segundos sintiendo la expansión abdominal. Exhala muy lentamente por la boca durante 6 segundos. Repite 6 veces.",
+                    query: "respiracion diafragmatica relajacion"
+                },
+                {
+                    titulo: "🧘 2. Estiramiento analítico de grupos musculares",
+                    resumen: "Alargamiento controlado de tren inferior y espalda.",
+                    detalle: "Apóyate en un soporte firme. Dobla una pierna llevando el talón al glúteo (20 segundos sin rebotes). Repite con la otra pierna.",
+                    query: "estiramientos globales relajacion"
+                }
+            ];
+
+            // Generación algorítmica de la parte principal según los condicionantes
+            let principalAlgoritmica = [];
+
+            if (instalacion === 'Gimnasio municipal') {
+                principalAlgoritmica = [
+                    {
+                        titulo: "⚙️ 1. Adaptación inicial en máquina (" + objetivo + ")",
+                        resumen: "Puesta a punto general con equipamiento guiado.",
+                        detalle: "Realiza un bloque inicial controlando postura y técnica con carga ligera (" + seriesAlgoritmo + ").",
+                        query: "circuito gimnasio municipal tecnica"
+                    },
+                    {
+                        titulo: "🦵 2. Prensa o Sentadilla guiada en máquina",
+                        resumen: "Fuerza de piernas con soporte de seguridad.",
+                        detalle: "Coloca los pies a la anchura de hombros. Empuja extendiendo sin bloquear rodillas y frena la bajada (" + seriesAlgoritmo + ").",
+                        query: "prensa de piernas gimnasio tecnica"
+                    },
+                    {
+                        titulo: "🫱 3. Remo sentado en polea o máquina",
+                        resumen: "Fortalecimiento de espalda alta y corrección postural.",
+                        detalle: "Espalda recta y pecho erguido. Tira de los agarres hacia el abdomen llevando los codos atrás (" + seriesAlgoritmo + ").",
+                        query: "remo sentado polea gimnasio"
+                    },
+                    {
+                        titulo: "💪 4. Press de pecho en máquina guiada",
+                        resumen: "Tonificación segura del tren superior.",
+                        detalle: "Espalda apoyada firmemente, empuja las empuñaduras hacia delante y regresa con control (" + seriesAlgoritmo + ").",
+                        query: "press de pecho maquina gimnasio"
+                    },
+                    {
+                        titulo: "🏋️ 5. Extensión de cuádriceps en máquina",
+                        resumen: "Trabajo específico de la musculatura anterior.",
+                        detalle: "Sentado con el rodillo en los empeines, eleva las piernas estirándolas al frente de forma controlada (" + seriesAlgoritmo + ").",
+                        query: "extension de cuadriceps maquina"
+                    },
+                    {
+                        titulo: "🛡️ 6. Plancha abdominal isométrica en banco",
+                        resumen: "Estabilidad profunda de la zona media (Core).",
+                        detalle: "Apoya antebrazos en un banco firme y puntas de pies. Alinea el cuerpo contrayendo abdomen durante 25-30 segundos.",
+                        query: "plancha abdominal tecnica correcta"
+                    }
+                ];
+            } else if (instalacion === 'En Casa') {
+                if (material === 'Accesorios de casa') {
+                    principalAlgoritmica = [
+                        {
+                            titulo: "🪑 1. Sentadilla asistida usando silla",
+                            resumen: "Flexión de piernas con asiento de referencia.",
+                            detalle: "Baja la cadera hacia atrás como para sentarte, toca ligeramente el asiento y vuelve a subir (" + seriesAlgoritmo + ").",
+                            query: "sentadilla con silla tecnica"
+                        },
+                        {
+                            titulo: "🧴 2. Remo inclinado con botellas de agua",
+                            resumen: "Trabajo de espalda con peso doméstico.",
+                            detalle: "Tronco ligeramente inclinado con espalda recta. Sube los codos pegados al cuerpo con una botella en cada mano (" + seriesAlgoritmo + ").",
+                            query: "remo con botellas de agua"
+                        },
+                        {
+                            titulo: "🧹 3. Elevación frontal con palo de escoba",
+                            resumen: "Movilidad y tonificación de hombros.",
+                            detalle: "Sujeta el palo con manos separadas a la anchura de hombros. Elévalo desde los muslos hasta la altura de los ojos (" + seriesAlgoritmo + ").",
+                            query: "ejercicios con palo de escoba hombros"
+                        },
+                        {
+                            titulo: "🫸 4. Flexiones inclinadas en encimera",
+                            resumen: "Fuerza de pectoral adaptada y segura.",
+                            detalle: "Manos firmes en el borde de una mesa estable. Flexiona codos acercando el pecho y empuja (" + seriesAlgoritmo + ").",
+                            query: "flexiones inclinadas en mesa"
+                        },
+                        {
+                            titulo: "🪑 5. Zancadas cortas apoyado en respaldo",
+                            resumen: "Fortalecimiento de piernas con soporte.",
+                            detalle: "Sujeto al respaldo de una silla, da un paso corto atrás bajando la cadera verticalmente (" + seriesAlgoritmo + " por pierna).",
+                            query: "zancadas con apoyo de silla"
+                        },
+                        {
+                            titulo: "🛡️ 6. Puente de glúteo en esterilla o suelo",
+                            resumen: "Elevación de cadera para zona lumbar y glúteos.",
+                            detalle: "Tumbado boca arriba con rodillas dobladas, eleva la pelvis contrayendo con fuerza arriba (" + seriesAlgoritmo + ").",
+                            query: "puente de gluteo suelo"
+                        }
+                    ];
+                } else {
+                    principalAlgoritmica = [
+                        {
+                            titulo: "🧍 1. Sentadillas libres con peso corporal",
+                            resumen: "Flexión profunda de piernas controlando postura.",
+                            detalle: "Separa los pies a la anchura de hombros. Flexiona rodillas llevando cadera atrás manteniendo el pecho abierto (" + seriesAlgoritmo + ").",
+                            query: "sentadilla libre tecnica correcta"
+                        },
+                        {
+                            titulo: "🦵 2. Zancadas alternas hacia atrás",
+                            resumen: "Fortalecimiento y equilibrio de piernas.",
+                            detalle: "Paso amplio atrás apoyando la puntera y bajando la cadera verticalmente con espalda recta (" + seriesAlgoritmo + ").",
+                            query: "zancadas hacia atras tecnica"
+                        },
+                        {
+                            titulo: "🧱 3. Flexiones apoyadas en pared",
+                            resumen: "Trabajo de brazos y pectoral sin impacto.",
+                            detalle: "Frente a una pared a un paso de distancia, apoya manos y flexiona codos acercando el rostro con control (" + seriesAlgoritmo + ").",
+                            query: "flexiones en pared tecnica"
+                        },
+                        {
+                            titulo: "🦀 4. Extensión de cadera en cuadrupedia",
+                            resumen: "Estabilidad de cadera y glúteo.",
+                            detalle: "Apoyado sobre manos y rodillas, extiende una pierna atrás sin arquear la zona lumbar (" + seriesAlgoritmo + " por pierna).",
+                            query: "patada de gluteo cuadrupedia"
+                        },
+                        {
+                            titulo: "🦅 5. Aperturas inversas sin peso",
+                            resumen: "Trabajo postural de espalda alta.",
+                            detalle: "Tronco inclinado al frente con brazos estirados abajo, elévalos abriendo el pecho como alas (" + seriesAlgoritmo + ").",
+                            query: "aperturas inversas sin peso"
+                        },
+                        {
+                            titulo: "🛡️ 6. Plancha abdominal estática",
+                            resumen: "Control y firmeza de la zona media.",
+                            detalle: "Apóyate sobre antebrazos y puntas de pies. Mantén el cuerpo alineado durante 25-30 segundos.",
+                            query: "plancha abdominal basica"
+                        }
+                    ];
+                }
+            } else if (instalacion === 'Exterior') {
+                principalAlgoritmica = [
+                    {
+                        titulo: "🪑 1. Subida a banco urbano (Step-up)",
+                        resumen: "Fuerza en piernas usando mobiliario del parque.",
+                        detalle: "Sube al asiento del banco apoyando toda la planta del pie, eleva el cuerpo contrayendo el glúteo y baja con control (" + seriesAlgoritmo + ").",
+                        query: "subida a banco step up parque"
+                    },
+                    {
+                        titulo: "🧱 2. Flexiones inclinadas en respaldo de banco",
+                        resumen: "Tonificación de pectoral en parque.",
+                        detalle: "Manos firmes en el respaldo superior del banco. Cuerpo alineado como tabla y flexión controlada de codos (" + seriesAlgoritmo + ").",
+                        query: "flexiones inclinadas en banco parque"
+                    },
+                    {
+                        titulo: "💪 3. Fondos de tríceps en borde de banco",
+                        resumen: "Fortalecimiento de brazos en mobiliario urbano.",
+                        detalle: "Manos en el borde del asiento con dedos al frente y pies apoyados en suelo. Flexión de codos atrás (" + seriesAlgoritmo + ").",
+                        query: "fondos de triceps en banco parque"
+                    },
+                    {
+                        titulo: "🦵 4. Zancadas estáticas con apoyo en barandilla",
+                        resumen: "Fuerza de piernas con soporte urbano.",
+                        detalle: "Sujeto a una barandilla, da un paso al frente y baja la cadera verticalmente con control (" + seriesAlgoritmo + " por pierna).",
+                        query: "zancadas estaticas con apoyo"
+                    },
+                    {
+                        titulo: "⚡ 5. Desplazamientos laterales activos",
+                        resumen: "Agilidad y trabajo cardiovascular en parque.",
+                        detalle: "Pequeños desplazamientos laterales de un lado a otro manteniendo rodillas flexibles durante 1 minuto.",
+                        query: "desplazamientos laterales ejercicio"
+                    },
+                    {
+                        titulo: "🛡️ 6. Sentadilla isométrica contra columna",
+                        resumen: "Resistencia estática sin impacto articular.",
+                        detalle: "Espalda contra un muro o columna lisa, baja la cadera hasta formar 90 grados en rodillas y mantén 20-30 segundos.",
+                        query: "sentadilla isometrica pared"
+                    }
+                ];
+            } else { // Ruta
+                principalAlgoritmica = [
+                    {
+                        titulo: "🚶 1. Caminata aeróbica constante (" + objetivo + ")",
+                        resumen: "Marcha continuada con postura erguida y braceo.",
+                        detalle: "Mirada al frente, hombros relajados y ritmo constante que permita hablar sin ahogo durante el bloque principal.",
+                        query: "marcha nordica caminata deportiva tecnica"
+                    },
+                    {
+                        titulo: "🪑 2. Parada activa: Sentadillas en banco de ruta",
+                        resumen: "Fuerza de piernas aprovechando elementos del camino.",
+                        detalle: "Aprovecha un banco o muro firme para realizar 10-12 repeticiones de sentarse y levantarse con control absoluto de postura.",
+                        query: "sentadilla en banco de ruta"
+                    },
+                    {
+                        titulo: "🌳 3. Flexiones de empuje contra árbol firme",
+                        resumen: "Tonificación de torso utilizando árboles de la ruta.",
+                        detalle: "Apoya las palmas contra el tronco de un árbol a la altura del pecho. Realiza 12 flexiones inclinadas manteniendo abdomen firme.",
+                        query: "flexiones contra arbol tecnica"
+                    },
+                    {
+                        titulo: "⏱️ 4. Fartlek suave (Cambios de ritmo en marcha)",
+                        resumen: "Intervalos de aceleración controlada en camino.",
+                        detalle: "Alterna 2 minutos caminando a ritmo muy vivo con 1 minuto de marcha a paso normal para estimular capacidad aeróbica.",
+                        query: "caminata intervalos cambios de ritmo"
+                    },
+                    {
+                        titulo: "🦵 5. Elevaciones de talones en bordillo o escalón",
+                        resumen: "Fortalecimiento de gemelos y equilibrio en ruta.",
+                        detalle: "Aprovecha un escalón apoyando la mitad anterior de los pies. Eleva los talones todo lo posible y baja despacio (" + seriesAlgoritmo + ").",
+                        query: "elevacion de talones gemelos"
+                    },
+                    {
+                        titulo: "🌲 6. Zancadas dinámicas en terreno llano",
+                        resumen: "Estabilidad y zancada controlada en el camino.",
+                        detalle: "Da pasos largos hacia delante en un tramo llano y seguro, bajando la cadera con suavidad y alternando piernas de forma fluida.",
+                        query: "zancadas en movimiento tecnica"
+                    }
+                ];
+            }
+
+            return {
+                tiempoCalentamiento: '8 min',
+                tiempoPrincipal: '30 min',
+                tiempoCalma: '7 min',
+                calentamiento: bancoCalentamiento,
+                principal: principalAlgoritmica,
+                calma: bancoCalma
+            };
+        }
+
+        // Renderizado interactivo de cada ejercicio con panel explicativo
         function renderEjercicioInteractivo(titulo, resumen, explicacionDetallada, queryBusqueda) {
             const idUnico = 'ex_' + Math.random().toString(36).substring(2, 9);
             const urlVideo = `https://www.youtube.com/results?search_query=${encodeURIComponent(queryBusqueda + ' ejercicio tecnica correcta')}`;
@@ -582,7 +913,7 @@
             usuario.preferenciasSesion = { instalacion, material, tiempo, objetivo };
             actualizarUsuarioEnStorage(usuario);
 
-            const rutina = construirBloquesRutinaAjustada(instalacion, material, tiempo, objetivo, usuario);
+            const rutina = construirSesionAlgoritmica(instalacion, material, tiempo, objetivo, usuario);
             sesionGeneradaActual = {
                 fecha: new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'}),
                 instalacion,
@@ -616,311 +947,13 @@
                         <div>${rutina.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                     </div>
 
-                    <button type="button" class="btn-main" style="background-color: #059669; margin-top: 10px;" onclick="guardarSesionEnHistorial()">
+                    <button type="button" class="btn-main" style="background-color: #059669; margin-top: 14px;" onclick="guardarSesionEnHistorial()">
                         💾 GUARDAR ESTA SESIÓN EN MI HISTORIAL
                     </button>
                 </div>
             `;
             contenedor.style.display = 'block';
             contenedor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function construirBloquesRutinaAjustada(instalacion, material, tiempo, objetivo, usuario) {
-            const mins = parseInt(tiempo, 10) || 45;
-            // Tiempos ajustados: Calentamiento 8 min, Vuelta a la calma 7 min, Parte Principal 30 min (total 45 min)
-            const tCal = '8 min';
-            const tCalm = '7 min';
-            const tPrin = (mins - 15) + ' min'; // 30 min para 45 de total
-
-            const nivelBajo = (usuario.condicion === 'Mala' || usuario.condicion === 'Muy mala' || usuario.habitos === 'Persona Mayor');
-            const repes = nivelBajo ? '2 series de 8 repeticiones (ritmo pausado)' : '3 series de 10-12 repeticiones (descanso de 45s)';
-
-            // EXACTAMENTE 3 EJERCICIOS PARA EL CALENTAMIENTO
-            let calentamiento = [
-                {
-                    titulo: "🔄 1. Movilidad articular de cuello y hombros",
-                    resumen: "Giros circulares controlados para lubricar el cuello y la cintura escapular.",
-                    detalle: "De pie o sentado con la espalda recta, realiza 8 giros suaves de cabeza hacia la derecha y 8 hacia la izquierda. A continuación, eleva los hombros hacia las orejas y muévelos en círculos hacia atrás lentamente 10 veces.",
-                    query: "movilidad articular cuello y hombros calentamiento"
-                },
-                {
-                    titulo: "🔄 2. Movilidad de cadera y rodillas",
-                    resumen: "Rotaciones amplias de cadera y flexión suave de rodillas.",
-                    detalle: "Con las manos en la cadera y los pies separados a la anchura de los hombros, dibuja círculos amplios y lentos con la cadera (8 en cada sentido). Después, junta ligeramente las rodillas y haz flexiones muy suaves con las manos apoyadas en los muslos.",
-                    query: "movilidad de cadera y rodillas calentamiento"
-                },
-                {
-                    titulo: "🚶 3. Marcha suave de activación en el sitio",
-                    resumen: "Elevación ligera de rodillas combinada con braceo fluido.",
-                    detalle: "Camina en el mismo sitio coordinando brazos y piernas a un ritmo muy suave y controlado durante 3 minutos para elevar la temperatura corporal antes de la parte principal.",
-                    query: "marcha en el sitio calentamiento"
-                }
-            ];
-
-            // EXACTAMENTE 2 EJERCICIOS PARA LA VUELTA A LA CALMA
-            let calma = [
-                {
-                    titulo: "🌬️ 1. Respiración diafragmática profunda",
-                    resumen: "Control de la respiración para reducir pulsaciones y relajar la musculatura.",
-                    detalle: "Inhala despacio por la nariz durante 4 segundos sintiendo cómo se expande tu abdomen. Mantén el aire 2 segundos y exhala muy lentamente por la boca con los labios fruncidos durante 6 segundos. Repite 6 veces.",
-                    query: "respiracion diafragmatica relajacion"
-                },
-                {
-                    titulo: "🧘 2. Estiramiento suave de tren inferior",
-                    resumen: "Alargamiento controlado de cuádriceps, gemelos y zona lumbar.",
-                    detalle: "Apóyate en una pared o respaldo firme. Dobla una pierna llevando el talón hacia el glúteo para estirar el cuádriceps (mantén 20 segundos sin rebotes). Repite con la otra pierna y estira gemelos apoyando la planta entera en el suelo.",
-                    query: "estiramientos cuadriceps y gemelos"
-                }
-            ];
-
-            let principal = [];
-
-            if (instalacion === 'Gimnasio municipal') {
-                principal = [
-                    {
-                        titulo: `⚙️ 1. Circuito guiado inicial (${objetivo})`,
-                        resumen: "Puesta a punto general con el equipamiento del gimnasio.",
-                        detalle: `Realiza un bloque de adaptación inicial controlando la postura y la respiración (${repes}).`,
-                        query: "circuito gimnasio municipal ejercicios"
-                    },
-                    {
-                        titulo: "🦵 2. Prensa o Sentadilla asistida en máquina",
-                        resumen: "Trabajo seguro de fuerza para piernas con soporte guiado.",
-                        detalle: `Coloca los pies bien apoyados a la anchura de hombros. Empuja extendiendo las piernas sin bloquear las rodillas arriba y baja frenando lentamente (${repes}).`,
-                        query: "prensa de piernas gimnasio tecnica"
-                    },
-                    {
-                        titulo: "🫱 3. Remo sentado en polea / máquina",
-                        resumen: "Fortalecimiento de espalda alta y mejora postural.",
-                        detalle: `Siéntate con la espalda recta y el pecho erguido. Tira de los agarres hacia tu abdomen llevando los codos hacia atrás y juntando las escápulas (${repes}).`,
-                        query: "remo sentado en polea gimnasio"
-                    },
-                    {
-                        titulo: "💪 4. Press de pecho en máquina",
-                        resumen: "Tonificación segura del tren superior y pectoral.",
-                        detalle: `Sentado con la espalda apoyada firmemente, empuja las empuñaduras hacia delante de forma controlada y regresa despacio (${repes}).`,
-                        query: "press de pecho maquina gimnasio"
-                    },
-                    {
-                        titulo: "🏋️ 5. Extensión de cuádriceps en máquina",
-                        resumen: "Fortalecimiento específico de la musculatura anterior de la rodilla.",
-                        detalle: `Sentado en la máquina con el rodillo apoyado en los empeines, eleva las piernas de forma controlada estirándolas al frente y baja despacio (${repes}).`,
-                        query: "extension de cuadriceps maquina"
-                    },
-                    {
-                        titulo: "🛡️ 6. Plancha abdominal isométrica en banco",
-                        resumen: "Fortalecimiento profundo de la zona media y protección lumbar.",
-                        detalle: "Apoya los antebrazos en un banco firme y las puntas de los pies. Alinea tu cuerpo contrayendo abdomen y glúteos durante 25-30 segundos.",
-                        query: "plancha abdominal tecnica correcta"
-                    }
-                ];
-            } else if (instalacion === 'En Casa') {
-                if (material === 'Accesorios de casa') {
-                    principal = [
-                        {
-                            titulo: "🪑 1. Sentadilla asistida con silla",
-                            resumen: "Flexión de piernas usando el asiento como referencia.",
-                            detalle: `Colócate frente a una silla firme. Baja la cadera hacia atrás como si fueras a sentarte, toca ligeramente el asiento y vuelve a subir empujando desde los talones (${repes}).`,
-                            query: "sentadilla con silla tecnica"
-                        },
-                        {
-                            titulo: "🧴 2. Remo inclinado con botellas de agua",
-                            resumen: "Trabajo de espalda usando dos botellas llenas.",
-                            detalle: `Inclina ligeramente el tronco hacia delante manteniendo la espalda recta. Con una botella en cada mano, sube los codos pegados al cuerpo (${repes}).`,
-                            query: "remo con botellas de agua"
-                        },
-                        {
-                            titulo: "🧹 3. Elevación frontal con palo de escoba",
-                            resumen: "Movilidad y tonificación de hombros y brazos.",
-                            detalle: `Sujeta un palo de escoba con las dos manos separadas a la anchura de hombros. Elévalo suavemente desde los muslos hasta la altura de los ojos (${repes}).`,
-                            query: "ejercicios con palo de escoba hombros"
-                        },
-                        {
-                            titulo: "🫸 4. Flexiones inclinadas en encimera o mesa",
-                            resumen: "Fuerza de pecho y brazos adaptada y segura.",
-                            detalle: `Apoya las manos firmemente en el borde de una mesa estable o encimera. Flexiona los codos acercando el pecho y empuja para volver (${repes}).`,
-                            query: "flexiones inclinadas en mesa"
-                        },
-                        {
-                            titulo: "🪑 5. Zancadas cortas apoyado en respaldo",
-                            resumen: "Fortalecimiento de piernas con apoyo de estabilidad.",
-                            detalle: `Sujétate al respaldo de una silla y da un paso corto atrás bajando la cadera verticalmente con control (${repes} por cada pierna).`,
-                            query: "zancadas con apoyo de silla"
-                        },
-                        {
-                            titulo: "🛡️ 6. Puente de glúteo en esterilla o suelo",
-                            resumen: "Elevación de cadera para fortalecer glúteos y zona lumbar.",
-                            detalle: `Tumbado boca arriba con las rodillas dobladas y los pies apoyados, eleva la cadera contrayendo con fuerza los glúteos arriba (${repes}).`,
-                            query: "puente de gluteo suelo"
-                        }
-                    ];
-                } else if (material === 'Material de gimnasio en casa') {
-                    principal = [
-                        {
-                            titulo: "🏋️ 1. Sentadilla Goblet con mancuerna",
-                            resumen: "Sentadilla profunda sujetando un peso frente al pecho.",
-                            detalle: `Sujeta una mancuerna verticalmente pegada al esternón. Baja la cadera manteniendo los talones totalmente apoyados y la espalda erguida (${repes}).`,
-                            query: "sentadilla goblet con mancuerna"
-                        },
-                        {
-                            titulo: "🪢 2. Remo vertical con banda elástica",
-                            resumen: "Tracción de espalda fijando la banda bajo los pies.",
-                            detalle: `Pisa el centro de la banda elástica y sujeta los extremos con las manos. Inclina el tronco recto y tira de los extremos hacia la cadera (${repes}).`,
-                            query: "remo con banda elastica espalda"
-                        },
-                        {
-                            titulo: "🙋 3. Press de hombros con mancuernas o banda",
-                            resumen: "Empuje vertical controlado para hombros y brazos.",
-                            detalle: `Sujeta las mancuernas a la altura de los hombros y elévalas verticalmente hacia arriba sin arquear la zona lumbar (${repes}).`,
-                            query: "press de hombros mancuernas"
-                        },
-                        {
-                            titulo: "🌉 4. Puente de glúteo con resistencia",
-                            resumen: "Elevación de cadera añadiendo peso o banda.",
-                            detalle: `Tumbado boca arriba con una mancuerna sobre las caderas, eleva la pelvis contrayendo con firmeza arriba (${repes}).`,
-                            query: "puente de gluteo con peso"
-                        },
-                        {
-                            titulo: "🦾 5. Curl de bíceps con mancuernas o banda",
-                            resumen: "Tonificación de los brazos de pie o sentado.",
-                            detalle: `Sujeta el peso con las palmas hacia delante y flexiona los codos acercando las manos a los hombros sin mover los codos (${repes}).`,
-                            query: "curl de biceps mancuernas"
-                        },
-                        {
-                            titulo: "🛡️ 6. Plancha abdominal estática",
-                            resumen: "Control y firmeza de la zona media.",
-                            detalle: "Apóyate sobre los antebrazos y las puntas de los pies. Contrae abdomen y glúteos evitando que la cadera caiga durante 25-30 segundos.",
-                            query: "plancha abdominal basica"
-                        }
-                    ];
-                } else {
-                    principal = [
-                        {
-                            titulo: "🧍 1. Sentadillas libres con peso corporal",
-                            resumen: "Flexión profunda de piernas controlando la postura.",
-                            detalle: `Separa los pies a la anchura de los hombros. Flexiona las rodillas llevando la cadera hacia atrás como si buscaras un asiento, manteniendo el pecho abierto (${repes}).`,
-                            query: "sentadilla libre tecnica correcta"
-                        },
-                        {
-                            titulo: "🦵 2. Zancadas alternas hacia atrás",
-                            resumen: "Fortalecimiento de piernas y equilibrio general.",
-                            detalle: `Da un paso amplio hacia atrás apoyando la puntera y baja la cadera verticalmente con la espalda recta. Vuelve y alterna (${repes}).`,
-                            query: "zancadas hacia atras tecnica"
-                        },
-                        {
-                            titulo: "🧱 3. Flexiones apoyadas en pared",
-                            resumen: "Trabajo de brazos y pectoral sin sobrecargar articulaciones.",
-                            detalle: `Colócate frente a una pared a un paso de distancia. Apoya las manos a la altura de los hombros y flexiona los codos con control (${repes}).`,
-                            query: "flexiones en pared tecnica"
-                        },
-                        {
-                            titulo: "🦀 4. Extensión de cadera en cuadrupedia",
-                            resumen: "Fortalecimiento de glúteos y estabilidad de cadera.",
-                            detalle: `Apoyado sobre manos y rodillas en el suelo, extiende una pierna hacia atrás sin arquear la espalda y alterna (${repes} por pierna).`,
-                            query: "patada de gluteo en cuadrupedia"
-                        },
-                        {
-                            titulo: "🦅 5. Aperturas inversas de brazos sin peso",
-                            resumen: "Trabajo de postura y parte alta de la espalda.",
-                            detalle: `Inclina el tronco recto al frente con los brazos estirados abajo y elévalos hacia los lados abriendo el pecho como alas (${repes}).`,
-                            query: "aperturas inversas sin peso espalda"
-                        },
-                        {
-                            titulo: "🛡️ 6. Plancha abdominal estática",
-                            resumen: "Control y firmeza de la zona media.",
-                            detalle: "Apóyate sobre los antebrazos y puntas de los pies. Mantén el cuerpo firme y alineado durante 25-30 segundos.",
-                            query: "plancha abdominal basica"
-                        }
-                    ];
-                }
-            } else if (instalacion === 'Exterior') {
-                principal = [
-                    {
-                        titulo: "🪑 1. Subida a banco urbano (Step-up)",
-                        resumen: "Trabajo de fuerza en piernas usando el banco del parque.",
-                        detalle: `Sube al asiento del banco apoyando toda la planta del pie, eleva el cuerpo contrayendo el glúteo y baja con control (${repes} alternando piernas).`,
-                        query: "subida a banco step up parque"
-                    },
-                    {
-                        titulo: "🧱 2. Flexiones inclinadas en respaldo de banco",
-                        resumen: "Tonificación de pectoral y brazos aprovechando el mobiliario.",
-                        detalle: `Apoya las manos firmemente en el respaldo superior del banco. Mantén el cuerpo alineado como una tabla y flexiona los codos (${repes}).`,
-                        query: "flexiones inclinadas en banco parque"
-                    },
-                    {
-                        titulo: "💪 3. Fondos de tríceps en asiento de banco",
-                        resumen: "Fortalecimiento de brazos usando el borde del banco.",
-                        detalle: `Coloca las manos en el borde del asiento con los dedos hacia delante y los pies apoyados en el suelo. Flexiona los codos hacia atrás (${repes}).`,
-                        query: "fondos de triceps en banco parque"
-                    },
-                    {
-                        titulo: "🦵 4. Zancadas estáticas apoyado en barandilla",
-                        resumen: "Fuerza de piernas con soporte de seguridad.",
-                        detalle: `Sujetándote a una barandilla o soporte urbano, da un paso al frente y baja la cadera verticalmente de forma controlada (${repes} por pierna).`,
-                        query: "zancadas estaticas con apoyo"
-                    },
-                    {
-                        titulo: "⚡ 5. Desplazamientos laterales activos",
-                        resumen: "Agilidad y trabajo cardiovascular controlado en el parque.",
-                        detalle: "Realiza pequeños desplazamientos laterales de un lado a otro en un espacio seguro de 3 o 4 pasos, manteniendo las rodillas flexibles durante 1 minuto.",
-                        query: "desplazamientos laterales ejercicio"
-                    },
-                    {
-                        titulo: "🛡️ 6. Sentadilla isométrica contra pared o columna",
-                        resumen: "Resistencia estática de piernas sin impacto.",
-                        detalle: "Apoya la espalda contra una columna o muro liso, baja la cadera hasta formar un ángulo de 90 grados en las rodillas y mantén 20-30 segundos.",
-                        query: "sentadilla isometrica pared"
-                    }
-                ];
-            } else if (instalacion === 'Ruta') {
-                principal = [
-                    {
-                        titulo: `🚶 1. Caminata aeróbica constante (${objetivo})`,
-                        resumen: "Marcha continuada manteniendo postura erguida y braceo.",
-                        detalle: "Mantén la mirada al frente, los hombros relajados y un ritmo constante que te permita respirar con naturalidad durante la mayor parte del bloque.",
-                        query: "marcha nordica caminata deportiva tecnica"
-                    },
-                    {
-                        titulo: "🪑 2. Parada activa: Sentadillas en banco o muro",
-                        resumen: "Fuerza de piernas aprovechando elementos del trayecto.",
-                        detalle: "Aprovecha un banco o muro firme del camino para realizar 10-12 repeticiones de sentarse y levantarse con control absoluto de la postura.",
-                        query: "sentadilla en banco de ruta"
-                    },
-                    {
-                        titulo: "🌳 3. Flexiones de empuje contra árbol firme",
-                        resumen: "Tonificación de torso utilizando árboles o señales de la ruta.",
-                        detalle: "Apoya las palmas de las manos contra el tronco de un árbol grande a la altura del pecho. Realiza 12 flexiones inclinadas manteniendo el abdomen firme.",
-                        query: "flexiones contra arbol tecnica"
-                    },
-                    {
-                        titulo: "⏱️ 4. Fartlek suave (Cambios de ritmo en marcha)",
-                        resumen: "Intervalos de aceleración controlada en el camino.",
-                        detalle: "Alterna 2 minutos caminando a un ritmo muy vivo con 1 minuto de marcha a paso normal, repitiendo el ciclo para estimular la capacidad aeróbica.",
-                        query: "caminata intervalos cambios de ritmo"
-                    },
-                    {
-                        titulo: "🦵 5. Elevaciones de talones en bordillo o escalón",
-                        resumen: "Fortalecimiento de gemelos y mejora del equilibrio.",
-                        detalle: "Aprovecha un escalón o bordillo firme apoyando la mitad anterior de los pies. Eleva los talones todo lo posible y baja despacio (${repes}).",
-                        query: "elevacion de talones gemelos escalon"
-                    },
-                    {
-                        titulo: "🌲 6. Zancadas dinámicas en terreno llano",
-                        resumen: "Control de estabilidad y zancada en la ruta.",
-                        detalle: "Da pasos largos hacia delante en un tramo llano y seguro del camino, bajando la cadera con suavidad y alternando las piernas de forma fluida.",
-                        query: "zancadas en movimiento tecnica"
-                    }
-                ];
-            }
-
-            return {
-                tiempoCalentamiento: tCal,
-                tiempoPrincipal: tPrin,
-                tiempoCalma: tCalm,
-                calentamiento,
-                principal,
-                calma
-            };
         }
 
         function guardarSesionEnHistorial() {
@@ -945,23 +978,23 @@
             const historial = usuario.historialSesiones || [];
 
             if (historial.length === 0) {
-                contenedor.innerHTML = '<p style="margin:0; color:#475569;">Aún no has guardado ninguna sesión. Genera una en la pestaña "Actividad" y pulsa el botón verde para guardarla aquí.</p>';
+                contenedor.innerHTML = '<p style="margin:0; color:var(--text-muted);">Aún no has guardado ninguna sesión. Genera una en la pestaña "Actividad" y pulsa el botón verde para guardarla aquí.</p>';
                 return;
             }
 
             contenedor.innerHTML = historial.map((s) => `
-                <details style="background: #eff6ff; border: 2px solid #93c5fd; border-radius: 12px; padding: 12px; margin-bottom: 10px;">
-                    <summary style="font-weight: bold; color: var(--melide-primary); cursor: pointer;">
+                <details style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 12px;">
+                    <summary style="font-weight: 700; color: var(--melide-primary); cursor: pointer;">
                         📅 ${s.fecha} — ${s.instalacion} (${s.tiempo})
                     </summary>
-                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #cbd5e1; font-size: 0.82rem; color: #334155;">
-                        <p style="margin: 0 0 6px 0;"><strong>Material:</strong> ${s.material} | <strong>Objetivo:</strong> ${s.objetivo}</p>
+                    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 0.85rem; color: var(--text-main);">
+                        <p style="margin: 0 0 8px 0;"><strong>Material:</strong> ${s.material} | <strong>Objetivo:</strong> ${s.objetivo}</p>
                         ${s.calentamiento ? `
-                            <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🔥 Calentamiento:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
-                            <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>💪 Parte Principal:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
-                            <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🧘 Vuelta a la Calma:</strong></p>
+                            <p style="margin: 8px 0 4px 0; color: var(--melide-primary);"><strong>🔥 Calentamiento:</strong></p>
+                            <div style="margin-bottom: 8px;">${s.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                            <p style="margin: 8px 0 4px 0; color: var(--melide-primary);"><strong>💪 Parte Principal:</strong></p>
+                            <div style="margin-bottom: 8px;">${s.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                            <p style="margin: 8px 0 4px 0; color: var(--melide-primary);"><strong>🧘 Vuelta a la Calma:</strong></p>
                             <div>${s.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                         ` : ''}
                     </div>
@@ -1003,7 +1036,7 @@
             document.getElementById('saludo-principal').innerText = `¡Hola, ${usuario.mote || usuario.nombre}!`;
 
             const msg = document.getElementById('perfil-msg');
-            msg.innerText = '✅ Ficha actualizada.';
+            msg.innerText = '✅ Ficha actualizada correctamente.';
             msg.style.display = 'block';
             setTimeout(() => { msg.style.display = 'none'; }, 3000);
         }
@@ -1024,7 +1057,7 @@
                 const suma = usuarios.reduce((acc, u) => acc + (u.edad || 0), 0);
                 document.getElementById('stat-edad-media').innerText = Math.round(suma / usuarios.length) + ' años';
                 document.getElementById('admin-lista-usuarios').innerHTML = usuarios.slice(-5).reverse().map(u => 
-                    `<div style="padding: 4px 0; border-bottom: 1px solid #cbd5e1;"><strong>${u.nombre} ${u.apellidos}</strong> (${u.edad} años)</div>`
+                    `<div style="padding: 6px 0; border-bottom: 1px solid var(--border-color);"><strong>${u.nombre} ${u.apellidos}</strong> (${u.edad} años)</div>`
                 ).join('');
             } else {
                 document.getElementById('stat-edad-media').innerText = '--';
