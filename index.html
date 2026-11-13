@@ -34,11 +34,11 @@
         header { 
             background: var(--navy-darkest); 
             color: white; 
-            padding: 0 24px; 
+            padding: 0 20px; 
             display: none; 
             align-items: center; 
             justify-content: space-between;
-            height: 70px; 
+            height: 75px; 
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4); 
             border-bottom: 2px solid var(--gold-accent);
             z-index: 100; 
@@ -78,7 +78,7 @@
         @media (min-width: 768px) {
             .login-box { max-width: 540px; padding: 40px; }
             .screen { padding: 32px 24px; }
-            #subvista-actividad, #subvista-historial, #subvista-perfil { max-width: 660px !important; }
+            #subvista-actividad, #subvista-historial, #subvista-perfil, #admin-content-area { max-width: 720px !important; }
         }
 
         @media (min-width: 1024px) {
@@ -265,15 +265,49 @@
         .history-expanded-body {
             display: none; margin-top: 14px; padding-top: 14px; border-top: 1.5px dashed #cbd5e1;
         }
+
+        /* Estilos específicos para el Panel de Administración (Cajones) */
+        .admin-drawer {
+            background: var(--card-surface);
+            border-radius: 16px;
+            border: 1.5px solid var(--border-subtle);
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .admin-drawer-header {
+            background: var(--navy-primary);
+            color: white;
+            padding: 16px 20px;
+            font-weight: 800;
+            font-size: 1.05rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .admin-drawer-header:hover {
+            background: var(--navy-medium);
+        }
+        .admin-drawer-body {
+            padding: 20px;
+            display: none;
+            background: #f8fafc;
+        }
     </style>
 </head>
 <body>
 
     <header id="main-header">
         <button class="header-btn" id="btn-atras" onclick="irA('scr-inicio')" style="display: none;">&#8592;</button>
-        <div style="display: flex; align-items: center; gap: 14px;">
-            <img src="concello-de-melide.jpeg" alt="Logo" style="height: 44px; border-radius: 8px; object-fit: contain;">
-            <span style="font-weight: 800; letter-spacing: 0.5px; font-size: 1.05rem;">FACENDO DEPORTE EN MELIDE</span>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <img src="concello-de-melide.jpeg" alt="Logo Melide" style="height: 52px; width: auto; border-radius: 8px; object-fit: contain; background: rgba(255,255,255,0.05); padding: 2px;">
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <span style="font-weight: 800; letter-spacing: 0.5px; font-size: 1.05rem; line-height: 1.2;">FACENDO DEPORTE EN MELIDE</span>
+                <span style="font-size: 0.78rem; color: #cbd5e1; font-weight: 600; letter-spacing: 0.3px;">Servizo de Deportes</span>
+            </div>
         </div>
         <div style="display: flex; align-items: center; gap: 6px;">
             <button class="header-btn" onclick="toggleFullScreen()" title="Pantalla completa">&#x26F6;</button>
@@ -284,7 +318,7 @@
     <!-- PANTALLA 1: INICIO -->
     <div id="scr-inicio" class="screen active">
         <div class="login-box">
-            <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" style="width: 220px; max-width: 80%; height: auto; margin-bottom: 20px; border-radius: 12px; object-fit: contain;">
+            <img src="concello-de-melide.jpeg" alt="Escudo Concello de Melide" style="width: 200px; max-width: 75%; height: auto; margin-bottom: 20px; border-radius: 12px; object-fit: contain;">
             
             <h2 style="color: var(--navy-primary); margin-top: 0; margin-bottom: 20px; font-size: 1.45rem; letter-spacing: 0.5px; font-weight: 800;">FACENDO DEPORTE EN MELIDE</h2>
             
@@ -293,7 +327,7 @@
             <form onsubmit="handleLogin(event)">
                 <input type="text" id="login-user" placeholder="Usuario / Correo / DNI" class="form-control" required>
                 <input type="password" id="login-pass" placeholder="Contraseña" class="form-control" required>
-                <button type="submit" class="btn-main" style="margin-bottom: 14px;">ENTRAR</button>
+                <button type="submit" class="btn-main btn-gold" style="margin-bottom: 14px;">ENTRAR</button>
             </form>
 
             <div style="border-top: 1px solid var(--border-subtle); padding-top: 18px; margin-top: 8px;">
@@ -466,28 +500,63 @@
         </div>
     </div>
 
-    <!-- PANTALLA 4: ADMINISTRACIÓN -->
+    <!-- PANTALLA 4: ADMINISTRACIÓN (TONECHO / 0010) -->
     <div id="scr-admin" class="screen">
-        <div class="login-box" style="max-width: 680px; width: 100%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--navy-primary); padding-bottom: 12px; margin-bottom: 24px;">
+        <div id="admin-content-area" style="width: 100%; max-width: 680px; box-sizing: border-box;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold-accent); padding-bottom: 12px; margin-bottom: 24px;">
                 <div>
-                    <span style="background: #991b1b; color: white; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.5px;">ADMINISTRACIÓN</span>
-                    <h2 style="color: var(--navy-primary); margin: 6px 0 0 0; font-size: 1.5rem; font-weight: 800;">Panel de Estadísticas</h2>
+                    <span style="background: #991b1b; color: white; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.5px;">PANEL DE GESTIÓN MUNICIPAL</span>
+                    <h2 style="color: #ffffff; margin: 6px 0 0 0; font-size: 1.5rem; font-weight: 800;">Servizo de Deportes - Tonecho</h2>
                 </div>
                 <span style="font-size: 2.2rem;">📊</span>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card"><span class="num" id="stat-total-usuarios">0</span><span class="lbl">Usuarios Inscritos</span></div>
-                <div class="stat-card"><span class="num" id="stat-edad-media">--</span><span class="lbl">Edad Media</span></div>
+            <!-- CAJÓN 1: USUARIOS REGISTRADOS -->
+            <div class="admin-drawer">
+                <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-usuarios')">
+                    <span>👥 1. Usuarios Registrados (Orden alfabético)</span>
+                    <span id="icon-drawer-usuarios">▼</span>
+                </div>
+                <div id="drawer-usuarios" class="admin-drawer-body">
+                    <div id="admin-lista-usuarios-completa"></div>
+                </div>
             </div>
 
-            <div style="background: #f8fafc; padding: 20px; border-radius: 16px; border: 1.5px solid var(--border-subtle); margin-bottom: 24px; text-align: left;">
-                <h4 style="margin: 0 0 12px 0; color: var(--navy-primary); font-size: 1rem; font-weight: 700;">Últimos Vecinos Registrados</h4>
-                <div id="admin-lista-usuarios" style="font-size: 0.88rem; color: var(--text-dark);"></div>
+            <!-- CAJÓN 2: TODAS LAS SESIONES -->
+            <div class="admin-drawer">
+                <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-sesiones')">
+                    <span>📋 2. Todas las Sesiones Creadas</span>
+                    <span id="icon-drawer-sesiones">▼</span>
+                </div>
+                <div id="drawer-sesiones" class="admin-drawer-body">
+                    <div id="admin-lista-todas-sesiones"></div>
+                </div>
             </div>
 
-            <button type="button" class="btn-main btn-registro" onclick="cerrarSesion()">SALIR</button>
+            <!-- CAJÓN 3: ESTADÍSTICAS Y USOS -->
+            <div class="admin-drawer">
+                <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-stats')">
+                    <span>📊 3. Estadísticas, Usos y Temporizalización</span>
+                    <span id="icon-drawer-stats">▼</span>
+                </div>
+                <div id="drawer-stats" class="admin-drawer-body">
+                    <div id="admin-estadisticas-contenido"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; text-align: center;">
+                <button type="button" class="btn-main btn-registro" style="max-width: 200px;" onclick="cerrarSesion()">SALIR DE ADMINISTRACIÓN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE SOLO LECTURA PARA SESIONES EN ADMIN -->
+    <div id="admin-modal-sesion" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
+        <div style="background: #ffffff; border-radius: 16px; padding: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative;">
+            <button onclick="cerrarModalAdmin()" style="position: absolute; top: 15px; right: 15px; background: #fee2e2; color: #991b1b; border: none; font-weight: 800; padding: 6px 12px; border-radius: 8px; cursor: pointer;">✕ Cerrar</button>
+            <h3 style="color: var(--navy-primary); margin-top: 0;">Detalle de la Sesión (Solo Lectura)</h3>
+            <div id="admin-modal-body"></div>
         </div>
     </div>
 
@@ -496,14 +565,12 @@
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
         let sesionGeneradaActual = null;
 
-        // GENERADOR DINÁMICO POR REGLAS Y COMBINATORIA (Sin listas estáticas prefabricadas)
         function generarRutinaDinamica(instalacion, material, tiempo, objetivo, usuario) {
             const mins = parseInt(tiempo, 10) || 45;
             const edad = usuario.edad || 40;
             const esAdaptado = edad >= 65 || usuario.habitos === 'Persona Mayor' || usuario.condicion === 'Mala' || usuario.condicion === 'Muy mala';
             const dosificacion = esAdaptado ? '2 series de 8-10 reps (ritmo pausado, descanso 60s)' : '3 series de 12 reps (ritmo controlado, descanso 45s)';
 
-            // Parámetros dinámicos de entorno
             const soporteEntorno = {
                 'Gimnasio municipal': { apoyo: 'máquina guiada o banco', resistencia: 'carga ligera regulable', entorno: 'sala' },
                 'Exterior': { apoyo: 'banco urbano o barandilla', resistencia: 'peso corporal e inclinación', entorno: 'parque' },
@@ -511,7 +578,6 @@
                 'En Casa': { apoyo: 'silla firme o pared', resistencia: material === 'Sin material' ? 'peso corporal' : material.toLowerCase(), entorno: 'hogar' }
             }[instalacion];
 
-            // Generador de bloques mediante matrices combinatorias
             const motoresCalentamiento = [
                 { zona: 'Cervical y escapular', accion: 'Rotaciones circulares lentas en ambos sentidos (8 reps por lado)', foco: 'movilidad cuello y hombros' },
                 { zona: 'Cadera y cintura pélvica', accion: 'Círculos amplios con manos en cintura para lubricar articulación (10 reps)', foco: 'movilidad de cadera calentamiento' },
@@ -525,7 +591,6 @@
                 query: m.foco
             }));
 
-            // Generación algorítmica de 6 ejercicios centrales combinando patrón motor + entorno + objetivo
             const patronesMotores = [
                 { patron: 'Dominante de rodilla (Sentadilla)', ejecucion: `Flexión controlada de piernas utilizando ${soporteEntorno.apoyo} como referencia de seguridad`, busqueda: 'sentadilla tecnica correcta' },
                 { patron: 'Tracción horizontal (Remo)', ejecucion: `Tracción de brazos llevando codos atrás con ${soporteEntorno.resistencia}`, busqueda: 'remo espalda tecnica' },
@@ -708,8 +773,8 @@
             const userInput = document.getElementById('login-user').value.trim();
             const passInput = document.getElementById('login-pass').value.trim();
 
-            if (userInput === 'Tonecho' && passInput === '0010') {
-                cargarVistaEstadisticas();
+            if (userInput.toLowerCase() === 'tonecho' && passInput === '0010') {
+                cargarPanelAdministracion();
                 irA('scr-admin');
                 return;
             }
@@ -769,6 +834,9 @@
             sesionGeneradaActual = {
                 id: 'ses_' + Date.now(),
                 fecha: new Date().toLocaleDateString('es-ES') + ' ' + new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'}),
+                timestamp: Date.now(),
+                usuarioDni: usuario.dni,
+                usuarioNombre: `${usuario.nombre} ${usuario.apellidos} (${usuario.mote})`,
                 instalacion,
                 material,
                 tiempo,
@@ -861,7 +929,7 @@
                                 <div style="margin-bottom: 12px;">${s.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
                                 <p style="margin: 0 0 6px 0; color: var(--navy-primary); font-weight: 800;">🧘 Vuelta a la Calma (${s.tiempoCalma || '7 min'}):</p>
                                 <div>${s.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
-                            ` : '<p>Detalles no disponibles para esta sesión antigua.</p>'}
+                            ` : '<p>Detalles no disponibles.</p>'}
                         </div>
                     </div>
                 `;
@@ -883,6 +951,164 @@
             usuario.historialSesiones.splice(index, 1);
             actualizarUsuarioEnStorage(usuario);
             cargarHistorialSesiones();
+        }
+
+        // --- LÓGICA DEL PANEL DE ADMINISTRACIÓN (Tandech / Tonecho) ---
+        function toggleAdminDrawer(drawerId) {
+            const body = document.getElementById(drawerId);
+            const icon = document.getElementById('icon-' + drawerId);
+            if (!body) return;
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            if (icon) icon.innerText = isOpen ? '▼' : '▲';
+        }
+
+        function cargarPanelAdministracion() {
+            const usuarios = obtenerUsuarios();
+            
+            // 1. CAJÓN DE USUARIOS (Ordenados alfabéticamente)
+            usuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+            const contenedorUsuarios = document.getElementById('admin-lista-usuarios-completa');
+            
+            if (usuarios.length === 0) {
+                contenedorUsuarios.innerHTML = '<p style="color:var(--text-muted);">No hay vecinos registrados todavía.</p>';
+            } else {
+                contenedorUsuarios.innerHTML = usuarios.map(u => {
+                    const sesionesCount = (u.historialSesiones || []).length;
+                    return `
+                        <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: var(--navy-primary); font-size: 0.95rem;">${u.nombre} ${u.apellidos}</strong> (${u.mote || 'Sin alias'})<br>
+                                <span style="font-size: 0.78rem; color: var(--text-muted);">DNI: ${u.dni} | Edad: ${u.edad} años | Tel: ${u.telefono}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${sesionesCount} sesiones</span>
+                                ${sesionsCount > 0 ? `<button class="btn-small btn-open-session" onclick="verSesionesDeUsuario('${u.dni}')">Ver sesiones</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 2. CAJÓN DE TODAS LAS SESIONES (Globales de todos los usuarios)
+            const contenedorSesiones = document.getElementById('admin-lista-todas-sesiones');
+            let todasLasSesiones = [];
+            usuarios.forEach(u => {
+                if (u.historialSesiones) {
+                    u.historialSesiones.forEach(s => {
+                        todasLasSesiones.push({ ...s, propietario: `${u.nombre} ${u.apellidos} (${u.mote})` });
+                    });
+                }
+            });
+
+            // Ordenar por fecha más reciente
+            todasLasSesiones.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            if (todasLasSesiones.length === 0) {
+                contenedorSesiones.innerHTML = '<p style="color:var(--text-muted);">No se ha generado ninguna sesión en la aplicación todavía.</p>';
+            } else {
+                contenedorSesiones.innerHTML = todasLasSesiones.map((s, idx) => `
+                    <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <strong style="color: var(--navy-primary); font-size: 0.9rem;">${s.propietario}</strong><br>
+                            <span style="font-size: 0.78rem; color: var(--text-muted);">📅 ${s.fecha} | 📍 ${s.instalacion} (${s.tiempo})</span>
+                        </div>
+                        <button class="btn-small btn-open-session" onclick='abrirModalSesionDirecta(${JSON.stringify(s)})'>Ver rutina completa</button>
+                    </div>
+                `).join('');
+            }
+
+            // 3. CAJÓN DE ESTADÍSTICAS Y TEMPORALIZACIÓN
+            const contenedorStats = document.getElementById('admin-estadisticas-contenido');
+            const totalUsuarios = usuarios.length;
+            const totalSesiones = todasLasSesiones.length;
+            const edadSuma = usuarios.reduce((acc, u) => acc + (u.edad || 0), 0);
+            const edadMedia = totalUsuarios > 0 ? Math.round(edadSuma / totalUsuarios) : 0;
+
+            // Desglose temporal básico
+            const ahora = Date.now();
+            const unDia = 24 * 60 * 60 * 1000;
+            const unaSemana = 7 * unDia;
+            const unMes = 30 * unDia;
+
+            const sesionesHoy = todasLasSesiones.filter(s => (ahora - (s.timestamp || 0)) < unDia).length;
+            const sesionesSemana = todasLasSesiones.filter(s => (ahora - (s.timestamp || 0)) < unaSemana).length;
+            const sesionesMes = todasLasSesiones.filter(s => (ahora - (s.timestamp || 0)) < unMes).length;
+
+            contenedorStats.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;">
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-primary); display: block;">${totalUsuarios}</span>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">USUARIOS TOTALES</span>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-primary); display: block;">${totalSesiones}</span>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">SESIONES CREADAS</span>
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle); text-align: center;">
+                        <span style="font-size: 1.5rem; font-weight: 800; color: var(--navy-primary); display: block;">${edadMedia} años</span>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted);">EDAD MEDIA VECINAL</span>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <h5 style="margin: 0 0 10px 0; color: var(--navy-primary);">📈 Análisis de Usos por Temporalidad</h5>
+                    <ul style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--text-dark); line-height: 1.6;">
+                        <li><strong>Últimas 24 horas:</strong> ${sesionesHoy} sesiones generadas.</li>
+                        <li><strong>Últimos 7 días (Semana):</strong> ${sesionesSemana} sesiones generadas.</li>
+                        <li><strong>Últimos 30 días (Mes):</strong> ${sesionesMes} sesiones generadas.</li>
+                        <li><strong>Histórico completo (Años):</strong> ${totalSesiones} sesiones registradas en total.</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function verSesionesDeUsuario(dni) {
+            const usuarios = obtenerUsuarios();
+            const u = usuarios.find(x => x.dni === dni);
+            if (!u || !u.historialSesiones) return;
+
+            let html = `<h4 style="color:var(--navy-primary); margin-top:0;">Sesiones de ${u.nombre} ${u.apellidos} (${u.mote})</h4>`;
+            u.historialSesiones.forEach((s, idx) => {
+                html += `
+                    <div style="background:#f8fafc; border:1px solid var(--border-subtle); border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>📅 ${s.fecha} — 📍 ${s.instalacion} (${s.tiempo})</span>
+                        <button class="btn-small btn-open-session" onclick='abrirModalSesionDirecta(${JSON.stringify(s)})'>Ver</button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('admin-modal-body').innerHTML = html;
+            document.getElementById('admin-modal-sesion').style.display = 'flex';
+        }
+
+        function abrirModalSesionDirecta(s) {
+            let html = `
+                <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
+                    <strong>Propietario:</strong> ${s.usuarioNombre || 'Usuario municipal'}<br>
+                    <strong>Fecha:</strong> ${s.fecha} | <strong>Lugar:</strong> ${s.instalacion} | <strong>Duración:</strong> ${s.tiempo} | <strong>Objetivo:</strong> ${s.objetivo}
+                </div>
+            `;
+
+            if (s.calentamiento) {
+                html += `
+                    <p style="margin: 0 0 4px 0; color: var(--navy-primary); font-weight: 800;">🔥 Calentamiento (${s.tiempoCalentamiento}):</p>
+                    <div style="margin-bottom: 10px;">${s.calentamiento.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                    <p style="margin: 0 0 4px 0; color: var(--navy-primary); font-weight: 800;">💪 Parte Principal (${s.tiempoPrincipal}):</p>
+                    <div style="margin-bottom: 10px;">${s.principal.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                    <p style="margin: 0 0 4px 0; color: var(--navy-primary); font-weight: 800;">🧘 Vuelta a la Calma (${s.tiempoCalma}):</p>
+                    <div>${s.calma.map(i => renderEjercicioInteractivo(i.titulo, i.resumen, i.detalle, i.query)).join('')}</div>
+                `;
+            } else {
+                html += `<p>Información detallada no disponible.</p>`;
+            }
+
+            document.getElementById('admin-modal-body').innerHTML = html;
+            document.getElementById('admin-modal-sesion').style.display = 'flex';
+        }
+
+        function cerrarModalAdmin() {
+            document.getElementById('admin-modal-sesion').style.display = 'none';
         }
 
         function cargarDatosEnFormularioEdicion() {
@@ -930,21 +1156,6 @@
             if (idx !== -1) {
                 usuarios[idx] = usuarioActualizado;
                 guardarUsuarios(usuarios);
-            }
-        }
-
-        function cargarVistaEstadisticas() {
-            const usuarios = obtenerUsuarios();
-            document.getElementById('stat-total-usuarios').innerText = usuarios.length;
-            if (usuarios.length > 0) {
-                const suma = usuarios.reduce((acc, u) => acc + (u.edad || 0), 0);
-                document.getElementById('stat-edad-media').innerText = Math.round(suma / usuarios.length) + ' años';
-                document.getElementById('admin-lista-usuarios').innerHTML = usuarios.slice(-5).reverse().map(u => 
-                    `<div style="padding: 6px 0; border-bottom: 1px solid var(--border-subtle);"><strong>${u.nombre} ${u.apellidos}</strong> (${u.edad} años)</div>`
-                ).join('');
-            } else {
-                document.getElementById('stat-edad-media').innerText = '--';
-                document.getElementById('admin-lista-usuarios').innerHTML = 'No hay registros.';
             }
         }
 
