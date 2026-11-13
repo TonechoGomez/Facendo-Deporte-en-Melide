@@ -109,21 +109,22 @@
             margin: 0 0 8px 0; color: var(--melide-primary); font-size: 1rem; display: flex; align-items: center; gap: 6px;
         }
         
-        /* Tarjeta de Asistente Visual por Ejercicio */
-        .exercise-card {
-            background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+        /* Tarjeta Visual de Ejercicio con Ilustración Gráfica Destacada */
+        .exercise-visual-card {
+            display: flex; align-items: center; gap: 12px;
+            background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px;
         }
-        .exercise-title-row {
-            display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;
+        .exercise-badge-icon {
+            width: 48px; height: 48px; border-radius: 12px; background: #e0f2fe; color: #0369a1;
+            display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;
+            border: 1px solid #bae6fd;
         }
-        .exercise-name {
-            font-weight: bold; color: var(--melide-primary); font-size: 0.9rem;
+        .exercise-content { flex: 1; }
+        .exercise-title {
+            font-weight: bold; color: var(--melide-primary); font-size: 0.88rem; margin: 0 0 2px 0;
         }
-        .exercise-sequence {
-            font-size: 0.75rem; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 6px; font-weight: bold;
-        }
-        .exercise-desc {
-            font-size: 0.82rem; color: #334155; margin: 0; line-height: 1.4;
+        .exercise-instructions {
+            font-size: 0.8rem; color: #334155; margin: 0; line-height: 1.35;
         }
     </style>
 </head>
@@ -358,15 +359,28 @@
         const STORAGE_KEY_SESSION = 'melide_deporte_sesion_activa';
         let sesionGeneradaActual = null;
 
-        // Asistente Visual Inteligente por Iconos y Secuencia de Postura
-        function renderTarjetaEjercicio(titulo, secuencia, descripcion) {
+        // Selector inteligente de icono gráfico según el tipo de ejercicio
+        function obtenerIconoGrafico(texto) {
+            const t = texto.toLowerCase();
+            if (t.includes('sentadilla') || t.includes('zancada') || t.includes('step') || t.includes('piernas')) return '🧎‍♂️';
+            if (t.includes('flexión') || t.includes('fondo') || t.includes('press') || t.includes('empuje')) return '🤲';
+            if (t.includes('remo') || t.includes('espalda') || t.includes('palo')) return '🚣';
+            if (t.includes('caminata') || t.includes('marcha') || t.includes('ruta') || t.includes('cardio')) return '🚶‍♂️';
+            if (t.includes('estiramiento') || t.includes('respiración') || t.includes('calma')) return '🧘‍♂️';
+            if (t.includes('movilidad') || t.includes('círculos') || t.includes('cuello')) return '🔄';
+            if (t.includes('core') || t.includes('abdominal') || t.includes('plancha')) return '🛡️';
+            return '⭐';
+        }
+
+        function renderTarjetaVisual(titulo, descripcion) {
+            const icono = obtenerIconoGrafico(titulo + ' ' + descripcion);
             return `
-                <div class="exercise-card">
-                    <div class="exercise-title-row">
-                        <span class="exercise-name">${titulo}</span>
-                        <span class="exercise-sequence">${secuencia}</span>
+                <div class="exercise-visual-card">
+                    <div class="exercise-badge-icon">${icono}</div>
+                    <div class="exercise-content">
+                        <p class="exercise-title">${titulo}</p>
+                        <p class="exercise-instructions">${descripcion}</p>
                     </div>
-                    <p class="exercise-desc">${descripcion}</p>
                 </div>
             `;
         }
@@ -571,17 +585,17 @@
 
                     <div class="routine-block">
                         <h4>🔥 1. Calentamiento (${rutina.tiempoCalentamiento})</h4>
-                        <div>${rutina.calentamiento.map(item => renderTarjetaEjercicio(item.titulo, item.secuencia, item.desc)).join('')}</div>
+                        <div>${rutina.calentamiento.map(item => renderTarjetaVisual(item.titulo, item.desc)).join('')}</div>
                     </div>
 
                     <div class="routine-block">
                         <h4>💪 2. Parte Principal (${rutina.tiempoPrincipal})</h4>
-                        <div>${rutina.principal.map(item => renderTarjetaEjercicio(item.titulo, item.secuencia, item.desc)).join('')}</div>
+                        <div>${rutina.principal.map(item => renderTarjetaVisual(item.titulo, item.desc)).join('')}</div>
                     </div>
 
                     <div class="routine-block">
                         <h4>🧘 3. Vuelta a la Calma (${rutina.tiempoCalma})</h4>
-                        <div>${rutina.calma.map(item => renderTarjetaEjercicio(item.titulo, item.secuencia, item.desc)).join('')}</div>
+                        <div>${rutina.calma.map(item => renderTarjetaVisual(item.titulo, item.desc)).join('')}</div>
                     </div>
 
                     <button type="button" class="btn-main" style="background-color: #059669; margin-top: 10px;" onclick="guardarSesionEnHistorial()">
@@ -603,66 +617,66 @@
             const series = nivelBajo ? '2 series de 10 reps (suave)' : '3 series de 12-15 reps (descanso 45s)';
 
             let calentamiento = [
-                { titulo: "🔄 Movilidad articular superior", secuencia: "🧎‍♂️ ➔ 🔄 ➔ ✨", desc: "Giros suaves y controlados de cuello, hombros y muñecas para lubricar articulaciones (1 min)." },
-                { titulo: "🔄 Movilidad de cadera y tobillos", secuencia: "🧍 ➔ 🔄 ➔ 🟢", desc: "Círculos amplios de cadera y flexo-extensión suave de tobillos (2 min)." }
+                { titulo: "Movilidad articular superior", desc: "Giros suaves y controlados de cuello, hombros y muñecas para lubricar articulaciones (1 min)." },
+                { titulo: "Movilidad de cadera y tobillos", desc: "Círculos amplios de cadera y flexo-extensión suave de tobillos (2 min)." }
             ];
             let principal = [];
             let calma = [
-                { titulo: "🌬️ Respiración diafragmática", secuencia: "👃 ➔ 🫁 ➔ 👄", desc: "Inhalar profundo por la nariz hinchando abdomen y soltar lento por la boca (2 min)." },
-                { titulo: "🧘 Estiramiento de tren inferior", secuencia: "🦵 ➔ ⏱️ ➔ 😌", desc: "Mantener 20 segundos suaves por cada lado sin rebotes ni tirones." }
+                { titulo: "Respiración diafragmática", desc: "Inhalar profundo por la nariz hinchando abdomen y soltar lento por la boca (2 min)." },
+                { titulo: "Estiramiento de tren inferior", desc: "Mantener 20 segundos suaves por cada lado sin rebotes ni tirones." }
             ];
 
             if (instalacion === 'Gimnasio municipal') {
-                calentamiento.push({ titulo: "🚴 Activación cardiovascular", secuencia: "⚡ ➔ 🫀 ➔ 🟢", desc: "5 minutos en bicicleta estática, cinta o remo a ritmo muy suave." });
+                calentamiento.push({ titulo: "Activación cardiovascular", desc: "5 minutos en bicicleta estática, cinta o remo a ritmo muy suave." });
                 principal = [
-                    { titulo: `📍 Circuito Gimnasio (${objetivo})`, secuencia: "⚙️ ➔ 🏋️ ➔ 💪", desc: "Bloque adaptado al equipamiento profesional disponible en la instalación." },
-                    { titulo: "🦵 Bloque 1 - Tren inferior", secuencia: "⬇️ ➔ ⬆️ ➔ 🔥", desc: `Trabajo global de piernas y estabilidad (${series}).` },
-                    { titulo: "💪 Bloque 2 - Torso y Brazos", secuencia: "🫱 ➔ 🫲 ➔ ✨", desc: `Movimientos equilibrados de empuje y tracción (${series}).` },
-                    { titulo: "🛡️ Bloque 3 - Estabilidad Core", secuencia: "🧍 ➔ 🔒 ➔ 🎯", desc: "Control postural y fortalecimiento de la zona media abdominal." }
+                    { titulo: `Circuito Gimnasio (${objetivo})`, desc: "Bloque adaptado al equipamiento profesional disponible en la instalación." },
+                    { titulo: "Bloque 1 - Tren inferior", desc: `Trabajo global de piernas y estabilidad (${series}).` },
+                    { titulo: "Bloque 2 - Torso y Brazos", desc: `Movimientos equilibrados de empuje y tracción (${series}).` },
+                    { titulo: "Bloque 3 - Estabilidad Core", desc: "Control postural y fortalecimiento de la zona media abdominal." }
                 ];
             } else if (instalacion === 'En Casa') {
-                calentamiento.push({ titulo: "🚶 Marcha activa en el sitio", secuencia: "🦿 ➔ ⬆️ ➔ 🔄", desc: "Elevación suave de rodillas alternadas acompañando con braceo dinámico." });
+                calentamiento.push({ titulo: "Marcha activa en el sitio", desc: "Elevación suave de rodillas alternadas acompañando con braceo dinámico." });
                 if (material === 'Accesorios de casa') {
                     principal = [
-                        { titulo: "🪑 Sentadilla con silla", secuencia: "🧎‍♂️ ➔ 🪑 ➔ 🧍", desc: `Siéntate y levántate controlando la bajada sin dejarte caer de golpe (${series}).` },
-                        { titulo: "🧴 Remo con botellas o bolsas", secuencia: "🏋️ ➔ 🫱 ➔ 💪", desc: `Inclina ligeramente el tronco y lleva el peso hacia la cintura (${series}).` },
-                        { titulo: "🧹 Press con palo de escoba", secuencia: "🪵 ➔ ⬆️ ➔ 🟢", desc: `Sujeta el palo a la anchura de hombros y elévalo sobre la cabeza (${series}).` },
-                        { titulo: "🫸 Flexiones en mesa o encimera", secuencia: "🪞 ➔ 🫸 ➔ ✨", desc: `Apoya las manos en un borde firme y flexiona los codos (${series}).` }
+                        { titulo: "Sentadilla con silla", desc: `Siéntate y levántate controlando la bajada sin dejarte caer de golpe (${series}).` },
+                        { titulo: "Remo con botellas o bolsas", desc: `Inclina ligeramente el tronco y lleva el peso hacia la cintura (${series}).` },
+                        { titulo: "Press con palo de escoba", desc: `Sujeta el palo a la anchura de hombros y elévalo sobre la cabeza (${series}).` },
+                        { titulo: "Flexiones en mesa o encimera", desc: `Apoya las manos en un borde firme y flexiona los codos (${series}).` }
                     ];
                 } else if (material === 'Material de gimnasio en casa') {
                     principal = [
-                        { titulo: "🏋️ Sentadilla goblet con mancuerna", secuencia: "📦 ➔ 🧎‍♂️ ➔ 🧍", desc: `Sujeta el peso pegado al pecho y baja con la espalda recta (${series}).` },
-                        { titulo: "🦾 Remo con banda o mancuerna", secuencia: "🪢 ➔ 🫱 ➔ 💪", desc: `Tracciona llevando los codos atrás juntando escápulas (${series}).` },
-                        { titulo: "🙋 Press de hombros", secuencia: "🏋️ ➔ ⬆️ ➔ ✨", desc: `Empuje vertical controlado sin arquear la zona lumbar (${series}).` },
-                        { titulo: "🌉 Puente de glúteo en esterilla", secuencia: "🧘 ➔ 🌉 ➔ 🎯", desc: `Eleva la cadera contrayendo los glúteos arriba (${series}).` }
+                        { titulo: "Sentadilla goblet con mancuerna", desc: `Sujeta el peso pegado al pecho y baja con la espalda recta (${series}).` },
+                        { titulo: "Remo con banda o mancuerna", desc: `Tracciona llevando los codos atrás juntando escápulas (${series}).` },
+                        { titulo: "Press de hombros", desc: `Empuje vertical controlado sin arquear la zona lumbar (${series}).` },
+                        { titulo: "Puente de glúteo en esterilla", desc: `Eleva la cadera contrayendo los glúteos arriba (${series}).` }
                     ];
                 } else {
                     principal = [
-                        { titulo: "🧍 Sentadillas al aire", secuencia: "⬇️ ➔ ⏸️ ➔ ⬆️", desc: `Baja manteniendo los talones apoyados y la espalda recta (${series}).` },
-                        { titulo: "🦵 Zancadas atrás alternas", secuencia: "🦿 ➔ ⬇️ ➔ 🔄", desc: `Da un paso amplio atrás apoyando bien la puntera (${series}).` },
-                        { titulo: "🧱 Flexiones en pared o suelo", secuencia: "🧱 ➔ 🫸 ➔ ✨", desc: `Mantén el abdomen firme durante todo el recorrido (${series}).` },
-                        { titulo: "🛡️ Plancha abdominal", secuencia: "🧱 ➔ ⏱️ ➔ 🔒", desc: "Mantén la postura firme 20-30 segundos sin hundir la zona lumbar." }
+                        { titulo: "Sentadillas al aire", desc: `Baja manteniendo los talones apoyados y la espalda recta (${series}).` },
+                        { titulo: "Zancadas atrás alternas", desc: `Da un paso amplio atrás apoyando bien la puntera (${series}).` },
+                        { titulo: "Flexiones en pared o suelo", desc: `Mantén el abdomen firme durante todo el recorrido (${series}).` },
+                        { titulo: "Plancha abdominal", desc: "Mantén la postura firme 20-30 segundos sin hundir la zona lumbar." }
                     ];
                 }
-                calma.push({ titulo: "🪑 Estiramiento de espalda", secuencia: "🪑 ➔ 🫸 ➔ 😌", desc: "Apoya las manos en el respaldo de una silla y alarga suavemente la columna." });
+                calma.push({ titulo: "Estiramiento de espalda", desc: "Apoya las manos en el respaldo de una silla y alarga suavemente la columna." });
             } else if (instalacion === 'Exterior') {
-                calentamiento.push({ titulo: "🌳 Caminata rápida con giro", secuencia: "🚶 ➔ 🔄 ➔ ✨", desc: "Paso vivo por el parque realizando rotaciones suaves de tronco." });
+                calentamiento.push({ titulo: "Caminata rápida con giro", desc: "Paso vivo por el parque realizando rotaciones suaves de tronco." });
                 principal = [
-                    { titulo: "🪑 Subida a banco (Step-up)", secuencia: "🪑 ➔ 🦿 ➔ ⬆️", desc: `Sube alternando ambas piernas en el asiento con control (${series}).` },
-                    { titulo: "🧱 Flexiones inclinadas en banco", secuencia: "🧱 ➔ 🫸 ➔ 🟢", desc: `Cuerpo alineado como una tabla apoyando las manos en el respaldo (${series}).` },
-                    { titulo: "💪 Fondos de tríceps en banco", secuencia: "🪑 ➔ 🫱 ➔ ⬇️", desc: `Manos apoyadas en el borde del asiento y flexión suave de codos (${series}).` },
-                    { titulo: "⚡ Desplazamientos laterales", secuencia: "🏃 ➔ ↔️ ➔ 🎯", desc: "4 bloques de 1 minuto activo + 30 seg de recuperación." }
+                    { titulo: "Subida a banco (Step-up)", desc: `Sube alternando ambas piernas en el asiento con control (${series}).` },
+                    { titulo: "Flexiones inclinadas en banco", desc: `Cuerpo alineado como una tabla apoyando las manos en el respaldo (${series}).` },
+                    { titulo: "Fondos de tríceps en banco", desc: `Manos apoyadas en el borde del asiento y flexión suave de codos (${series}).` },
+                    { titulo: "Desplazamientos laterales", desc: "4 bloques de 1 minuto activo + 30 seg de recuperación." }
                 ];
-                calma.push({ titulo: "🪑 Estiramiento en banco", secuencia: "🪑 ➔ 🦵 ➔ 😌", desc: "Apoya un talón sobre el asiento del banco e inclina suavemente el tronco." });
+                calma.push({ titulo: "Estiramiento en banco", desc: "Apoya un talón sobre el asiento del banco e inclina suavemente el tronco." });
             } else if (instalacion === 'Ruta') {
-                calentamiento.push({ titulo: "🌲 Caminata progresiva", secuencia: "🚶 ➔ 📈 ➔ 🟢", desc: "Primeros 5 minutos aumentando poco a poco la amplitud de zancada." });
+                calentamiento.push({ titulo: "Caminata progresiva", desc: "Primeros 5 minutos aumentando poco a poco la amplitud de zancada." });
                 principal = [
-                    { titulo: `🚶 Caminata constante (${objetivo})`, secuencia: "🚶 ➔ 📏 ➔ 🎯", desc: "Mantén postura erguida, mirada al frente y braceo natural constante." },
-                    { titulo: "🪑 Parada activa en banco o muro", secuencia: "🪑 ➔ 🧎‍♂️ ➔ 🔄", desc: "10 repeticiones de sentarse y levantarse con control de postura." },
-                    { titulo: "🌳 Empuje contra árbol o señal", secuencia: "🪵 ➔ 🫸 ➔ 💪", desc: "12 flexiones inclinadas de brazos apoyando firmemente las palmas." },
-                    { titulo: "⚡ Cambios de ritmo (Fartlek)", secuencia: "🚶 ➔ 🏃 ➔ ⏱️", desc: "Alterna 2 minutos a paso muy vivo con 1 minuto a paso normal." }
+                    { titulo: `Caminata constante (${objetivo})`, desc: "Mantén postura erguida, mirada al frente y braceo natural constante." },
+                    { titulo: "Parada activa en banco o muro", desc: "10 repeticiones de sentarse y levantarse con control de postura." },
+                    { titulo: "Empuje contra árbol o señal", desc: "12 flexiones inclinadas de brazos apoyando firmemente las palmas." },
+                    { titulo: "Cambios de ritmo (Fartlek)", desc: "Alterna 2 minutos a paso muy vivo con 1 minuto a paso normal." }
                 ];
-                calma.push({ titulo: "🌳 Estiramiento de gemelos", secuencia: "🪵 ➔ 🦿 ➔ 😌", desc: "Adelanta una pierna contra el árbol y mantén el talón trasero pegado al suelo." });
+                calma.push({ titulo: "Estiramiento de gemelos", desc: "Adelanta una pierna contra el árbol y mantén el talón trasero pegado al suelo." });
             }
 
             return {
@@ -710,11 +724,11 @@
                         <p style="margin: 0 0 6px 0;"><strong>Material:</strong> ${s.material} | <strong>Objetivo:</strong> ${s.objetivo}</p>
                         ${s.calentamiento ? `
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🔥 Calentamiento:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderTarjetaEjercicio(i.titulo, i.secuencia, i.desc)).join('')}</div>
+                            <div style="margin-bottom: 6px;">${s.calentamiento.map(i => renderTarjetaVisual(i.titulo, i.desc)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>💪 Parte Principal:</strong></p>
-                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderTarjetaEjercicio(i.titulo, i.secuencia, i.desc)).join('')}</div>
+                            <div style="margin-bottom: 6px;">${s.principal.map(i => renderTarjetaVisual(i.titulo, i.desc)).join('')}</div>
                             <p style="margin: 6px 0 2px 0; color: var(--melide-primary);"><strong>🧘 Vuelta a la Calma:</strong></p>
-                            <div>${s.calma.map(i => renderTarjetaEjercicio(i.titulo, i.secuencia, i.desc)).join('')}</div>
+                            <div>${s.calma.map(i => renderTarjetaVisual(i.titulo, i.desc)).join('')}</div>
                         ` : ''}
                     </div>
                 </details>
