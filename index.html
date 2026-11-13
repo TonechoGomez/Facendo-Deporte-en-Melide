@@ -34,15 +34,27 @@
         header { 
             background: var(--navy-darkest); 
             color: white; 
-            padding: 0 20px; 
+            padding: 0 24px; 
             display: none; 
             align-items: center; 
             justify-content: space-between;
-            height: 75px; 
+            min-height: 75px; 
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4); 
             border-bottom: 2px solid var(--gold-accent);
             z-index: 100; 
             flex-shrink: 0;
+        }
+
+        /* Contenedor flexible del header para centrar en PC y ajustar en móvil */
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+        @media (min-width: 768px) {
+            header { justify-content: space-around; padding: 0 40px; }
+            .header-brand { justify-content: center; max-width: 600px; margin: 0 auto; }
         }
 
         .screen { 
@@ -140,7 +152,7 @@
         .btn-registro { background: #991b1b; }
         .btn-registro:hover { background: #7f1d1d; }
 
-        .header-btn { background: none; border: none; color: white; font-size: 1.6rem; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background 0.2s; }
+        .header-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: background 0.2s; }
         .header-btn:hover { background: rgba(255,255,255,0.12); }
 
         .error-msg {
@@ -288,20 +300,46 @@
             display: none;
             background: #f8fafc;
         }
+
+        /* Estilos para las barras de gráficas estadísticas */
+        .stat-bar-container {
+            margin-bottom: 12px;
+        }
+        .stat-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--navy-primary);
+            margin-bottom: 4px;
+        }
+        .stat-bar-track {
+            background: #e2e8f0;
+            border-radius: 6px;
+            height: 12px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .stat-bar-fill {
+            background: var(--gold-accent);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.6s ease;
+        }
     </style>
 </head>
 <body>
 
     <header id="main-header">
-        <button class="header-btn" id="btn-atras" onclick="irA('scr-inicio')" style="display: none;">&#8592;</button>
-        <div style="display: flex; align-items: center; gap: 16px;">
+        <button class="header-btn" id="btn-atras" onclick="irA('scr-inicio')" style="display: none; visibility: hidden;">&#8592;</button>
+        <div class="header-brand">
             <img src="concello-de-melide.jpeg" alt="Logo Melide" style="height: 52px; width: auto; border-radius: 8px; object-fit: contain; background: rgba(255,255,255,0.05); padding: 2px;">
             <div style="display: flex; flex-direction: column; justify-content: center;">
-                <span style="font-weight: 800; letter-spacing: 0.5px; font-size: 1.05rem; line-height: 1.2;">FACENDO DEPORTE EN MELIDE</span>
+                <span style="font-weight: 800; letter-spacing: 0.5px; font-size: 1.05rem; line-height: 1.2; color: #ffffff;">FACENDO DEPORTE EN MELIDE</span>
                 <span style="font-size: 0.78rem; color: #cbd5e1; font-weight: 600; letter-spacing: 0.3px;">Servizo de Deportes</span>
             </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 4px;">
             <button class="header-btn" onclick="toggleFullScreen()" title="Pantalla completa">&#x26F6;</button>
             <button class="header-btn" onclick="cerrarSesion()" title="Cerrar Sesión">&#127968;</button>
         </div>
@@ -526,10 +564,10 @@
                 </div>
             </div>
 
-            <!-- CAJÓN 3: ESTADÍSTICAS Y USOS -->
+            <!-- CAJÓN 3: ESTADÍSTICAS, GRÁFICAS Y USOS -->
             <div class="admin-drawer">
                 <div class="admin-drawer-header" onclick="toggleAdminDrawer('drawer-stats')">
-                    <span>📊 3. Estadísticas, Usos y Temporalización</span>
+                    <span>📊 3. Estadísticas, Gráficas y Temporalización</span>
                     <span id="icon-drawer-stats">▼</span>
                 </div>
                 <div id="drawer-stats" class="admin-drawer-body">
@@ -674,7 +712,12 @@
                 header.style.display = 'none';
             } else {
                 header.style.display = 'flex';
-                btnAtras.style.display = (idPantalla === 'scr-registro') ? 'block' : 'none';
+                if (idPantalla === 'scr-registro') {
+                    btnAtras.style.display = 'block';
+                    btnAtras.style.visibility = 'visible';
+                } else {
+                    btnAtras.style.display = 'none';
+                }
             }
         }
 
@@ -1010,7 +1053,7 @@
                 `).join('');
             }
 
-            // 3. CAJÓN DE ESTADÍSTICAS Y TEMPORALIZACIÓN
+            // 3. CAJÓN DE ESTADÍSTICAS, GRÁFICAS Y TEMPORALIZACIÓN
             const contenedorStats = document.getElementById('admin-estadisticas-contenido');
             const totalUsuarios = usuarios.length;
             const totalSesiones = cacheTodasLasSesionesAdmin.length;
@@ -1025,6 +1068,12 @@
             const sesionesHoy = cacheTodasLasSesionesAdmin.filter(s => (ahora - (s.timestamp || 0)) < unDia).length;
             const sesionesSemana = cacheTodasLasSesionesAdmin.filter(s => (ahora - (s.timestamp || 0)) < unaSemana).length;
             const sesionesMes = cacheTodasLasSesionesAdmin.filter(s => (ahora - (s.timestamp || 0)) < unMes).length;
+
+            // Porcentajes para las gráficas visuales de barras
+            const maxRef = Math.max(totalSesiones, 1);
+            const pctHoy = Math.min(Math.round((sesionesHoy / maxRef) * 100), 100);
+            const pctSemana = Math.min(Math.round((sesionesSemana / maxRef) * 100), 100);
+            const pctMes = Math.min(Math.round((sesionesMes / maxRef) * 100), 100);
 
             contenedorStats.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px;">
@@ -1042,14 +1091,28 @@
                     </div>
                 </div>
 
-                <div style="background: white; padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-                    <h5 style="margin: 0 0 10px 0; color: var(--navy-primary);">📈 Análisis de Usos por Temporalidad</h5>
-                    <ul style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: var(--text-dark); line-height: 1.6;">
-                        <li><strong>Últimas 24 horas:</strong> ${sesionesHoy} sesiones generadas.</li>
-                        <li><strong>Últimos 7 días (Semana):</strong> ${sesionesSemana} sesiones generadas.</li>
-                        <li><strong>Últimos 30 días (Mes):</strong> ${sesionesMes} sesiones generadas.</li>
-                        <li><strong>Histórico completo (Años):</strong> ${totalSesiones} sesiones registradas en total.</li>
-                    </ul>
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📈 Gráficas de Actividad y Usos Temporales</h5>
+                    
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Últimas 24 horas (Día)</span><span>${sesionesHoy} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctHoy}%;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Últimos 7 días (Semana)</span><span>${sesionesSemana} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctSemana}%;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container">
+                        <div class="stat-bar-label"><span>Últimos 30 días (Mes)</span><span>${sesionesMes} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: ${pctMes}%;"></div></div>
+                    </div>
+
+                    <div class="stat-bar-container" style="margin-bottom: 0;">
+                        <div class="stat-bar-label"><span>Histórico completo (Años)</span><span>${totalSesiones} sesiones</span></div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" style="width: 100%; background: var(--navy-primary);"></div></div>
+                    </div>
                 </div>
             `;
         }
