@@ -409,7 +409,7 @@ function toggleAdminDrawer(drawerId) {
 function cargarPanelAdministracion() {
     const usuarios = obtenerUsuarios();
     
-    // 1. CAJÓN DE USUARIOS (Ordenados alfabéticamente)
+    // 1. CAJÓN DE USUARIOS (Ordenados alfabéticamente con botón de borrado)
     usuarios.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
     const contenedorUsuarios = document.getElementById('admin-lista-usuarios-completa');
     
@@ -424,9 +424,10 @@ function cargarPanelAdministracion() {
                         <strong style="color: var(--navy-primary); font-size: 0.95rem;">${u.nombre} ${u.apellidos}</strong> (${u.mote || 'Sin alias'})<br>
                         <span style="font-size: 0.78rem; color: var(--text-muted);">DNI: ${u.dni} | Edad: ${u.edad} años | Tel: ${u.telefono}</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">${sesionesCount} sesiones</span>
                         ${sesionesCount > 0 ? `<button class="btn-small btn-open-session" onclick="verSesionesDeUsuario('${u.dni}')">Ver sesiones</button>` : ''}
+                        <button class="btn-small btn-delete-session" onclick="eliminarUsuarioAdmin('${u.dni}')">🗑️ Borrar</button>
                     </div>
                 </div>
             `;
@@ -492,7 +493,6 @@ function cargarPanelAdministracion() {
     const pctSemana = Math.min(Math.round((sesionesSemana / maxRef) * 100), 100);
     const pctMes = Math.min(Math.round((sesionesMes / maxRef) * 100), 100);
 
-    // Cálculos para Gráfica por Instalación
     let instGimnasio = 0, instExterior = 0, instRuta = 0, instCasa = 0;
     cacheTodasLasSesionesAdmin.forEach(s => {
         if (s.instalacion === 'Gimnasio municipal') instGimnasio++;
@@ -506,7 +506,6 @@ function cargarPanelAdministracion() {
     const pctRuta = Math.round((instRuta / maxInst) * 100);
     const pctCasa = Math.round((instCasa / maxInst) * 100);
 
-    // Cálculos para Gráfica por Edad de Usuarios
     let edadJoven = 0, edadAdulto = 0, edadSenior = 0, edadMayor = 0;
     usuarios.forEach(u => {
         const e = u.edad || 0;
@@ -537,7 +536,6 @@ function cargarPanelAdministracion() {
             </div>
         </div>
 
-        <!-- GRÁFICA TEMPORAL -->
         <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
             <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📈 Gráficas de Usos Temporales</h5>
             
@@ -562,7 +560,6 @@ function cargarPanelAdministracion() {
             </div>
         </div>
 
-        <!-- GRÁFICA POR INSTALACIÓN -->
         <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 16px;">
             <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">📍 Uso por Tipo de Instalación</h5>
             
@@ -587,7 +584,6 @@ function cargarPanelAdministracion() {
             </div>
         </div>
 
-        <!-- GRÁFICA POR EDAD DE USUARIOS -->
         <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle);">
             <h5 style="margin: 0 0 14px 0; color: var(--navy-primary);">👥 Distribución de Usuarios por Edad</h5>
             
@@ -612,6 +608,19 @@ function cargarPanelAdministracion() {
             </div>
         </div>
     `;
+}
+
+function eliminarUsuarioAdmin(dni) {
+    if (!confirm(`¿Estás seguro de que deseas eliminar al usuario con DNI ${dni}? Se borrará su ficha y todas sus sesiones guardadas.`)) {
+        return;
+    }
+
+    let usuarios = obtenerUsuarios();
+    usuarios = usuarios.filter(u => u.dni !== dni);
+    guardarUsuarios(usuarios);
+
+    // Recargar el panel de administración para ver los cambios reflejados al instante
+    cargarPanelAdministracion();
 }
 
 function verSesionesDeUsuario(dni) {
